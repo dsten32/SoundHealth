@@ -8,6 +8,7 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.lifecycle.LiveData;
 
 import android.view.View;
 import android.widget.Button;
@@ -20,7 +21,10 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
@@ -34,6 +38,8 @@ public class MainActivity extends AppCompatActivity{
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        dataRepository = new DataRepository(getApplication().getApplicationContext());
+
         setContentView(R.layout.activity_main);
         location = (TextView) findViewById(R.id.location);
         location.setText("new text I put here 'cos I could");
@@ -45,6 +51,15 @@ public class MainActivity extends AppCompatActivity{
         goToMap = (Button) findViewById(R.id.goToMap);
 
         getDataPoint();
+
+        showData();
+    }
+
+    //test method to grab a datapoint out of the database and display it
+    private void showData(){
+        LiveData<List<Data>> datapoints = dataRepository.getAllData();
+
+//        Toast.makeText(this,datapoints.getValue().toString(),Toast.LENGTH_LONG).show();
     }
 
     //data collection method
@@ -76,11 +91,10 @@ public class MainActivity extends AppCompatActivity{
                             Double dB = 45.6;
 
                             Data dataPoint = new Data(date,time,userId,lati,longi,dB);
-                            dataRepository = new DataRepository(getApplication().getApplicationContext());
                             dataRepository.insert(dataPoint);
 
 //                            textPlace.setText(String.valueOf(location.getLatitude()));
-                            Toast.makeText(getApplication().getApplicationContext(), "Datapoint saved: "+dataPoint.toString(), Toast.LENGTH_LONG).show();
+//                            Toast.makeText(getApplication().getApplicationContext(), "Datapoint saved: "+dataPoint.toString(), Toast.LENGTH_LONG).show();
                             LatLng current = new LatLng(location.getLatitude(), location.getLongitude());
                         }
                     }

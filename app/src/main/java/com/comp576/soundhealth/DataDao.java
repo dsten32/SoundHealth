@@ -19,4 +19,5 @@ public interface DataDao {
     void delete(Data data);
     @Query("SELECT * from Data ORDER BY id")
     LiveData<List<Data>> getAllData();
+
 }
