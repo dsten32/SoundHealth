@@ -2,7 +2,7 @@ package com.comp576.soundhealth;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -62,8 +62,8 @@ public class ChartActivity extends AppCompatActivity{
 
         @Override
         public void onValueDeselected() {
-//                pieChartData.setHasCenterCircle(true).setCenterText1("Your Sound Profile").setCenterText1FontSize(20).setCenterText1Color(Color.parseColor("#0097A7"));
-//                pieChartView.setPieChartData(pieChartData);
+                pieChartData.setHasCenterCircle(true).setCenterText1("Your Sound Profile").setCenterText1FontSize(20).setCenterText1Color(Color.parseColor("#0097A7"));
+                pieChartView.setPieChartData(pieChartData);
 
             }
     }
