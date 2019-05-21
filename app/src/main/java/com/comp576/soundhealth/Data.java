@@ -3,6 +3,7 @@ package com.comp576.soundhealth;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
@@ -11,11 +12,13 @@ public class Data implements Parcelable {
     @PrimaryKey(autoGenerate = true)
     public long id;
     public String date,time,userId;
-    public Long lati,longi,dB;
+    public Double lati;
+    public Double longi;
+    public Double dB;
 
 
-    public Data(long id, String date, String time, String userId, Long lati, Long longi, Long dB) {
-        this.id = id;
+    public Data(String date, String time, String userId, Double lati, Double longi, Double dB) {
+//        this.id = id;
         this.date = date;
         this.time = time;
         this.userId = userId;
@@ -41,17 +44,17 @@ public class Data implements Parcelable {
         if (in.readByte() == 0) {
             lati = null;
         } else {
-            lati = in.readLong();
+            lati = in.readDouble();
         }
         if (in.readByte() == 0) {
             longi = null;
         } else {
-            longi = in.readLong();
+            longi = in.readDouble();
         }
         if (in.readByte() == 0) {
             dB = null;
         } else {
-            dB = in.readLong();
+            dB = in.readDouble();
         }
     }
 
@@ -67,19 +70,19 @@ public class Data implements Parcelable {
             dest.writeByte((byte) 0);
         } else {
             dest.writeByte((byte) 1);
-            dest.writeLong(lati);
+            dest.writeDouble(lati);
         }
         if (longi == null) {
             dest.writeByte((byte) 0);
         } else {
             dest.writeByte((byte) 1);
-            dest.writeLong(longi);
+            dest.writeDouble(longi);
         }
         if (dB == null) {
             dest.writeByte((byte) 0);
         } else {
             dest.writeByte((byte) 1);
-            dest.writeLong(dB);
+            dest.writeDouble(dB);
         }
     }
 
@@ -99,4 +102,20 @@ public class Data implements Parcelable {
             return new Data[size];
         }
     };
+
+    @NonNull
+    @Override
+    public String toString() {
+
+        return this.id
+                + "; "
+                + this.date
+                + "; "
+                + this.time
+                + "; "
+                + String.valueOf(this.lati)
+                +"; "
+                + String.valueOf(this.longi)
+                + String.valueOf(this.dB);
+    }
 }
