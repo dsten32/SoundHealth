@@ -30,6 +30,7 @@ public class MainActivity extends AppCompatActivity{
         goToMap = (Button) findViewById(R.id.goToMap);
 
 
+
     }
 
     public void goToChart(View view){
