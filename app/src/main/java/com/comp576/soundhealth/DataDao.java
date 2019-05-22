@@ -17,7 +17,7 @@ public interface DataDao {
     void update(Data data);
     @Delete
     void delete(Data data);
-    @Query("SELECT * from Data ORDER BY id")
+    @Query("SELECT * from data")//ORDER BY id")
     LiveData<List<Data>> getAllData();
 
 }

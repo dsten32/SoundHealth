@@ -59,6 +59,13 @@ public class MainActivity extends AppCompatActivity{
     private void showData(){
         LiveData<List<Data>> datapoints = dataRepository.getAllData();
 
+        if (datapoints != null){
+//                    Toast.makeText(this,datapoints,Toast.LENGTH_LONG).show();
+
+        } else {
+                    Toast.makeText(this,"crap",Toast.LENGTH_LONG).show();
+
+        }
 //        Toast.makeText(this,datapoints.getValue().toString(),Toast.LENGTH_LONG).show();
     }
 

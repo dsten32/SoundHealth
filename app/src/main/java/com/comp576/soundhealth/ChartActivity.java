@@ -54,8 +54,10 @@ public class ChartActivity extends AppCompatActivity{
 
         @Override
         public void onValueSelected(int arcIndex, SliceValue value) {
-                pieChartData.setHasCenterCircle(true).setCenterText1("Your exposure to "+String.valueOf(value.getLabelAsChars())+" was \n" + value.getValue()).setCenterText1FontSize(10).setCenterText1Color(Color.parseColor("#0097A7"));
-                pieChartView.setPieChartData(pieChartData);
+                pieChartData.setHasCenterCircle(true).setCenterText1("Your exposure to "+String.valueOf(value.getLabelAsChars())+" was").setCenterText1FontSize(15).setCenterText1Color(Color.parseColor("#0097A7"));
+            pieChartData.setHasCenterCircle(true).setCenterText2(String.valueOf(value.getValue())).setCenterText2FontSize(10).setCenterText2Color(Color.parseColor("#0097A7"));
+
+            pieChartView.setPieChartData(pieChartData);
             Toast.makeText(getApplication().getApplicationContext(),"value selected: "+value,Toast.LENGTH_LONG).show();
 
             }
