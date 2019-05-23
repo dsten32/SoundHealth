@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity{
                             dataRepository.insert(dataPoint);
 
 //                            textPlace.setText(String.valueOf(location.getLatitude()));
-//                            Toast.makeText(getApplication().getApplicationContext(), "Datapoint saved: "+dataPoint.toString(), Toast.LENGTH_LONG).show();
+                            Toast.makeText(getApplication().getApplicationContext(), "Datapoint saved: "+dataPoint.toString(), Toast.LENGTH_LONG).show();
                             LatLng current = new LatLng(location.getLatitude(), location.getLongitude());
                         }
                     }
