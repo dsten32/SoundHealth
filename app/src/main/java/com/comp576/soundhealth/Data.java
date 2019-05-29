@@ -103,7 +103,6 @@ public class Data implements Parcelable {
         }
     };
 
-    @NonNull
     @Override
     public String toString() {
 

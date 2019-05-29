@@ -43,4 +43,12 @@
         android:layout_alignParentLeft="true"
         android:onClick="goToChart"
         android:text="Go To Chart" />
+    <Button
+        android:id="@+id/showData"
+        android:onClick="showData"
+        android:text="showdata"
+        android:layout_alignParentRight="true"
+        android:layout_above="@id/goToMap"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 </RelativeLayout>

@@ -2,13 +2,17 @@ package com.comp576.soundhealth;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import androidx.lifecycle.LiveData;
 
 public class DataRepository {
     private DataDao dataDao;
+    private List<Data> dataList;
     private LiveData<List<Data>> allData;
     DataRepository(Context context) {
         DataRoomDatabase db = DataRoomDatabase.getDatabase(context);
@@ -49,6 +53,22 @@ public class DataRepository {
                 dataDao.delete(data);
             }
             return null;
+        }
+    }
+
+    public List<Data> getDataList(){
+//        List<Data> testList = new ArrayList<>();
+//        testList.add(new Data("d","t","u",1.0,2.0,3.0));
+//
+//        return testList;
+//        return dataDao.getDataList();
+        return new DataListAsyncTask().doInBackground();
+    }
+    private class DataListAsyncTask extends AsyncTask<Void,Void,List<Data>>{
+
+        @Override
+        protected List<Data> doInBackground(Void... voids) {
+            return dataDao.getDataList();
         }
     }
 
