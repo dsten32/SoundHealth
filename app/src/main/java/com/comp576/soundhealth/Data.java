@@ -107,14 +107,15 @@ public class Data implements Parcelable {
     public String toString() {
 
         return this.id
-                + "; "
+                + "; \n"
                 + this.date
-                + "; "
+                + "; \n"
                 + this.time
-                + "; "
+                + "; \n"
                 + String.valueOf(this.lati)
-                +"; "
+                + "; \n"
                 + String.valueOf(this.longi)
-                + String.valueOf(this.dB);
+                + "; \n"
+                + String.valueOf(Math.round(this.dB*100.0)/100.0);
     }
 }

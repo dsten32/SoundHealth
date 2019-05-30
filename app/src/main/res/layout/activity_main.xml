@@ -44,9 +44,9 @@
         android:onClick="goToChart"
         android:text="Go To Chart" />
     <Button
-        android:id="@+id/showData"
-        android:onClick="showData"
-        android:text="showdata"
+        android:id="@+id/getData"
+        android:onClick="getDataPoint"
+        android:text="Get Data Point"
         android:layout_alignParentRight="true"
         android:layout_above="@id/goToMap"
         android:layout_width="wrap_content"

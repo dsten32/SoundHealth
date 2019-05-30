@@ -56,30 +56,13 @@ public class MainActivity extends AppCompatActivity{
         dateTime.setText(date);
         goToMap = (Button) findViewById(R.id.goToMap);
 
-        getDataPoint();
-
-
-
-
-
+//        getDataPoint();
     }
 
-    //test method to grab a datapoint out of the database and display it
-    public void showData(View view){
-        List<Data> datapoints = dataRepository.getDataList();
 
-        if (datapoints != null){
-                    Toast.makeText(this,datapoints.get(0).toString(),Toast.LENGTH_LONG).show();
-
-        } else {
-                    Toast.makeText(this,"crap",Toast.LENGTH_LONG).show();
-
-        }
-//        Toast.makeText(this,datapoints.getValue().toString(),Toast.LENGTH_LONG).show();
-    }
 
     //data collection method
-    private void getDataPoint(){
+    public void getDataPoint(View view){
         //see if we can generate some data shall we?
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
@@ -104,7 +87,7 @@ public class MainActivity extends AppCompatActivity{
                             String userId = "some text I haven't decided yet";
                             Double lati = location.getLatitude();
                             Double longi = location.getLongitude();
-                            Double dB = 45.6;
+                            Double dB = (Math.random()*70)+30;
 
                             dataRepository.insert(new Data(date,time,userId,lati,longi,dB));
 
