@@ -180,6 +180,8 @@ public class MainActivity extends AppCompatActivity{
     }
 
     public void callGetDatapoint(View view){
-        getDataPoint();
+//        getDataPoint();
+        DataCollection dataCollectior = new DataCollection(getApplicationContext());
+        dataCollectior.getDataPoint();
     }
 }

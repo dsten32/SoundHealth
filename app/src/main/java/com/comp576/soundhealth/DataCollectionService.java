@@ -16,7 +16,7 @@ public class DataCollectionService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         // Do the task here
         Log.i("DataCollectionService", "Service running");
-        MainActivity main = new MainActivity();
-        main.getDataPoint();
+        DataCollection dataCollectior = new DataCollection(getApplicationContext());
+        dataCollectior.getDataPoint();
     }
 }
