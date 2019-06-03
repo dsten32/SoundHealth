@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "516223389380",
+    "firebase_url": "https://soundhealth-1558336606616.firebaseio.com",
+    "project_id": "soundhealth-1558336606616",
+    "storage_bucket": "soundhealth-1558336606616.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:516223389380:android:37f8482cc5ed1b8e",
+        "android_client_info": {
+          "package_name": "com.comp576.soundhealth"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "516223389380-qgnp28sftfm3m6lr9anfocjh16qfsd6r.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyALaJVU-89mPApsIYOQW6AA_deJxRBIGB4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "516223389380-qgnp28sftfm3m6lr9anfocjh16qfsd6r.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

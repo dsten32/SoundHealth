@@ -12,7 +12,7 @@ import androidx.room.Update;
 @Dao
 public interface DataDao {
     @Insert
-    Long insert(Data data);
+    long insert(Data data);
     @Update
     void update(Data data);
     @Delete

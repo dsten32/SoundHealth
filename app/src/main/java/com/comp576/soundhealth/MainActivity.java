@@ -48,6 +48,8 @@ public class MainActivity extends AppCompatActivity{
     private ArrayAdapter<Data> adapter;
     private ArrayList<Data> data = new ArrayList<>();
     private ListView dataListView;
+    private static int MINUTE=60;
+    private int interval = 1;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -73,7 +75,6 @@ public class MainActivity extends AppCompatActivity{
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void checkPermissions(){
         if (checkSelfPermission(RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
             ActivityCompat.requestPermissions(this,new String[]{RECORD_AUDIO},0);
             //    Activity#requestPermissions
             // here to request the missing permissions, and then overriding
@@ -86,51 +87,45 @@ public class MainActivity extends AppCompatActivity{
         if (checkSelfPermission(ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             ActivityCompat.requestPermissions(this,new String[]{ACCESS_FINE_LOCATION},0);
-            //    Activity#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for Activity#requestPermissions for more details.
             return;
         }
     }
 
 
-
+//todo remove method.
     //data collection method move to own class?
-    @SuppressLint("MissingPermission") //add an exception try/catch to the getLastLocation?
-    public void getDataPoint(){
-        //see if we can generate some data shall we?
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-
-        fusedLocationProviderClient.getLastLocation()
-                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                    @Override
-                    public void onSuccess(Location location) {
-                        if (location != null) {
-                            String date =new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault()).format(new Date());
-                            String time =new SimpleDateFormat("hh:mm a", Locale.getDefault()).format(new Date());
-                            String userId = "some text I haven't decided yet";
-                            Double lati = location.getLatitude();
-                            Double longi = location.getLongitude();
-                            Double dB=null;
-                            try {
-                                dB = new Recorder().getNoiseLevel();
-                            } catch (NoValidNoiseLevelException e) {
-                                e.printStackTrace();
-                            }
-//                            Double dB = (Math.random()*70)+30;
-
-                            dataRepository.insert(new Data(date,time,userId,lati,longi,dB));
-
-//                            textPlace.setText(String.valueOf(location.getLatitude()));
-                            Toast.makeText(getApplication().getApplicationContext(), "Datapoint saved: "+String.valueOf(dB), Toast.LENGTH_LONG).show();
-                            LatLng current = new LatLng(location.getLatitude(), location.getLongitude());
-                        }
-                    }
-                });
-    }
+//    @SuppressLint("MissingPermission") //add an exception try/catch to the getLastLocation?
+//    public void getDataPoint(){
+//        //see if we can generate some data shall we?
+//        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+//
+//        fusedLocationProviderClient.getLastLocation()
+//                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+//                    @Override
+//                    public void onSuccess(Location location) {
+//                        if (location != null) {
+//                            String date =new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault()).format(new Date());
+//                            String time =new SimpleDateFormat("hh:mm a", Locale.getDefault()).format(new Date());
+//                            String userId = "some text I haven't decided yet";
+//                            Double lati = location.getLatitude();
+//                            Double longi = location.getLongitude();
+//                            Double dB=null;
+//                            try {
+//                                dB = new Recorder().getNoiseLevel();
+//                            } catch (NoValidNoiseLevelException e) {
+//                                e.printStackTrace();
+//                            }
+////                            Double dB = (Math.random()*70)+30;
+//
+//                            dataRepository.insert(new Data(date,time,userId,lati,longi,dB));
+//
+////                            textPlace.setText(String.valueOf(location.getLatitude()));
+//                            Toast.makeText(getApplication().getApplicationContext(), "Datapoint saved: "+String.valueOf(dB), Toast.LENGTH_LONG).show();
+//                            LatLng current = new LatLng(location.getLatitude(), location.getLongitude());
+//                        }
+//                    }
+//                });
+//    }
 
     // Setup a recurring alarm every half hour
     //from https://github.com/codepath/android_guides/wiki/Starting-Background-Services#using-with-alarmmanager-for-periodic-tasks
@@ -146,7 +141,7 @@ public class MainActivity extends AppCompatActivity{
         // First parameter is the type: ELAPSED_REALTIME, ELAPSED_REALTIME_WAKEUP, RTC_WAKEUP
         // Interval can be INTERVAL_FIFTEEN_MINUTES, INTERVAL_HALF_HOUR, INTERVAL_HOUR, INTERVAL_DAY
         alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, firstMillis,
-                30*1000, pIntent);
+                interval*MINUTE*1000, pIntent);
     }
 
     //stop data collection service

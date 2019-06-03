@@ -7,11 +7,17 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import androidx.lifecycle.LiveData;
 
 public class DataRepository {
     private DataDao dataDao;
+    private ExecutorService executorService;
     private List<Data> dataList;
     private LiveData<List<Data>> allData;
     DataRepository(Context context) {
@@ -19,15 +25,33 @@ public class DataRepository {
         dataDao = db.dataDao();
         allData = dataDao.getAllData();
     }
-    public void insert(Data data) {
-        new InsertAsyncTask().execute(data);
+    public long insert(final Data data) {
+//        InsertAsyncTask insert = new InsertAsyncTask();
+//        insert.execute(data);
+//        return insert.id;
+        ExecutorService executorService = Executors.newFixedThreadPool(10);
+        Callable<Long> insertCallable = () -> dataDao.insert(data);
+        long rowId = 0;
+
+        Future<Long> future = executorService.submit(insertCallable);
+        try {
+            rowId = future.get();
+        } catch (InterruptedException e1) {
+            e1.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        return rowId;
     }
+
+    //replaced with executorservice above in insert method.
     private class InsertAsyncTask extends AsyncTask<Data, Void, Void> {
+        public long id=2000;
         @Override
         protected Void doInBackground(final Data... params) {
-            for (Data data : params) {
-                dataDao.insert(data);
-            }
+//            for (Data data : params) {
+                this.id=dataDao.insert(params[0]);
+//            }
             return null;
         }
     }
