@@ -179,4 +179,9 @@ public class MainActivity extends AppCompatActivity{
         DataCollection dataCollectior = new DataCollection(getApplicationContext());
         dataCollectior.getDataPoint();
     }
+
+    public void callSendDataCollection(View view){
+        DataCollection dataCollection = new DataCollection(getApplicationContext());
+        dataCollection.sendDataCollection();
+    }
 }

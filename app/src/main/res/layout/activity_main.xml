@@ -48,9 +48,20 @@
         android:onClick="callGetDatapoint"
         android:text="Get Single Data Point"
         android:layout_alignParentRight="true"
-        android:layout_above="@id/goToMap"
+        android:layout_above="@id/sendData"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/sendData"
+        android:onClick="callSendDataCollection"
+        android:text="Send Data Collection"
+        android:layout_alignParentRight="true"
+        android:layout_above="@id/goToMap"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:enabled="false"/>
+
     <Button
         android:id="@+id/goToMap"
         android:layout_width="wrap_content"

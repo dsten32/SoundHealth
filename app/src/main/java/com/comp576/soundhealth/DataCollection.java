@@ -10,14 +10,20 @@ import android.widget.Toast;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.WriteBatch;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.Executor;
@@ -31,10 +37,12 @@ public class DataCollection extends Activity {
     private FusedLocationProviderClient fusedLocationProviderClient;
     private DataRepository dataRepository;
     private Context context;
+    private FirebaseFirestore db;
 
     public DataCollection (Context context){
         this.context=context;
         dataRepository = new DataRepository(context);
+        db = FirebaseFirestore.getInstance();
     }
 
     //data collection method move to own class?
@@ -76,7 +84,7 @@ public class DataCollection extends Activity {
     }
 
     public void sendData(Data data){
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
+//        FirebaseFirestore db = FirebaseFirestore.getInstance();
 
 // Add a new document with a generated ID
         db.collection("data_collection")
@@ -93,6 +101,24 @@ public class DataCollection extends Activity {
                         Log.w(TAG, "Error adding document", e);
                     }
                 });
+
+    }
+
+    public void sendDataCollection(){
+        //create a batch of fake data and send to the firestore.
+        ArrayList<Data> dataList = (ArrayList<Data>) new GenerateData().getFakeData();
+        WriteBatch batch = db.batch();
+        for (Data data:dataList) {
+            DocumentReference newDoc = db.collection("data_collection").document();
+            batch.set(newDoc, data);
+        }
+
+        batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                // ...
+            }
+        });
 
     }
 
