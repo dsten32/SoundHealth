@@ -62,9 +62,26 @@ public class MainActivity extends AppCompatActivity{
         goToMap = (Button) findViewById(R.id.goToMap);
 
 //        getDataPoint();
+        checkPermissions();
+
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    private void checkPermissions(){
         if (checkSelfPermission(RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             ActivityCompat.requestPermissions(this,new String[]{RECORD_AUDIO},0);
+            //    Activity#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for Activity#requestPermissions for more details.
+//            return;
+        }
+        if (checkSelfPermission(ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            ActivityCompat.requestPermissions(this,new String[]{ACCESS_FINE_LOCATION},0);
             //    Activity#requestPermissions
             // here to request the missing permissions, and then overriding
             //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
@@ -78,22 +95,11 @@ public class MainActivity extends AppCompatActivity{
 
 
     //data collection method
-    @RequiresApi(api = Build.VERSION_CODES.M)
     public void getDataPoint(View view){
         //see if we can generate some data shall we?
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
-        if (checkSelfPermission(ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            ActivityCompat.requestPermissions(this,new String[]{ACCESS_FINE_LOCATION},0);
-            //    Activity#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for Activity#requestPermissions for more details.
-            return;
-        }
+
         fusedLocationProviderClient.getLastLocation()
                 .addOnSuccessListener(this, new OnSuccessListener<Location>() {
                     @Override

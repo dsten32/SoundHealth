@@ -35,7 +35,7 @@ public class ChartActivity extends AppCompatActivity{
 
         pieChartView = findViewById(R.id.chart);
 
-
+//get user's data for display. may want to create a dB class to only grab that info.
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
@@ -44,6 +44,7 @@ public class ChartActivity extends AppCompatActivity{
             }
         });
 
+        //quick and dirty fix. need to implement async class and use onPostExecute
         try {
             Thread.sleep(50);
         } catch (InterruptedException e) {
@@ -52,7 +53,7 @@ public class ChartActivity extends AppCompatActivity{
 
         dataTotal=data.size();
 
-//Initial dummy data, TODO generate real data from user DB.
+//Generating slice data, simple categorisation of dB levels and taking percents.
         for(Data dataPoint :data){
             double dB = dataPoint.dB;
             float addPercent = 100/dataTotal;
@@ -114,10 +115,10 @@ public class ChartActivity extends AppCompatActivity{
 
     public void onEnterAnimationComplete(){
         if(data.isEmpty()){
-            Toast.makeText(this,dataQueried.toString(),Toast.LENGTH_LONG).show();
+            Toast.makeText(this,dataQueried.toString(),Toast.LENGTH_SHORT).show();
 
         } else {
-            Toast.makeText(this, data.get(data.size()-1).toString(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "#datapoints collected: "+ data.size(), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -138,7 +139,7 @@ public class ChartActivity extends AppCompatActivity{
             pieChartData.setHasCenterCircle(true).setCenterText2(String.valueOf(Math.round(value.getValue()))+"%").setCenterText2FontSize(10).setCenterText2Color(Color.parseColor("#0097A7"));
 
             pieChartView.setPieChartData(pieChartData);
-            Toast.makeText(getApplication().getApplicationContext(),"db Range: "+String.valueOf(value.getLabelAsChars()),Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplication().getApplicationContext(),"db Range: "+String.valueOf(value.getLabelAsChars()),Toast.LENGTH_SHORT).show();
 
             }
 
