@@ -133,6 +133,7 @@ public class MainActivity extends AppCompatActivity{
     }
 
     // Setup a recurring alarm every half hour
+    //from https://github.com/codepath/android_guides/wiki/Starting-Background-Services#using-with-alarmmanager-for-periodic-tasks
     public void scheduleDataCollection() {
         // Construct an intent that will execute the AlarmReceiver
         Intent intent = new Intent(getApplicationContext(), AlarmReceiver.class);
@@ -148,6 +149,7 @@ public class MainActivity extends AppCompatActivity{
                 30*1000, pIntent);
     }
 
+    //stop data collection service
     public void cancelDataCollection() {
         Intent intent = new Intent(getApplicationContext(), AlarmReceiver.class);
         final PendingIntent pIntent = PendingIntent.getBroadcast(this, AlarmReceiver.REQUEST_CODE,

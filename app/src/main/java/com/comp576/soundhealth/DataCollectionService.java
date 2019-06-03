@@ -3,8 +3,8 @@ package com.comp576.soundhealth;
 import android.app.IntentService;
 import android.content.Intent;
 import android.util.Log;
-import android.view.View;
 
+//from https://github.com/codepath/android_guides/wiki/Starting-Background-Services#using-with-alarmmanager-for-periodic-tasks
 public class DataCollectionService extends IntentService {
 
 
