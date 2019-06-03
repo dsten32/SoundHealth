@@ -4,8 +4,10 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.LiveData;
@@ -31,6 +33,8 @@ import java.util.List;
 import java.util.Locale;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
+import static android.Manifest.permission.RECORD_AUDIO;
+import static androidx.core.content.ContextCompat.checkSelfPermission;
 
 public class MainActivity extends AppCompatActivity{
     private TextView location,dateTime;
@@ -41,6 +45,7 @@ public class MainActivity extends AppCompatActivity{
     private ArrayList<Data> data = new ArrayList<>();
     private ListView dataListView;
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,11 +62,23 @@ public class MainActivity extends AppCompatActivity{
         goToMap = (Button) findViewById(R.id.goToMap);
 
 //        getDataPoint();
+        if (checkSelfPermission(RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            ActivityCompat.requestPermissions(this,new String[]{RECORD_AUDIO},0);
+            //    Activity#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for Activity#requestPermissions for more details.
+            return;
+        }
     }
 
 
 
     //data collection method
+    @RequiresApi(api = Build.VERSION_CODES.M)
     public void getDataPoint(View view){
         //see if we can generate some data shall we?
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
@@ -87,12 +104,18 @@ public class MainActivity extends AppCompatActivity{
                             String userId = "some text I haven't decided yet";
                             Double lati = location.getLatitude();
                             Double longi = location.getLongitude();
-                            Double dB = (Math.random()*70)+30;
+                            Double dB=null;
+                            try {
+                                dB = new Recorder().getNoiseLevel();
+                            } catch (NoValidNoiseLevelException e) {
+                                e.printStackTrace();
+                            }
+//                            Double dB = (Math.random()*70)+30;
 
                             dataRepository.insert(new Data(date,time,userId,lati,longi,dB));
 
 //                            textPlace.setText(String.valueOf(location.getLatitude()));
-//                            Toast.makeText(getApplication().getApplicationContext(), "Datapoint saved: "+dataPoint.toString(), Toast.LENGTH_LONG).show();
+                            Toast.makeText(getApplication().getApplicationContext(), "Datapoint saved: "+String.valueOf(dB), Toast.LENGTH_LONG).show();
                             LatLng current = new LatLng(location.getLatitude(), location.getLongitude());
                         }
                     }

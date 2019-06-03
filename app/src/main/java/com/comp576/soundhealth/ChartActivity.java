@@ -34,7 +34,7 @@ public class ChartActivity extends AppCompatActivity{
         dataRepository = new DataRepository(this);
 
         pieChartView = findViewById(R.id.chart);
-        dataTotal=0;
+
 
         AsyncTask.execute(new Runnable() {
             @Override
@@ -50,37 +50,38 @@ public class ChartActivity extends AppCompatActivity{
             e.printStackTrace();
         }
 
+        dataTotal=data.size();
 
 //Initial dummy data, TODO generate real data from user DB.
         for(Data dataPoint :data){
-            dataTotal++;
             double dB = dataPoint.dB;
+            float addPercent = 100/dataTotal;
             if(dB >90){
-                nintiesPlus++;
+                nintiesPlus+=addPercent;
             } else if (dB >80){
-                eighties++;
+                eighties+=addPercent;
             } else if (dB >70){
-                seventies++;
+                seventies+=addPercent;
             }else if(dB >60){
                 sixties++;
             } else if(dB >50){
-                fifties++;
+                fifties+=addPercent;
             }else if(dB >40){
-                fourties++;
+                fourties+=addPercent;
             }else if(dB >30){
-                thirties++;
+                thirties+=addPercent;
             }
 
         }
 
         List pieData = new ArrayList<>();
-        pieData.add(new SliceValue(0, Color.GREEN).setLabel("30-39 dB").setTarget(thirties/dataTotal*100));
-        pieData.add(new SliceValue(0, Color.BLUE).setLabel("40-49 dB").setTarget(fourties/dataTotal*100));
-        pieData.add(new SliceValue(0, Color.CYAN).setLabel("50-59 dB").setTarget(fifties/dataTotal*100));
-        pieData.add(new SliceValue(0, Color.GRAY).setLabel("60-69 dB").setTarget(sixties/dataTotal*100));
-        pieData.add(new SliceValue(0, Color.YELLOW).setLabel("70-79 dB").setTarget(seventies/dataTotal*100));
-        pieData.add(new SliceValue(0, Color.MAGENTA).setLabel("80-89 dB").setTarget(eighties/dataTotal*100));
-        pieData.add(new SliceValue(0, Color.RED).setLabel(">90 dB").setTarget(nintiesPlus/dataTotal*100));
+        pieData.add(new SliceValue(0, Color.GREEN).setLabel("30-39 dB").setTarget(thirties));
+        pieData.add(new SliceValue(0, Color.BLUE).setLabel("40-49 dB").setTarget(fourties));
+        pieData.add(new SliceValue(0, Color.CYAN).setLabel("50-59 dB").setTarget(fifties));
+        pieData.add(new SliceValue(0, Color.GRAY).setLabel("60-69 dB").setTarget(sixties));
+        pieData.add(new SliceValue(0, Color.YELLOW).setLabel("70-79 dB").setTarget(seventies));
+        pieData.add(new SliceValue(0, Color.MAGENTA).setLabel("80-89 dB").setTarget(eighties));
+        pieData.add(new SliceValue(0, Color.RED).setLabel(">90 dB").setTarget(nintiesPlus));
 
         PieChartData pieChartData = new PieChartData(pieData);
         pieChartData.setHasLabels(true).setValueLabelTextSize(14);
@@ -132,11 +133,12 @@ public class ChartActivity extends AppCompatActivity{
 
         @Override
         public void onValueSelected(int arcIndex, SliceValue value) {
-                pieChartData.setHasCenterCircle(true).setCenterText1("Your exposure to "+String.valueOf(value.getLabelAsChars())+" was").setCenterText1FontSize(15).setCenterText1Color(Color.parseColor("#0097A7"));
+
+            pieChartData.setHasCenterCircle(true).setCenterText1("Your exposure to "+String.valueOf(value.getLabelAsChars())+" was").setCenterText1FontSize(15).setCenterText1Color(Color.parseColor("#0097A7"));
             pieChartData.setHasCenterCircle(true).setCenterText2(String.valueOf(Math.round(value.getValue()))+"%").setCenterText2FontSize(10).setCenterText2Color(Color.parseColor("#0097A7"));
 
             pieChartView.setPieChartData(pieChartData);
-            Toast.makeText(getApplication().getApplicationContext(),"value selected: "+value,Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplication().getApplicationContext(),"db Range: "+String.valueOf(value.getLabelAsChars()),Toast.LENGTH_LONG).show();
 
             }
 

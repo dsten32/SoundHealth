@@ -1,9 +1,16 @@
 package com.comp576.soundhealth;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.util.Log;
+
+import androidx.core.app.ActivityCompat;
+
+import static android.Manifest.permission.RECORD_AUDIO;
+import static androidx.core.content.ContextCompat.checkSelfPermission;
 
 /*base code for this class used from:
 https://stackoverflow.com/questions/10655703/what-does-androids-getmaxamplitude-function-for-the-mediarecorder-actually-gi
@@ -16,6 +23,7 @@ public class Recorder{
 
     public double getNoiseLevel() throws NoValidNoiseLevelException
     {
+
         Log.i(TAG, "start new recording process");
         int bufferSize = AudioRecord.getMinBufferSize(44100, AudioFormat.CHANNEL_IN_DEFAULT,AudioFormat.ENCODING_PCM_16BIT);
         //making the buffer bigger....
@@ -49,8 +57,7 @@ public class Recorder{
         Log.i(TAG, "getNoiseLevel() ");
         double db=0;
         if (x==0){
-            NoValidNoiseLevelException e = new NoValidNoiseLevelException(x);
-            throw e;
+            throw new NoValidNoiseLevelException(x);
         }
         // calculating the pascal pressure based on the idea that the max amplitude (between 0 and 32767) is
         // relative to the pressure
@@ -62,7 +69,6 @@ public class Recorder{
         {
             return db;
         }
-        NoValidNoiseLevelException e = new NoValidNoiseLevelException(x);
-        throw e;
+        throw new NoValidNoiseLevelException(x);
     }
 }
