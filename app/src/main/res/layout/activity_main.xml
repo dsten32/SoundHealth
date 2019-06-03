@@ -27,7 +27,7 @@
         />
     <Button
         android:id="@+id/startCollection"
-        android:onClick="getDataPoint"
+        android:onClick="callScheduleDataCollection"
         android:text="Start continuous collection"
         android:layout_alignParentRight="true"
         android:layout_above="@id/stopCollection"
@@ -36,7 +36,7 @@
 
     <Button
         android:id="@+id/stopCollection"
-        android:onClick="getDataPoint"
+        android:onClick="callCancelDataCollection"
         android:text="Stop collection"
         android:layout_alignParentRight="true"
         android:layout_above="@id/getData"
@@ -45,7 +45,7 @@
 
     <Button
         android:id="@+id/getData"
-        android:onClick="getDataPoint"
+        android:onClick="callGetDatapoint"
         android:text="Get Single Data Point"
         android:layout_alignParentRight="true"
         android:layout_above="@id/goToMap"

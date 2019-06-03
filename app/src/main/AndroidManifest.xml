@@ -47,6 +47,16 @@
             android:name=".ChartActivity"
             android:label="@string/title_activity_chart">
         </activity>
+
+        <receiver
+            android:name=".AlarmReceiver"
+            android:process=":remote" >
+        </receiver>
+
+        <service
+            android:name=".DataCollectionService"
+            android:exported="false" />
     </application>
+
 
 </manifest>

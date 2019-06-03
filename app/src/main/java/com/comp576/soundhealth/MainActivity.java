@@ -1,6 +1,10 @@
 package com.comp576.soundhealth;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -94,11 +98,11 @@ public class MainActivity extends AppCompatActivity{
 
 
 
-    //data collection method
-    public void getDataPoint(View view){
+    //data collection method move to own class?
+    @SuppressLint("MissingPermission") //add an exception try/catch to the getLastLocation?
+    public void getDataPoint(){
         //see if we can generate some data shall we?
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-
 
         fusedLocationProviderClient.getLastLocation()
                 .addOnSuccessListener(this, new OnSuccessListener<Location>() {
@@ -128,6 +132,30 @@ public class MainActivity extends AppCompatActivity{
                 });
     }
 
+    // Setup a recurring alarm every half hour
+    public void scheduleDataCollection() {
+        // Construct an intent that will execute the AlarmReceiver
+        Intent intent = new Intent(getApplicationContext(), AlarmReceiver.class);
+        // Create a PendingIntent to be triggered when the alarm goes off
+        final PendingIntent pIntent = PendingIntent.getBroadcast(this, AlarmReceiver.REQUEST_CODE,
+                intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        // Setup periodic alarm every every half hour from this point onwards
+        long firstMillis = System.currentTimeMillis(); // alarm is set right away
+        AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+        // First parameter is the type: ELAPSED_REALTIME, ELAPSED_REALTIME_WAKEUP, RTC_WAKEUP
+        // Interval can be INTERVAL_FIFTEEN_MINUTES, INTERVAL_HALF_HOUR, INTERVAL_HOUR, INTERVAL_DAY
+        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, firstMillis,
+                30*1000, pIntent);
+    }
+
+    public void cancelDataCollection() {
+        Intent intent = new Intent(getApplicationContext(), AlarmReceiver.class);
+        final PendingIntent pIntent = PendingIntent.getBroadcast(this, AlarmReceiver.REQUEST_CODE,
+                intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+        alarm.cancel(pIntent);
+    }
+
 
     //Navigation methods
     public void goToChart(View view){
@@ -141,4 +169,15 @@ public class MainActivity extends AppCompatActivity{
     }
 
 
+    public void callScheduleDataCollection(View view) {
+        scheduleDataCollection();
+    }
+
+    public void callCancelDataCollection(View view){
+        cancelDataCollection();
+    }
+
+    public void callGetDatapoint(View view){
+        getDataPoint();
+    }
 }
