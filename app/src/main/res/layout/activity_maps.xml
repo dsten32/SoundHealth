@@ -19,12 +19,17 @@
         android:layout_weight="3"
         >
 
-        <TextView
-            android:id="@+id/textPlace"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="Map Screen"
-            android:clickable="true"
+        <Button
+            android:id="@+id/goToMain"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Main"
             android:onClick="goToMain"/>
+        <Button
+            android:id="@+id/allDataHeat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="All Data Heat"
+            android:onClick="callAddHeatMapForAllData"/>
     </LinearLayout>
 </LinearLayout>

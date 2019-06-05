@@ -46,7 +46,7 @@ public class ChartActivity extends AppCompatActivity{
 
         //quick and dirty fix. need to implement async class and use onPostExecute
         try {
-            Thread.sleep(50);
+            Thread.sleep(100);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -86,7 +86,7 @@ public class ChartActivity extends AppCompatActivity{
 
         PieChartData pieChartData = new PieChartData(pieData);
         pieChartData.setHasLabels(true).setValueLabelTextSize(14);
-        pieChartData.setHasCenterCircle(true).setCenterText1("Your Sound Profile").setCenterText1FontSize(20).setCenterText1Color(Color.parseColor("#0097A7"));
+        pieChartData.setHasCenterCircle(true).setCenterCircleScale(0.7f).setCenterText1("Your Sound Profile").setCenterText1FontSize(20).setCenterText1Color(Color.parseColor("#0097A7"));
         pieChartView.setPieChartData(pieChartData);
 
         pieChartView.setOnValueTouchListener(new ValueTouchListener(pieChartData,pieChartView));
@@ -135,8 +135,8 @@ public class ChartActivity extends AppCompatActivity{
         @Override
         public void onValueSelected(int arcIndex, SliceValue value) {
 
-            pieChartData.setHasCenterCircle(true).setCenterText1("Your exposure to "+String.valueOf(value.getLabelAsChars())+" was").setCenterText1FontSize(15).setCenterText1Color(Color.parseColor("#0097A7"));
-            pieChartData.setHasCenterCircle(true).setCenterText2(String.valueOf(Math.round(value.getValue()))+"%").setCenterText2FontSize(10).setCenterText2Color(Color.parseColor("#0097A7"));
+            pieChartData.setHasCenterCircle(true).setCenterCircleScale(0.7f).setCenterText1("Your exposure to "+String.valueOf(value.getLabelAsChars())+" was").setCenterText1FontSize(15).setCenterText1Color(Color.parseColor("#0097A7")).setCenterText2(String.valueOf(Math.round(value.getValue()))+"%").setCenterText2FontSize(10).setCenterText2Color(Color.parseColor("#0097A7"));
+//            pieChartData.setHasCenterCircle(true)
 
             pieChartView.setPieChartData(pieChartData);
             Toast.makeText(getApplication().getApplicationContext(),"db Range: "+String.valueOf(value.getLabelAsChars()),Toast.LENGTH_SHORT).show();

@@ -6,10 +6,12 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 
+import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ListView;
@@ -54,12 +56,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        textPlace = findViewById(R.id.textPlace);
+//        textPlace = findViewById(R.id.textPlace);
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
         dataRepository = new DataRepository(this);
 
+        //same as chart activity - maybe asynctask class
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
@@ -87,6 +90,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
      */
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -113,7 +117,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     @Override
                     public void onSuccess(Location location) {
                         if (location != null) {
-                            textPlace.setText("Latitude: " + String.valueOf(location.getLatitude()) +"\nLongitude: "+String.valueOf(location.getLongitude()));
+//                            textPlace.setText("Latitude: " + String.valueOf(location.getLatitude()) +"\nLongitude: "+String.valueOf(location.getLongitude()));
 //                            Toast.makeText(getApplication().getApplicationContext(), "my location is: "+location, Toast.LENGTH_LONG).show();
                             LatLng current = new LatLng(location.getLatitude(), location.getLongitude());
                             mMap.addMarker(new MarkerOptions().position(current).title("you are here"));
@@ -174,8 +178,50 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
     }
 
+    //generate heatmap layer for all firestore data
+    private void addHeatMapForAllData() {
+        List<WeightedLatLng> list = new ArrayList<>();
+
+// Create the gradient.
+        int[] colors = {
+                Color.rgb(102, 225, 0), // green
+
+                Color.rgb(255, 0, 0)    // red
+        };
+
+        float[] startPoints = {
+                0.0f, 1f//0.16666f, 0.33333f, 0.5f, 0.66666f, 0.83333f,
+        };
+
+        Gradient gradient = new Gradient(colors, startPoints);
+
+
+        DataCollection dataCollection = new DataCollection(getApplicationContext());
+        ArrayList<Data> dataList = dataCollection.getDataCollection();
+
+//        for (Data data : dataList){
+////            list.add(new WeightedLatLng(new LatLng(data.lati, data.longi),((data.dB - 30) /10)*0.16333));
+//            list.add(new WeightedLatLng(new LatLng(data.lati, data.longi),20));
+//
+//        }
+//
+//        // Create a heat map tile provider, passing it the latlngs of the datapoints.
+//        HeatmapTileProvider mProvider = new HeatmapTileProvider.Builder()
+//                .weightedData(list)
+//                .gradient(gradient)
+//                .radius(50)
+//                .build();
+//        // Add a tile overlay to the map, using the heat map tile provider.
+//        mMap.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
+    }
+
+
     public void goToMain(View view){
         Intent goToMain = new Intent(this,MainActivity.class);
         startActivity(goToMain);
+    }
+
+    public void callAddHeatMapForAllData(View view){
+        addHeatMapForAllData();
     }
 }

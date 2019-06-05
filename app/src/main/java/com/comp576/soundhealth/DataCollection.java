@@ -17,6 +17,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.WriteBatch;
 
 import java.text.SimpleDateFormat;
@@ -26,7 +28,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import androidx.annotation.NonNull;
 
@@ -119,7 +126,39 @@ public class DataCollection extends Activity {
                 // ...
             }
         });
+    }
 
+    //get all data from firestore
+    public ArrayList<Data> getDataCollection(){
+        Log.i(TAG, "Accessed GET ALL DATA");
+        ArrayList<Data> dataList = new ArrayList<>();
+
+
+
+        db.collection("data_collection")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                dataList.add(new Data(document.getString("date"),document.getString("time"),document.getString("userId"),document.getDouble("lati"),document.getDouble("longi"),document.getDouble("dB")));
+
+//                                Log.d(TAG,dataList.get(dataList.size()-1).toString());
+                            }
+                        } else {
+                            Log.d(TAG, "Error getting documents: ", task.getException());
+                        }
+                    }
+                });
+
+        try {
+            Thread.sleep(20000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        Log.d(TAG,"LAST TIME"+dataList.get(dataList.size()-1).toString());
+        return dataList;
     }
 
 }
