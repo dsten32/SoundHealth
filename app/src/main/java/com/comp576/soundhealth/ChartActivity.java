@@ -12,9 +12,12 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
-import androidx.lifecycle.Observer;
-import lecho.lib.hellocharts.model.PieChartData;
-import lecho.lib.hellocharts.model.SliceValue;
+import lecho.lib.hellocharts.model.*;
+//import lecho.lib.hellocharts.model.SliceValue;
+//import lecho.lib.hellocharts.model.ColumnChartData;
+//import lecho.lib.hellocharts.model.Column;
+//import lecho.lib.hellocharts.model.SubcolumnValue;
+//import lecho.lib.hellocharts.model.
 import lecho.lib.hellocharts.view.PieChartView;
 import lecho.lib.hellocharts.listener.PieChartOnValueSelectListener;
 
@@ -33,7 +36,7 @@ public class ChartActivity extends AppCompatActivity{
         setContentView(R.layout.activity_chart);
         dataRepository = new DataRepository(this);
 
-        pieChartView = findViewById(R.id.chart);
+        pieChartView = findViewById(R.id.pieChart);
 
 //get user's data for display. may want to create a dB class to only grab that info.
         AsyncTask.execute(new Runnable() {
@@ -91,6 +94,12 @@ public class ChartActivity extends AppCompatActivity{
 
         pieChartView.setOnValueTouchListener(new ValueTouchListener(pieChartData,pieChartView));
         pieChartView.startDataAnimation();
+
+
+        List barData = new ArrayList<>();
+
+
+        ColumnChartData barChartData = new ColumnChartData(barData);
 
 //        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, data);
 //        //adapter setup
