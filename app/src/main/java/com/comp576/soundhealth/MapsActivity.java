@@ -14,7 +14,9 @@ import androidx.fragment.app.FragmentActivity;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -50,6 +52,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private List<Data> allData = new ArrayList<>();
     private DataRepository dataRepository;
     private DataCollection dataCollection;
+    private Button allDataHeatMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,13 +84,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         dataCollection = new DataCollection(getApplicationContext());
 
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                allData.addAll(dataCollection.getDataCollection());
-            }
-        });
+        new FirebaseAsyncTask().execute();
 
+    }
+
+    private class FirebaseAsyncTask extends AsyncTask<Void,Void,List<Data>> {
+
+        @Override
+        protected List<Data> doInBackground(Void... voids) {
+            return dataCollection.getDataCollection();
+        }
+
+        @Override
+        protected void onPostExecute(List<Data> data) {
+            allData.addAll(data);
+            allDataHeatMap = (Button) findViewById(R.id.allDataHeat);
+            allDataHeatMap.setEnabled(true);
+        }
     }
 
     /**
