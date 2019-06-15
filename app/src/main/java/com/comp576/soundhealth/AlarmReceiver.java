@@ -6,7 +6,7 @@ import android.content.Intent;
 
 //from https://github.com/codepath/android_guides/wiki/Starting-Background-Services#using-with-alarmmanager-for-periodic-tasks
 public class AlarmReceiver extends BroadcastReceiver {
-    public static final int REQUEST_CODE = 12345;
+    public static final int REQUEST_CODE = 1;
     public static final String ACTION = "com.codepath.example.servicesdemo.alarm";
 
     // Triggered by the Alarm periodically (starts the service to run task)

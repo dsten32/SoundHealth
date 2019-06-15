@@ -1,6 +1,7 @@
 package com.comp576.soundhealth;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -46,7 +47,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     private TextView textPlace;
     private List<Data> data = new ArrayList<>();
+    private List<Data> allData = new ArrayList<>();
     private DataRepository dataRepository;
+    private DataCollection dataCollection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,15 +74,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
         try {
-            Thread.sleep(100);
+            Thread.sleep(200);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+        dataCollection = new DataCollection(getApplicationContext());
+
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                allData.addAll(dataCollection.getDataCollection());
+            }
+        });
+
     }
-
-
-
-
 
     /**
      * Manipulates the map once available.
@@ -114,6 +123,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         fusedLocationProviderClient.getLastLocation()
                 .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @SuppressLint("MissingPermission")
                     @Override
                     public void onSuccess(Location location) {
                         if (location != null) {
@@ -147,6 +157,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     //generate heatmap layer an add to the map
     private void addHeatMap() {
+        mMap.clear();
         List<WeightedLatLng> list = new ArrayList<>();
 
 // Create the gradient.
@@ -163,9 +174,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Gradient gradient = new Gradient(colors, startPoints);
 
         for (Data data : data){
-//            list.add(new WeightedLatLng(new LatLng(data.lati, data.longi),((data.dB - 30) /10)*0.16333));
-            list.add(new WeightedLatLng(new LatLng(data.lati, data.longi),20));
-
+            if(data.lati != null && data.longi !=null && data.dB != null) {
+            list.add(new WeightedLatLng(new LatLng(data.lati, data.longi),((data.dB - 30) /10)*0.16333));
+            }
         }
 
         // Create a heat map tile provider, passing it the latlngs of the datapoints.
@@ -180,6 +191,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     //generate heatmap layer for all firestore data
     private void addHeatMapForAllData() {
+        mMap.clear();
         List<WeightedLatLng> list = new ArrayList<>();
 
 // Create the gradient.
@@ -196,29 +208,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Gradient gradient = new Gradient(colors, startPoints);
 
 
-        DataCollection dataCollection = new DataCollection(getApplicationContext());
-        ArrayList<Data> dataList = dataCollection.getDataCollection();
 
-//        for (Data data : dataList){
-////            list.add(new WeightedLatLng(new LatLng(data.lati, data.longi),((data.dB - 30) /10)*0.16333));
-//            list.add(new WeightedLatLng(new LatLng(data.lati, data.longi),20));
-//
-//        }
-//
-//        // Create a heat map tile provider, passing it the latlngs of the datapoints.
-//        HeatmapTileProvider mProvider = new HeatmapTileProvider.Builder()
-//                .weightedData(list)
-//                .gradient(gradient)
-//                .radius(50)
-//                .build();
-//        // Add a tile overlay to the map, using the heat map tile provider.
-//        mMap.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
+        for (Data data : allData){
+            if(data.lati != null && data.longi !=null && data.dB != null) {
+            list.add(new WeightedLatLng(new LatLng(data.lati, data.longi),((data.dB - 30) /10)*0.16333));
+            }
+        }
+
+        // Create a heat map tile provider, passing it the latlngs of the datapoints.
+        HeatmapTileProvider mProvider = new HeatmapTileProvider.Builder()
+                .weightedData(list)
+                .gradient(gradient)
+                .radius(50)
+                .build();
+        // Add a tile overlay to the map, using the heat map tile provider.
+        mMap.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
     }
 
 
     public void goToMain(View view){
         Intent goToMain = new Intent(this,MainActivity.class);
         startActivity(goToMain);
+    }
+
+    public void callAddHeatMapForUserData(View view){
+        addHeatMap();
     }
 
     public void callAddHeatMapForAllData(View view){

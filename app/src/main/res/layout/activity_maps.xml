@@ -26,6 +26,12 @@
             android:text="Main"
             android:onClick="goToMain"/>
         <Button
+            android:id="@+id/userDataHeat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="User Data Heat"
+            android:onClick="callAddHeatMapForUserData"/>
+        <Button
             android:id="@+id/allDataHeat"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

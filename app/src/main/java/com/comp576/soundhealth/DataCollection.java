@@ -83,8 +83,11 @@ public class DataCollection extends Activity {
                             sendData(data);
 
 //                            textPlace.setText(String.valueOf(location.getLatitude()));
-                            Toast.makeText(context, "Datapoint saved: "+data.toString(), Toast.LENGTH_LONG).show();
-                            LatLng current = new LatLng(location.getLatitude(), location.getLongitude());
+                            if(data!=null){
+                            Toast.makeText(context, "Datapoint saved: "+data.dB, Toast.LENGTH_LONG).show();
+                            } else {
+                                Toast.makeText(context, "huh, null", Toast.LENGTH_LONG).show();
+                            }
                         }
                     }
                 });
@@ -132,8 +135,6 @@ public class DataCollection extends Activity {
     public ArrayList<Data> getDataCollection(){
         Log.i(TAG, "Accessed GET ALL DATA");
         ArrayList<Data> dataList = new ArrayList<>();
-
-
 
         db.collection("data_collection")
                 .get()
