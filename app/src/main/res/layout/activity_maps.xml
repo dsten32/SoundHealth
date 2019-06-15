@@ -38,5 +38,10 @@
             android:enabled="false"
             android:text="All Data Heat"
             android:onClick="callAddHeatMapForAllData"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Heatmap Settings"
+            android:onClick="showDialog"/>
     </LinearLayout>
 </LinearLayout>
