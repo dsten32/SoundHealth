@@ -1,12 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical">
+
+
+
+
+<RadioGroup
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <RadioButton android:id="@+id/userData"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="User"
+        />
+    <RadioButton android:id="@+id/allData"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="All"
+        />
+</RadioGroup>
+
+    <CheckBox
+        android:id="@+id/monBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="true"
+        android:enabled="false"
+        android:text="Monday" />
+    <CheckBox
+        android:id="@+id/tueBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="true"
+        android:enabled="false"
+        android:text="Tuesday" />
+    <CheckBox
+        android:id="@+id/wedBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="true"
+        android:enabled="false"
+        android:text="Wednesday" />
+    <CheckBox
+        android:id="@+id/thurBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="true"
+        android:enabled="false"
+        android:text="Thursday" />
+    <CheckBox
+        android:id="@+id/friBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="true"
+        android:enabled="false"
+        android:text="Friday" />
+    <CheckBox
+        android:id="@+id/satBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="true"
+        android:enabled="false"
+        android:text="Saturday" />
+    <CheckBox
+        android:id="@+id/sunBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="true"
+        android:enabled="false"
+        android:text="Sunday" />
+    <CheckBox
+        android:id="@+id/allDaysBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="true"
+        android:enabled="true"
+        android:text="All Days" />
 
     <Button
         android:id="@+id/frag_close"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Dismiss"
-        android:onClick="dismissSettings"/>
+        android:onClick="dismissSettings"
+        android:text="Dismiss" />
+
 </LinearLayout>

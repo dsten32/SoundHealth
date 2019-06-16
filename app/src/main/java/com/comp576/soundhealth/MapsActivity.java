@@ -9,8 +9,11 @@ import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.RadioButton;
 import android.widget.TextView;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -50,7 +53,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private DataRepository dataRepository;
     private DataCollection dataCollection;
     private Button allDataHeatMap;
-    DialogFragment dialogFragment;
+    private DialogFragment dialogFragment;
+    private Boolean mapUserData = true;
+    private String[] daysToMap = {"Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"};
+    private CheckBox monBox,tueBox,wedBox,thurBox,friBox,satBox,sunBox;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,42 +73,40 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         dataRepository = new DataRepository(this);
 
-        //same as chart activity - maybe asynctask class
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                data.addAll(dataRepository.getDataList());
-            }
-        });
-
-        try {
-            Thread.sleep(200);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        new UserAsyncTask().execute();
 
         dataCollection = new DataCollection(getApplicationContext());
 
         new FirebaseAsyncTask().execute();
 
+        monBox = findViewById(R.id.monBox);
+        tueBox = findViewById(R.id.tueBox);
+        wedBox = findViewById(R.id.wedBox);
+        thurBox = findViewById(R.id.thurBox);
+        friBox = findViewById(R.id.friBox);
+        satBox = findViewById(R.id.satBox);
+        sunBox = findViewById(R.id.sunBox);
     }
 
-    public void showDialog(View view) {
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        Fragment prev = getSupportFragmentManager().findFragmentByTag("dialog");
-        if (prev != null) {
-            fragmentTransaction.remove(prev);
+
+
+    //get user data from repository and add heatmap to map on complete
+    private class UserAsyncTask extends AsyncTask<Void,Void,List<Data>> {
+
+        @Override
+        protected List<Data> doInBackground(Void... voids) {
+            return dataRepository.getDataList();
         }
-        fragmentTransaction.addToBackStack(null);
-        dialogFragment = new HeatmapSettingDialogFragment();
-        dialogFragment.show(fragmentTransaction,"dialog");
+
+        @Override
+        protected void onPostExecute(List<Data> userData) {
+            data.addAll(userData);
+            Log.d(" Heres the userdata:", data.get(0).toString());
+            addHeatMap();
+        }
     }
 
-    public void dismissSettings(View view) {
-
-        dialogFragment.dismiss();
-    }
-
+    //get all data from Firestore and enable allData Heatmap button on complete
     private class FirebaseAsyncTask extends AsyncTask<Void,Void,List<Data>> {
 
         @Override
@@ -116,6 +121,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             allDataHeatMap.setEnabled(true);
         }
     }
+
 
     /**
      * Manipulates the map once available.
@@ -166,7 +172,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             mMap.setMyLocationEnabled(true);
                             mMap.getUiSettings().setZoomControlsEnabled(true);
                             mMap.getUiSettings().setAllGesturesEnabled(true);
-                            addHeatMap();
+//                            addHeatMap();
 
                             CameraPosition cameraPosition = new CameraPosition.Builder()
                                     .target(new LatLng(location.getLatitude(), location.getLongitude()))      // Sets the center of the map to location user
@@ -182,7 +188,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-    //generate heatmap layer an add to the map
+    //generate user data heatmap layer an add to the map
     private void addHeatMap() {
         mMap.clear();
         List<WeightedLatLng> list = new ArrayList<>();
@@ -224,12 +230,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 // Create the gradient.
         int[] colors = {
                 Color.rgb(102, 225, 0), // green
-
-                Color.rgb(255, 0, 0)    // red
+                Color.GREEN,    // green(0-50)
+                Color.YELLOW,    // yellow(51-100)
+                Color.rgb(255,165,0), //Orange(101-150)
+                Color.RED,              //red(151-200)
+                Color.rgb(153,50,204), //dark orchid(201-300)
+                Color.rgb(165,42,42), //brown(301-500)
+//                Color.BLUE,
         };
 
         float[] startPoints = {
-                0.0f, 1f//0.16666f, 0.33333f, 0.5f, 0.66666f, 0.83333f,
+                0.0f, 0.16666f, 0.33333f, 0.5f, 0.66666f, 0.83333f, 1f
         };
 
         Gradient gradient = new Gradient(colors, startPoints);
@@ -238,7 +249,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         for (Data data : allData){
             if(data.lati != null && data.longi !=null && data.dB != null) {
-            list.add(new WeightedLatLng(new LatLng(data.lati, data.longi),((data.dB - 30) /10)*0.16333));
+            list.add(new WeightedLatLng(new LatLng(data.lati, data.longi),((data.dB - 30) * 10)*0.16333));
             }
         }
 
@@ -253,16 +264,59 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
+    //go back to the main activity screen
     public void goToMain(View view){
         Intent goToMain = new Intent(this,MainActivity.class);
         startActivity(goToMain);
     }
 
+    //method for calling the user data heatmap method from the view
     public void callAddHeatMapForUserData(View view){
         addHeatMap();
     }
 
+    //method for calling the all data heatmap method from the view
     public void callAddHeatMapForAllData(View view){
         addHeatMapForAllData();
     }
+
+    //show the heatmap settings dialog fragment
+    public void showDialog(View view) {
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        Fragment prev = getSupportFragmentManager().findFragmentByTag("dialog");
+        if (prev != null) {
+            fragmentTransaction.remove(prev);
+        }
+        fragmentTransaction.addToBackStack(null);
+        dialogFragment = new HeatmapSettingDialogFragment();
+        dialogFragment.show(fragmentTransaction,"dialog");
+    }
+
+    //dismis the settings dialog fragment
+    public void dismissSettings(View view) {
+
+        RadioButton mapUserDataRadio = findViewById(R.id.userData);
+        mapUserData = mapUserDataRadio.isChecked();
+
+        monBox = findViewById(R.id.monBox);
+        if(monBox.isChecked()){daysToMap[0]="Monday";}
+        tueBox = findViewById(R.id.tueBox);
+        if(tueBox.isChecked()){daysToMap[1]="Tuesday";}
+        wedBox = findViewById(R.id.wedBox);
+        if(wedBox.isChecked()){daysToMap[2]="Wednesday";}
+        thurBox = findViewById(R.id.thurBox);
+        if(thurBox.isChecked()){daysToMap[3]="Thursday";}
+        friBox = findViewById(R.id.friBox);
+        if(friBox.isChecked()){daysToMap[4]="Friday";}
+        satBox = findViewById(R.id.satBox);
+        if(satBox.isChecked()){daysToMap[5]="Saturday";}
+        sunBox = findViewById(R.id.sunBox);
+        if(sunBox.isChecked()){daysToMap[6]="Sunday";}
+
+
+        dialogFragment.dismiss();
+    }
+
+
+
 }
