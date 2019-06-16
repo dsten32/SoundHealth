@@ -13,7 +13,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.RadioButton;
 import android.widget.TextView;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -31,6 +30,8 @@ import com.google.maps.android.heatmaps.Gradient;
 import com.google.maps.android.heatmaps.HeatmapTileProvider;
 import com.google.maps.android.heatmaps.WeightedLatLng;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -40,7 +41,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
@@ -49,15 +49,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private FusedLocationProviderClient fusedLocationProviderClient;
     private GoogleMap mMap;
     private TextView textPlace;
-    private List<Data> data = new ArrayList<>();
-    private List<Data> allData = new ArrayList<>();
+    private List<Data> userDataList = new ArrayList<>();
+    private List<Data> allDataList = new ArrayList<>();
     private DataRepository dataRepository;
     private DataCollection dataCollection;
     private Button allDataHeatMap;
     private DialogFragment dialogFragment;
     private Boolean mapUserData = true;
-    private String[] daysToMap = {"Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"};
-    private CheckBox monBox,tueBox,wedBox,thurBox,friBox,satBox,sunBox;
+    private String[] daysToMap = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+    private CheckBox monBox, tueBox, wedBox, thurBox, friBox, satBox, sunBox;
 
 
     @Override
@@ -90,9 +90,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-
-    //get user data from repository and add heatmap to map on complete
-    private class UserAsyncTask extends AsyncTask<Void,Void,List<Data>> {
+    //get user userDataList from repository and add heatmap to map on complete
+    private class UserAsyncTask extends AsyncTask<Void, Void, List<Data>> {
 
         @Override
         protected List<Data> doInBackground(Void... voids) {
@@ -101,14 +100,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         @Override
         protected void onPostExecute(List<Data> userData) {
-            data.addAll(userData);
-            Log.d(" Heres the userdata:", data.get(0).toString());
+            userDataList.addAll(userData);
+            Log.d(" Heres the userdata:", userDataList.get(0).toString());
             addHeatMap();
         }
     }
 
-    //get all data from Firestore and enable allData Heatmap button on complete
-    private class FirebaseAsyncTask extends AsyncTask<Void,Void,List<Data>> {
+    //get all userDataList from Firestore and enable allDataList Heatmap button on complete
+    private class FirebaseAsyncTask extends AsyncTask<Void, Void, List<Data>> {
 
         @Override
         protected List<Data> doInBackground(Void... voids) {
@@ -117,7 +116,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         @Override
         protected void onPostExecute(List<Data> data) {
-            allData.addAll(data);
+            allDataList.addAll(data);
             allDataHeatMap = (Button) findViewById(R.id.allDataHeat);
             allDataHeatMap.setEnabled(true);
         }
@@ -145,7 +144,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         if (checkSelfPermission(ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
-            ActivityCompat.requestPermissions(this,new String[]{ACCESS_FINE_LOCATION},0);
+            ActivityCompat.requestPermissions(this, new String[]{ACCESS_FINE_LOCATION}, 0);
             //    Activity#requestPermissions
             // here to request the missing permissions, and then overriding
             //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
@@ -189,7 +188,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-    //generate user data heatmap layer an add to the map
+    //generate user userDataList heatmap layer an add to the map
     private void addHeatMap() {
         mMap.clear();
         List<WeightedLatLng> list = new ArrayList<>();
@@ -207,9 +206,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         Gradient gradient = new Gradient(colors, startPoints);
 
-        for (Data data : data){
-            if(data.lati != null && data.longi !=null && data.dB != null) {
-            list.add(new WeightedLatLng(new LatLng(data.lati, data.longi),((data.dB - 30) /10)*0.16333));
+        for (Data data : userDataList) {
+            if (data.lati != null && data.longi != null && data.dB != null) {
+                list.add(new WeightedLatLng(new LatLng(data.lati, data.longi), ((data.dB - 30) / 10) * 0.16333));
             }
         }
 
@@ -223,20 +222,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
     }
 
-    //generate heatmap layer for all firestore data
+    //generate heatmap layer for all firestore userDataList
     private void addHeatMapForAllData() {
+
         mMap.clear();
-        List<WeightedLatLng> list = new ArrayList<>();
+        List<WeightedLatLng> weightedLatLngs = new ArrayList<>();
 
 // Create the gradient.
         int[] colors = {
                 Color.rgb(102, 225, 0), // green
                 Color.GREEN,    // green(0-50)
                 Color.YELLOW,    // yellow(51-100)
-                Color.rgb(255,165,0), //Orange(101-150)
+                Color.rgb(255, 165, 0), //Orange(101-150)
                 Color.RED,              //red(151-200)
-                Color.rgb(153,50,204), //dark orchid(201-300)
-                Color.rgb(165,42,42), //brown(301-500)
+                Color.rgb(153, 50, 204), //dark orchid(201-300)
+                Color.rgb(165, 42, 42), //brown(301-500)
 //                Color.BLUE,
         };
 
@@ -247,16 +247,65 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Gradient gradient = new Gradient(colors, startPoints);
 
 
-
-        for (Data data : allData){
-            if(data.lati != null && data.longi !=null && data.dB != null) {
-            list.add(new WeightedLatLng(new LatLng(data.lati, data.longi),((data.dB - 30) * 10)*0.16333));
+        for (Data data : allDataList) {
+            if (data.lati != null && data.longi != null && data.dB != null) {
+                weightedLatLngs.add(new WeightedLatLng(new LatLng(data.lati, data.longi), ((data.dB - 30) * 10) * 0.16333));
             }
         }
 
         // Create a heat map tile provider, passing it the latlngs of the datapoints.
         HeatmapTileProvider mProvider = new HeatmapTileProvider.Builder()
-                .weightedData(list)
+                .weightedData(weightedLatLngs)
+                .gradient(gradient)
+                .radius(50)
+                .build();
+        // Add a tile overlay to the map, using the heat map tile provider.
+        mMap.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
+    }
+
+    //generate heatmap layer based on filter settings set by user. to replace the other two methods, probably.
+    private void addFilteredHeatMap() throws ParseException {
+        mMap.clear();
+        List<Data> heatMapData = new ArrayList<>();
+        List<WeightedLatLng> weightedLatLngs = new ArrayList<>();
+
+// Create the gradient.
+        int[] colors = {
+                Color.rgb(102, 225, 0), // green
+                Color.GREEN,    // green(0-50)
+                Color.YELLOW,    // yellow(51-100)
+                Color.rgb(255, 165, 0), //Orange(101-150)
+                Color.RED,              //red(151-200)
+                Color.rgb(153, 50, 204), //dark orchid(201-300)
+                Color.rgb(165, 42, 42), //brown(301-500)
+//                Color.BLUE,
+        };
+
+        float[] startPoints = {
+                0.0f, 0.16666f, 0.33333f, 0.5f, 0.66666f, 0.83333f, 1f
+        };
+
+        Gradient gradient = new Gradient(colors, startPoints);
+
+        //check if heatmap should use the users own userDataList
+        if (mapUserData) {
+            heatMapData.addAll(userDataList);
+        } else {
+            heatMapData.addAll(allDataList);
+        }
+
+        for (Data dataPoint : heatMapData) {
+            String day = new SimpleDateFormat("EEEE").format(new SimpleDateFormat("dd-MMM-yyyy").parse(dataPoint.date));
+//            Log.d("Date day = ",day);
+            if (dataPoint.lati != null && dataPoint.longi != null && dataPoint.dB != null && Arrays.asList(daysToMap).contains(day)) {
+                weightedLatLngs.add(new WeightedLatLng(new LatLng(dataPoint.lati, dataPoint.longi), ((dataPoint.dB - 30) * 10) * 0.16333));
+            }
+        }
+
+
+        // Create a heat map tile provider, passing it the latlngs of the datapoints.
+        HeatmapTileProvider mProvider = new HeatmapTileProvider.Builder()
+                .weightedData(weightedLatLngs)
                 .gradient(gradient)
                 .radius(50)
                 .build();
@@ -266,18 +315,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     //go back to the main activity screen
-    public void goToMain(View view){
-        Intent goToMain = new Intent(this,MainActivity.class);
+    public void goToMain(View view) {
+        Intent goToMain = new Intent(this, MainActivity.class);
         startActivity(goToMain);
     }
 
-    //method for calling the user data heatmap method from the view
-    public void callAddHeatMapForUserData(View view){
-        addHeatMap();
+    //method for calling the user userDataList heatmap method from the view
+    public void callAddHeatMapForUserData(View view) throws ParseException {
+//        addHeatMap()
+ addFilteredHeatMap();
     }
 
-    //method for calling the all data heatmap method from the view
-    public void callAddHeatMapForAllData(View view){
+    //method for calling the all userDataList heatmap method from the view
+    public void callAddHeatMapForAllData(View view) {
         addHeatMapForAllData();
     }
 
@@ -290,31 +340,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         fragmentTransaction.addToBackStack(null);
         dialogFragment = new HeatmapSettingDialogFragment();
-        dialogFragment.show(fragmentTransaction,"dialog");
+        dialogFragment.show(fragmentTransaction, "dialog");
     }
 
     //dismis the settings dialog fragment
     public void dismissSettings(View view) {
-//        mapUserData = ((RadioButton)findViewById(R.id.userData)).isChecked();
-//
-//        monBox = findViewById(R.id.monBox);
-//        if(monBox.isChecked()){daysToMap[0]="Monday";}
-//        tueBox = findViewById(R.id.tueBox);
-//        if(tueBox.isChecked()){daysToMap[1]="Tuesday";}
-//        wedBox = findViewById(R.id.wedBox);
-//        if(wedBox.isChecked()){daysToMap[2]="Wednesday";}
-//        thurBox = findViewById(R.id.thurBox);
-//        if(thurBox.isChecked()){daysToMap[3]="Thursday";}
-//        friBox = findViewById(R.id.friBox);
-//        if(friBox.isChecked()){daysToMap[4]="Friday";}
-//        satBox = findViewById(R.id.satBox);
-//        if(satBox.isChecked()){daysToMap[5]="Saturday";}
-//        sunBox = findViewById(R.id.sunBox);
-//        if(sunBox.isChecked()){daysToMap[6]="Sunday";}
-
-
         dialogFragment.dismiss();
-        Log.d("here's the days: ", Arrays.toString(daysToMap));
     }
 
     public void setMapUserData(Boolean mapUserData) {
