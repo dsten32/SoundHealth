@@ -32,6 +32,7 @@ import com.google.maps.android.heatmaps.HeatmapTileProvider;
 import com.google.maps.android.heatmaps.WeightedLatLng;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import androidx.annotation.RequiresApi;
@@ -294,29 +295,35 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     //dismis the settings dialog fragment
     public void dismissSettings(View view) {
-
-        RadioButton mapUserDataRadio = findViewById(R.id.userData);
-        mapUserData = mapUserDataRadio.isChecked();
-
-        monBox = findViewById(R.id.monBox);
-        if(monBox.isChecked()){daysToMap[0]="Monday";}
-        tueBox = findViewById(R.id.tueBox);
-        if(tueBox.isChecked()){daysToMap[1]="Tuesday";}
-        wedBox = findViewById(R.id.wedBox);
-        if(wedBox.isChecked()){daysToMap[2]="Wednesday";}
-        thurBox = findViewById(R.id.thurBox);
-        if(thurBox.isChecked()){daysToMap[3]="Thursday";}
-        friBox = findViewById(R.id.friBox);
-        if(friBox.isChecked()){daysToMap[4]="Friday";}
-        satBox = findViewById(R.id.satBox);
-        if(satBox.isChecked()){daysToMap[5]="Saturday";}
-        sunBox = findViewById(R.id.sunBox);
-        if(sunBox.isChecked()){daysToMap[6]="Sunday";}
+//        mapUserData = ((RadioButton)findViewById(R.id.userData)).isChecked();
+//
+//        monBox = findViewById(R.id.monBox);
+//        if(monBox.isChecked()){daysToMap[0]="Monday";}
+//        tueBox = findViewById(R.id.tueBox);
+//        if(tueBox.isChecked()){daysToMap[1]="Tuesday";}
+//        wedBox = findViewById(R.id.wedBox);
+//        if(wedBox.isChecked()){daysToMap[2]="Wednesday";}
+//        thurBox = findViewById(R.id.thurBox);
+//        if(thurBox.isChecked()){daysToMap[3]="Thursday";}
+//        friBox = findViewById(R.id.friBox);
+//        if(friBox.isChecked()){daysToMap[4]="Friday";}
+//        satBox = findViewById(R.id.satBox);
+//        if(satBox.isChecked()){daysToMap[5]="Saturday";}
+//        sunBox = findViewById(R.id.sunBox);
+//        if(sunBox.isChecked()){daysToMap[6]="Sunday";}
 
 
         dialogFragment.dismiss();
+        Log.d("here's the days: ", Arrays.toString(daysToMap));
     }
 
+    public void setMapUserData(Boolean mapUserData) {
+        this.mapUserData = mapUserData;
+    }
+
+    public void setDaysToMap(String[] daysToMap) {
+        this.daysToMap = daysToMap;
+    }
 
 
 }
