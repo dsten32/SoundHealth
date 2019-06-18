@@ -75,8 +75,11 @@ public class DataCollection extends Activity {
                             } catch (NoValidNoiseLevelException e) {
                                 e.printStackTrace();
                             }
-//                            Double dB = (Math.random()*70)+30;
 
+                            if(dB==null){
+                                Toast.makeText(getApplicationContext(),"datapoint dB = null. Fix mic and try again",Toast.LENGTH_SHORT).show();
+                                return;
+                            }
                             Data data =new Data(date,time,userId,lati,longi,dB);
 
                             long id=dataRepository.insert(data);
@@ -98,7 +101,7 @@ public class DataCollection extends Activity {
 //        FirebaseFirestore db = FirebaseFirestore.getInstance();
 
 // Add a new document with a generated ID
-        db.collection("data_collection")
+        db.collection("sound_data_collection")
                 .add(data)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
@@ -119,10 +122,10 @@ public class DataCollection extends Activity {
         //create a batch of fake data and send to the firestore.
         ArrayList<Data> dataList = (ArrayList<Data>) new GenerateData().getFakeData();
         WriteBatch batch = db.batch();
-        int dbID=0;
+        int dbID=0; //want to add id to the data as it's being sent. didn't work but not sure if it was 'cos of other problems
         for (Data data:dataList) {
             dbID++;
-            DocumentReference newDoc = db.collection("sound_data_collection").document();
+            DocumentReference newDoc = db.collection("sound_data_collection").document(String.valueOf(dbID));
             batch.set(newDoc, data);
         }
 
@@ -136,7 +139,6 @@ public class DataCollection extends Activity {
 
     //get all data from firestore
     public ArrayList<Data> getDataCollection(){
-        Log.i(TAG, "Accessed GET ALL DATA");
         ArrayList<Data> dataList = new ArrayList<>();
 
         db.collection("sound_data_collection")
@@ -161,7 +163,6 @@ public class DataCollection extends Activity {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-//        Log.d(TAG,"LAST TIME"+dataList.get(dataList.size()-1).toString());
         return dataList;
     }
 

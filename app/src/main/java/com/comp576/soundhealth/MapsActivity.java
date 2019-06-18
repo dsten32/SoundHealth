@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -306,14 +307,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
 
-        // Create a heat map tile provider, passing it the latlngs of the datapoints.
-        HeatmapTileProvider mProvider = new HeatmapTileProvider.Builder()
-                .weightedData(weightedLatLngs)
-                .gradient(gradient)
-                .radius(50)
-                .build();
-        // Add a tile overlay to the map, using the heat map tile provider.
-        mMap.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
+        if (weightedLatLngs.size()!=0) {
+            // Create a heat map tile provider, passing it the latlngs of the datapoints.
+            HeatmapTileProvider mProvider = new HeatmapTileProvider.Builder()
+                    .weightedData(weightedLatLngs)
+                    .gradient(gradient)
+                    .radius(50)
+                    .build();
+            // Add a tile overlay to the map, using the heat map tile provider.
+            mMap.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
+        } else {
+            Toast.makeText(getApplicationContext(),"no data that fits the filter found",Toast.LENGTH_SHORT).show();
+        }
     }
 
 
