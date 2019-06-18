@@ -123,14 +123,23 @@
         </TableRow>
     </TableLayout>
 
-    <TimePicker
-        android:id="@+id/startTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="36dp"
-        android:text="pick start time"
-        android:timePickerMode="clock"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="showStartTimePickerDialog"
+            android:text="@string/pick_start_time" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="showStopTimePickerDialog"
+            android:text="@string/pick_stop_time" />
+    </LinearLayout>
 
     <Button
         android:id="@+id/frag_close"

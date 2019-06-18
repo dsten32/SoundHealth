@@ -11,18 +11,18 @@ public class Data implements Parcelable {
     @PrimaryKey(autoGenerate = true)
     public long id;
     public String date,time,userId;
-    public Double lati;
-    public Double longi;
+    public Double lat;
+    public Double lng;
     public Double dB;
 
 
-    public Data(String date, String time, String userId, Double lati, Double longi, Double dB) {
+    public Data(String date, String time, String userId, Double lat, Double lng, Double dB) {
 //        this.id = id;
         this.date = date;
         this.time = time;
         this.userId = userId;
-        this.lati = lati;
-        this.longi = longi;
+        this.lat = lat;
+        this.lng = lng;
         this.dB = dB;
     }
 
@@ -41,14 +41,14 @@ public class Data implements Parcelable {
         time = in.readString();
         userId = in.readString();
         if (in.readByte() == 0) {
-            lati = null;
+            lat = null;
         } else {
-            lati = in.readDouble();
+            lat = in.readDouble();
         }
         if (in.readByte() == 0) {
-            longi = null;
+            lng = null;
         } else {
-            longi = in.readDouble();
+            lng = in.readDouble();
         }
         if (in.readByte() == 0) {
             dB = null;
@@ -65,17 +65,17 @@ public class Data implements Parcelable {
         dest.writeString(date);
         dest.writeString(time);
         dest.writeString(userId);
-        if (lati == null) {
+        if (lat == null) {
             dest.writeByte((byte) 0);
         } else {
             dest.writeByte((byte) 1);
-            dest.writeDouble(lati);
+            dest.writeDouble(lat);
         }
-        if (longi == null) {
+        if (lng == null) {
             dest.writeByte((byte) 0);
         } else {
             dest.writeByte((byte) 1);
-            dest.writeDouble(longi);
+            dest.writeDouble(lng);
         }
         if (dB == null) {
             dest.writeByte((byte) 0);
@@ -111,9 +111,9 @@ public class Data implements Parcelable {
                 + "; \n"
                 + this.time
                 + "; \n"
-                + String.valueOf(this.lati)
+                + String.valueOf(this.lat)
                 + "; \n"
-                + String.valueOf(this.longi)
+                + String.valueOf(this.lng)
                 + "; \n"
                 + String.valueOf(Math.round(this.dB*100.0)/100.0);
     }

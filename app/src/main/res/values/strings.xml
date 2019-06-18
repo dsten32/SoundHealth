@@ -2,4 +2,6 @@
     <string name="app_name">SoundHealth</string>
     <string name="title_activity_maps">Map</string>
     <string name="title_activity_chart">chart</string>
+    <string name="pick_start_time">Start Time</string>
+    <string name="pick_stop_time">Stop Time</string>
 </resources>

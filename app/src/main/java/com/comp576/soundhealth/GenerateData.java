@@ -13,8 +13,8 @@ public class GenerateData {
 
         for(int i=0;i<100;i++){
             date = String.valueOf(Math.round(Math.random()*28)) + "-Jun-2019";
-            time = String.valueOf(Math.round(Math.random()*10)+1)+":" + String.valueOf(Math.round(Math.random()*60)) +" PM";
-            userId = "justSomeGuy";
+            time = String.valueOf(Math.round(Math.random()*23)+1)+":" + String.valueOf(Math.round(Math.random()*60));
+            userId = "justSomeGuy" + String.valueOf(Math.random()*100);
             lat = ((Math.random()*0.11751)+37.717258)*-1;
             lng = (Math.random()*0.177837)+175.193019;
             dB = (Math.random()*70)+30;

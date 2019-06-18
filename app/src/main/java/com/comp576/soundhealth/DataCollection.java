@@ -64,7 +64,8 @@ public class DataCollection extends Activity {
                     public void onSuccess(Location location) {
                         if (location != null) {
                             String date =new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault()).format(new Date());
-                            String time =new SimpleDateFormat("hh:mm a", Locale.getDefault()).format(new Date());
+                            String time =new SimpleDateFormat("kk:mm", Locale.getDefault()).format(new Date());
+                            Log.d("time is", time);
                             String userId = "some text I haven't decided yet";
                             Double lati = location.getLatitude();
                             Double longi = location.getLongitude();
@@ -118,8 +119,10 @@ public class DataCollection extends Activity {
         //create a batch of fake data and send to the firestore.
         ArrayList<Data> dataList = (ArrayList<Data>) new GenerateData().getFakeData();
         WriteBatch batch = db.batch();
+        int dbID=0;
         for (Data data:dataList) {
-            DocumentReference newDoc = db.collection("data_collection").document();
+            dbID++;
+            DocumentReference newDoc = db.collection("sound_data_collection").document();
             batch.set(newDoc, data);
         }
 
@@ -136,14 +139,14 @@ public class DataCollection extends Activity {
         Log.i(TAG, "Accessed GET ALL DATA");
         ArrayList<Data> dataList = new ArrayList<>();
 
-        db.collection("data_collection")
+        db.collection("sound_data_collection")
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                dataList.add(new Data(document.getString("date"),document.getString("time"),document.getString("userId"),document.getDouble("lati"),document.getDouble("longi"),document.getDouble("dB")));
+                                dataList.add(new Data(document.getString("date"),document.getString("time"),document.getString("userId"),document.getDouble("lat"),document.getDouble("lng"),document.getDouble("dB")));
 
 //                                Log.d(TAG,dataList.get(dataList.size()-1).toString());
                             }
@@ -158,7 +161,7 @@ public class DataCollection extends Activity {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        Log.d(TAG,"LAST TIME"+dataList.get(dataList.size()-1).toString());
+//        Log.d(TAG,"LAST TIME"+dataList.get(dataList.size()-1).toString());
         return dataList;
     }
 

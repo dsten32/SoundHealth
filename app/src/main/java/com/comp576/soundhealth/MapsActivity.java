@@ -12,7 +12,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -29,6 +28,8 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.maps.android.heatmaps.Gradient;
 import com.google.maps.android.heatmaps.HeatmapTileProvider;
 import com.google.maps.android.heatmaps.WeightedLatLng;
+
+
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -57,9 +58,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private DialogFragment dialogFragment;
     private Boolean mapUserData = true;
     private String[] daysToMap = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
-    private CheckBox monBox, tueBox, wedBox, thurBox, friBox, satBox, sunBox;
-
-
+    private int startHour=0,startMin=0,stopHour=23,stopMin=60;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,13 +79,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         new FirebaseAsyncTask().execute();
 
-        monBox = findViewById(R.id.monBox);
-        tueBox = findViewById(R.id.tueBox);
-        wedBox = findViewById(R.id.wedBox);
-        thurBox = findViewById(R.id.thurBox);
-        friBox = findViewById(R.id.friBox);
-        satBox = findViewById(R.id.satBox);
-        sunBox = findViewById(R.id.sunBox);
     }
 
 
@@ -101,8 +93,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         @Override
         protected void onPostExecute(List<Data> userData) {
             userDataList.addAll(userData);
-            Log.d(" Heres the userdata:", userDataList.get(0).toString());
-            addHeatMap();
+//            Log.d(" Heres the userdata:", userDataList.get(0).toString());
+            if(userData.size()!=0) {
+                addHeatMap();
+            }
         }
     }
 
@@ -207,8 +201,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Gradient gradient = new Gradient(colors, startPoints);
 
         for (Data data : userDataList) {
-            if (data.lati != null && data.longi != null && data.dB != null) {
-                list.add(new WeightedLatLng(new LatLng(data.lati, data.longi), ((data.dB - 30) / 10) * 0.16333));
+            if (data.lat != null && data.lng != null && data.dB != null) {
+                list.add(new WeightedLatLng(new LatLng(data.lat, data.lng), ((data.dB - 30) / 10) * 0.16333));
             }
         }
 
@@ -248,8 +242,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
         for (Data data : allDataList) {
-            if (data.lati != null && data.longi != null && data.dB != null) {
-                weightedLatLngs.add(new WeightedLatLng(new LatLng(data.lati, data.longi), ((data.dB - 30) * 10) * 0.16333));
+            if (data.lat != null && data.lng != null && data.dB != null) {
+                weightedLatLngs.add(new WeightedLatLng(new LatLng(data.lat, data.lng), ((data.dB - 30) * 10) * 0.16333));
             }
         }
 
@@ -295,10 +289,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         for (Data dataPoint : heatMapData) {
-            String day = new SimpleDateFormat("EEEE").format(new SimpleDateFormat("dd-MMM-yyyy").parse(dataPoint.date));
-//            Log.d("Date day = ",day);
-            if (dataPoint.lati != null && dataPoint.longi != null && dataPoint.dB != null && Arrays.asList(daysToMap).contains(day)) {
-                weightedLatLngs.add(new WeightedLatLng(new LatLng(dataPoint.lati, dataPoint.longi), ((dataPoint.dB - 30) * 10) * 0.16333));
+            String datapointDay = new SimpleDateFormat("EEEE").format(new SimpleDateFormat("dd-MMM-yyyy").parse(dataPoint.date));
+            String[] datapointTime = dataPoint.time.split(":");
+            int datapointMinutes = (Integer.parseInt(datapointTime[0]) * 60) + Integer.parseInt(datapointTime[1]);
+            int startTimeMinutes = (startHour * 60) + startMin;
+            int stopTimeMinutes = (stopHour * 60) + stopMin;
+            Log.d("timestuff:  ",String.valueOf(datapointMinutes)+" from: "+datapointTime[0]+" "+datapointTime[1]+" "+ String.valueOf(startTimeMinutes)+" from: "+String.valueOf(startHour)+" "+String.valueOf(startMin)+" "+String.valueOf(stopTimeMinutes));
+            if (dataPoint.lat != null
+                    && dataPoint.lng != null
+                    && dataPoint.dB != null
+                    && Arrays.asList(daysToMap).contains(datapointDay)
+                    && datapointMinutes > startTimeMinutes
+                    && datapointMinutes < stopTimeMinutes) {
+                weightedLatLngs.add(new WeightedLatLng(new LatLng(dataPoint.lat, dataPoint.lng), ((dataPoint.dB - 30) * 10) * 0.16333));
             }
         }
 
@@ -343,11 +346,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         dialogFragment.show(fragmentTransaction, "dialog");
     }
 
-    //dismis the settings dialog fragment
-    public void dismissSettings(View view) {
-        dialogFragment.dismiss();
+    public void showStartTimePickerDialog(View v) {
+        DialogFragment newFragment = new HeatmapSettingDialogFragment.StartTimePickerFragment();
+        newFragment.show(getSupportFragmentManager(), "timePicker");
     }
 
+    public void showStopTimePickerDialog(View v) {
+        DialogFragment newFragment = new HeatmapSettingDialogFragment.StopTimePickerFragment();
+        newFragment.show(getSupportFragmentManager(), "timePicker");
+    }
+
+    //dismis the settings dialog fragment
+    public void dismissSettings(View view) throws ParseException {
+        dialogFragment.dismiss();
+        addFilteredHeatMap();
+    }
+
+    //setters
     public void setMapUserData(Boolean mapUserData) {
         this.mapUserData = mapUserData;
     }
@@ -356,5 +371,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         this.daysToMap = daysToMap;
     }
 
+    public void setStartHour(int startHour) {
+        this.startHour = startHour;
+    }
 
+    public void setStartMin(int startMin) {
+        this.startMin = startMin;
+    }
+
+    public void setStopHour(int stopHour) {
+        this.stopHour = stopHour;
+    }
+
+    public void setStopMin(int stopMin) {
+        this.stopMin = stopMin;
+    }
 }

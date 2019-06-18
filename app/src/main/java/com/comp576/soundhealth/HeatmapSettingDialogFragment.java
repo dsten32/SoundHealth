@@ -1,8 +1,10 @@
 package com.comp576.soundhealth;
 
 import android.app.Dialog;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,12 +13,17 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.RadioButton;
+import android.widget.TimePicker;
 
+import java.text.ParseException;
 import java.util.Arrays;
+import java.util.Calendar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 public class HeatmapSettingDialogFragment extends DialogFragment implements View.OnClickListener {
     private CheckBox allDaysBox;
@@ -73,9 +80,7 @@ public class HeatmapSettingDialogFragment extends DialogFragment implements View
         Log.d("onclock:","yep");
         if(view.getId()==R.id.frag_close) {
             MapsActivity mapActivity = (MapsActivity) getActivity();
-//            ((RadioButton) v.findViewById(R.id.userData)).isChecked();
-//
-//            mapActivity.setMapUserData(((RadioButton) v.findViewById(R.id.userData)).isChecked());
+            mapActivity.setMapUserData(((RadioButton) v.findViewById(R.id.userData)).isChecked());
 
             CheckBox[] checkArr = {
                     v.findViewById(R.id.monBox),
@@ -97,10 +102,62 @@ public class HeatmapSettingDialogFragment extends DialogFragment implements View
 
             mapActivity.setDaysToMap(days);
 
-            mapActivity.dismissSettings(view);
+            try {
+                mapActivity.dismissSettings(view);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
 
+        }
+
+    }
+
+    public static class StartTimePickerFragment extends DialogFragment
+            implements TimePickerDialog.OnTimeSetListener {
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Use the current time as the default values for the picker
+            final Calendar c = Calendar.getInstance();
+            int hour = c.get(Calendar.HOUR_OF_DAY);
+            int minute = c.get(Calendar.MINUTE);
+
+            // Create a new instance of TimePickerDialog and return it
+            return new TimePickerDialog(getActivity(), this, hour, minute,
+                    DateFormat.is24HourFormat(getActivity()));
+        }
+
+        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+            // Do something with the time chosen by the user
+            Log.d("hour min = ",String.valueOf(hourOfDay) +" "+ String.valueOf(minute));
+            MapsActivity mapActivity = (MapsActivity) getActivity();
+            mapActivity.setStartHour(hourOfDay);
+            mapActivity.setStartMin(minute);
         }
     }
 
+    public static class StopTimePickerFragment extends DialogFragment
+            implements TimePickerDialog.OnTimeSetListener {
 
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Use the current time as the default values for the picker
+            final Calendar c = Calendar.getInstance();
+            int hour = c.get(Calendar.HOUR_OF_DAY);
+            int minute = c.get(Calendar.MINUTE);
+
+            // Create a new instance of TimePickerDialog and return it
+            return new TimePickerDialog(getActivity(), this, hour, minute,
+                    DateFormat.is24HourFormat(getActivity()));
+        }
+
+        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+            // Do something with the time chosen by the user
+            Log.d("hour min = ",String.valueOf(hourOfDay) +" "+ String.valueOf(minute));
+            MapsActivity mapActivity = (MapsActivity) getActivity();
+            mapActivity.setStopHour(hourOfDay);
+            mapActivity.setStopMin(minute);
+        }
+    }
 }
+

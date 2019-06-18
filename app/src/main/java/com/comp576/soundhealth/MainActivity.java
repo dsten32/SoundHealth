@@ -75,18 +75,13 @@ public class MainActivity extends AppCompatActivity{
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void checkPermissions(){
         if (checkSelfPermission(RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,new String[]{RECORD_AUDIO},0);
+            ActivityCompat.requestPermissions(this,new String[]{RECORD_AUDIO,ACCESS_FINE_LOCATION},0);
             //    Activity#requestPermissions
             // here to request the missing permissions, and then overriding
             //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
             //                                          int[] grantResults)
             // to handle the case where the user grants the permission. See the documentation
             // for Activity#requestPermissions for more details.
-//            return;
-        }
-        if (checkSelfPermission(ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            ActivityCompat.requestPermissions(this,new String[]{ACCESS_FINE_LOCATION},0);
             return;
         }
     }
@@ -107,8 +102,8 @@ public class MainActivity extends AppCompatActivity{
 //                            String date =new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault()).format(new Date());
 //                            String time =new SimpleDateFormat("hh:mm a", Locale.getDefault()).format(new Date());
 //                            String userId = "some text I haven't decided yet";
-//                            Double lati = location.getLatitude();
-//                            Double longi = location.getLongitude();
+//                            Double lat = location.getLatitude();
+//                            Double lng = location.getLongitude();
 //                            Double dB=null;
 //                            try {
 //                                dB = new Recorder().getNoiseLevel();
@@ -117,7 +112,7 @@ public class MainActivity extends AppCompatActivity{
 //                            }
 ////                            Double dB = (Math.random()*70)+30;
 //
-//                            dataRepository.insert(new Data(date,time,userId,lati,longi,dB));
+//                            dataRepository.insert(new Data(date,time,userId,lat,lng,dB));
 //
 ////                            textPlace.setText(String.valueOf(location.getLatitude()));
 //                            Toast.makeText(getApplication().getApplicationContext(), "Datapoint saved: "+String.valueOf(dB), Toast.LENGTH_LONG).show();
