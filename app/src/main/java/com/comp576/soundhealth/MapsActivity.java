@@ -58,7 +58,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Button allDataHeatMap;
     private DialogFragment dialogFragment;
     private Boolean mapUserData = true;
-    private String[] daysToMap = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+    public String[] daysToMap = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
     private int startHour=0,startMin=0,stopHour=23,stopMin=60;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -390,5 +390,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     public void setStopMin(int stopMin) {
         this.stopMin = stopMin;
+    }
+
+    public Boolean getMapUserData() {
+        return mapUserData;
     }
 }

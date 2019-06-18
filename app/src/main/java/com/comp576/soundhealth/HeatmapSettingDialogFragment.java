@@ -29,6 +29,9 @@ public class HeatmapSettingDialogFragment extends DialogFragment implements View
     private CheckBox allDaysBox;
     private Button dismissBut;
     private View v;
+    private MapsActivity mapActivity;
+    private CheckBox[] checkDaysArr;
+    private Boolean[] daysSelected = new Boolean[7];
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -38,32 +41,49 @@ public class HeatmapSettingDialogFragment extends DialogFragment implements View
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        mapActivity = (MapsActivity) getActivity();
         v = inflater.inflate(R.layout.fragment_heatmap_settings_dialog, container, false);
+
+//        if(mapActivity.getMapUserData()){
+            ((RadioButton)v.findViewById(R.id.userData)).setChecked(mapActivity.getMapUserData());
+        ((RadioButton)v.findViewById(R.id.allData)).setChecked(!mapActivity.getMapUserData());
+
+//        }
+
+        checkDaysArr = new CheckBox[]{
+                v.findViewById(R.id.monBox),
+                v.findViewById(R.id.tueBox),
+                v.findViewById(R.id.wedBox),
+                v.findViewById(R.id.thurBox),
+                v.findViewById(R.id.friBox),
+                v.findViewById(R.id.satBox),
+                v.findViewById(R.id.sunBox),
+        };
+
         dismissBut = v.findViewById(R.id.frag_close);
         dismissBut.setOnClickListener(this);
 
         allDaysBox = (CheckBox) v.findViewById(R.id.allDaysBox);
 
+        for(int i=0;i<daysSelected.length;i++){
+            if (mapActivity.daysToMap[i]==null){
+                checkDaysArr[i].setChecked(false);
+            } else {
+                checkDaysArr[i].setChecked(true);
+            }
+        }
+
         allDaysBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                CheckBox[] checkArr = {
-                        v.findViewById(R.id.monBox),
-                        v.findViewById(R.id.tueBox),
-                        v.findViewById(R.id.wedBox),
-                        v.findViewById(R.id.thurBox),
-                        v.findViewById(R.id.friBox),
-                        v.findViewById(R.id.satBox),
-                        v.findViewById(R.id.sunBox),
-                };
 
                 if (allDaysBox.isChecked()) {
-                    for (CheckBox box : checkArr) {
+                    for (CheckBox box : checkDaysArr) {
                         box.setChecked(true);
                         box.setEnabled(false);
                     }
                 } else {
-                    for (CheckBox box : checkArr) {
+                    for (CheckBox box : checkDaysArr) {
                         box.setEnabled(true);
                     }
                 }
@@ -77,24 +97,13 @@ public class HeatmapSettingDialogFragment extends DialogFragment implements View
 
     @Override
     public void onClick(View view) {
-        Log.d("onclock:","yep");
+        Log.d("onclIck:","yep");
         if(view.getId()==R.id.frag_close) {
-            MapsActivity mapActivity = (MapsActivity) getActivity();
             mapActivity.setMapUserData(((RadioButton) v.findViewById(R.id.userData)).isChecked());
-
-            CheckBox[] checkArr = {
-                    v.findViewById(R.id.monBox),
-                    v.findViewById(R.id.tueBox),
-                    v.findViewById(R.id.wedBox),
-                    v.findViewById(R.id.thurBox),
-                    v.findViewById(R.id.friBox),
-                    v.findViewById(R.id.satBox),
-                    v.findViewById(R.id.sunBox),
-            };
 
             String[] days ={"Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"};
             for(int i=0;i < days.length;i++){
-                if(!checkArr[i].isChecked()){
+                if(!checkDaysArr[i].isChecked()){
                     days[i]=null;
                 }
             }
