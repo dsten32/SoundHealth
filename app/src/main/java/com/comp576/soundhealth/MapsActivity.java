@@ -78,7 +78,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         dataCollection = new DataCollection(getApplicationContext());
 
-        new FirebaseAsyncTask().execute();
+//        new FirebaseAsyncTask().execute();
 
     }
 
@@ -96,7 +96,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             userDataList.addAll(userData);
 //            Log.d(" Heres the userdata:", userDataList.get(0).toString());
             if(userData.size()!=0) {
-                addHeatMap();
+                addFilteredHeatMap();
             }
         }
     }
@@ -114,6 +114,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             allDataList.addAll(data);
             allDataHeatMap = (Button) findViewById(R.id.allDataHeat);
             allDataHeatMap.setEnabled(true);
+            addFilteredHeatMap();
         }
     }
 
@@ -184,38 +185,38 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     //generate user userDataList heatmap layer an add to the map
-    private void addHeatMap() {
-        mMap.clear();
-        List<WeightedLatLng> list = new ArrayList<>();
-
-// Create the gradient.
-        int[] colors = {
-                Color.rgb(102, 225, 0), // green
-
-                Color.rgb(255, 0, 0)    // red
-        };
-
-        float[] startPoints = {
-                0.0f, 1f//0.16666f, 0.33333f, 0.5f, 0.66666f, 0.83333f,
-        };
-
-        Gradient gradient = new Gradient(colors, startPoints);
-
-        for (Data data : userDataList) {
-            if (data.lat != null && data.lng != null && data.dB != null) {
-                list.add(new WeightedLatLng(new LatLng(data.lat, data.lng), ((data.dB - 30) / 10) * 0.16333));
-            }
-        }
-
-        // Create a heat map tile provider, passing it the latlngs of the datapoints.
-        HeatmapTileProvider mProvider = new HeatmapTileProvider.Builder()
-                .weightedData(list)
-                .gradient(gradient)
-                .radius(50)
-                .build();
-        // Add a tile overlay to the map, using the heat map tile provider.
-        mMap.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
-    }
+//    private void addHeatMap() {
+//        mMap.clear();
+//        List<WeightedLatLng> list = new ArrayList<>();
+//
+//// Create the gradient.
+//        int[] colors = {
+//                Color.rgb(102, 225, 0), // green
+//
+//                Color.rgb(255, 0, 0)    // red
+//        };
+//
+//        float[] startPoints = {
+//                0.0f, 1f//0.16666f, 0.33333f, 0.5f, 0.66666f, 0.83333f,
+//        };
+//
+//        Gradient gradient = new Gradient(colors, startPoints);
+//
+//        for (Data data : userDataList) {
+//            if (data.lat != null && data.lng != null && data.dB != null) {
+//                list.add(new WeightedLatLng(new LatLng(data.lat, data.lng), ((data.dB - 30) / 10) * 0.16333));
+//            }
+//        }
+//
+//        // Create a heat map tile provider, passing it the latlngs of the datapoints.
+//        HeatmapTileProvider mProvider = new HeatmapTileProvider.Builder()
+//                .weightedData(list)
+//                .gradient(gradient)
+//                .radius(50)
+//                .build();
+//        // Add a tile overlay to the map, using the heat map tile provider.
+//        mMap.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
+//    }
 
     //generate heatmap layer for all firestore userDataList
     private void addHeatMapForAllData() {
@@ -259,7 +260,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     //generate heatmap layer based on filter settings set by user. to replace the other two methods, probably.
-    private void addFilteredHeatMap() throws ParseException {
+    private void addFilteredHeatMap() {
         mMap.clear();
         List<Data> heatMapData = new ArrayList<>();
         List<WeightedLatLng> weightedLatLngs = new ArrayList<>();
@@ -290,7 +291,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         for (Data dataPoint : heatMapData) {
-            String datapointDay = new SimpleDateFormat("EEEE").format(new SimpleDateFormat("dd-MMM-yyyy").parse(dataPoint.date));
+            String datapointDay = null;
+            try {
+                datapointDay = new SimpleDateFormat("EEEE").format(new SimpleDateFormat("dd-MMM-yyyy").parse(dataPoint.date));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
             String[] datapointTime = dataPoint.time.split(":");
             int datapointMinutes = (Integer.parseInt(datapointTime[0]) * 60) + Integer.parseInt(datapointTime[1]);
             int startTimeMinutes = (startHour * 60) + startMin;
@@ -362,9 +368,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     //dismis the settings dialog fragment
-    public void dismissSettings(View view) throws ParseException {
+    public void dismissSettings(View view) {
         dialogFragment.dismiss();
-        addFilteredHeatMap();
+        if(mapUserData){
+            addFilteredHeatMap();
+        } else {
+            new FirebaseAsyncTask().execute();
+        }
     }
 
     //setters

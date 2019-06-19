@@ -111,12 +111,7 @@ public class HeatmapSettingDialogFragment extends DialogFragment implements View
 
             mapActivity.setDaysToMap(days);
 
-            try {
-                mapActivity.dismissSettings(view);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-
+            mapActivity.dismissSettings(view);
         }
 
     }
