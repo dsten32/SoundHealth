@@ -62,12 +62,10 @@ public class MainActivity extends AppCompatActivity{
         location.setText("new text I put here 'cos I could");
 
         dateTime = findViewById(R.id.dateTime);
-        String date =new SimpleDateFormat("dd-MMM-yyyy hh:mm a", Locale.getDefault()).format(new Date());
-//        Date date = Calendar.getInstance().getTime();
+        String date =new SimpleDateFormat("dd-MMM-yyyy kk:mm", Locale.getDefault()).format(new Date());
         dateTime.setText(date);
         goToMap = (Button) findViewById(R.id.goToMap);
 
-//        getDataPoint();
         checkPermissions();
 
     }
@@ -86,41 +84,6 @@ public class MainActivity extends AppCompatActivity{
         }
     }
 
-
-//todo remove method.
-    //data collection method move to own class?
-//    @SuppressLint("MissingPermission") //add an exception try/catch to the getLastLocation?
-//    public void getDataPoint(){
-//        //see if we can generate some data shall we?
-//        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-//
-//        fusedLocationProviderClient.getLastLocation()
-//                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-//                    @Override
-//                    public void onSuccess(Location location) {
-//                        if (location != null) {
-//                            String date =new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault()).format(new Date());
-//                            String time =new SimpleDateFormat("hh:mm a", Locale.getDefault()).format(new Date());
-//                            String userId = "some text I haven't decided yet";
-//                            Double lat = location.getLatitude();
-//                            Double lng = location.getLongitude();
-//                            Double dB=null;
-//                            try {
-//                                dB = new Recorder().getNoiseLevel();
-//                            } catch (NoValidNoiseLevelException e) {
-//                                e.printStackTrace();
-//                            }
-////                            Double dB = (Math.random()*70)+30;
-//
-//                            dataRepository.insert(new Data(date,time,userId,lat,lng,dB));
-//
-////                            textPlace.setText(String.valueOf(location.getLatitude()));
-//                            Toast.makeText(getApplication().getApplicationContext(), "Datapoint saved: "+String.valueOf(dB), Toast.LENGTH_LONG).show();
-//                            LatLng current = new LatLng(location.getLatitude(), location.getLongitude());
-//                        }
-//                    }
-//                });
-//    }
 
     // Setup a recurring alarm every half hour
     //from https://github.com/codepath/android_guides/wiki/Starting-Background-Services#using-with-alarmmanager-for-periodic-tasks
@@ -170,7 +133,6 @@ public class MainActivity extends AppCompatActivity{
     }
 
     public void callGetDatapoint(View view){
-//        getDataPoint();
         DataCollection dataCollectior = new DataCollection(getApplicationContext());
         dataCollectior.getDataPoint();
     }

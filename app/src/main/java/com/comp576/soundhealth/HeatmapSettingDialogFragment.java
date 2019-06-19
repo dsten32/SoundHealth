@@ -15,15 +15,12 @@ import android.widget.CompoundButton;
 import android.widget.RadioButton;
 import android.widget.TimePicker;
 
-import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Calendar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 
 public class HeatmapSettingDialogFragment extends DialogFragment implements View.OnClickListener {
     private CheckBox allDaysBox;
@@ -44,11 +41,8 @@ public class HeatmapSettingDialogFragment extends DialogFragment implements View
         mapActivity = (MapsActivity) getActivity();
         v = inflater.inflate(R.layout.fragment_heatmap_settings_dialog, container, false);
 
-//        if(mapActivity.getMapUserData()){
-            ((RadioButton)v.findViewById(R.id.userData)).setChecked(mapActivity.getMapUserData());
+        ((RadioButton)v.findViewById(R.id.userData)).setChecked(mapActivity.getMapUserData());
         ((RadioButton)v.findViewById(R.id.allData)).setChecked(!mapActivity.getMapUserData());
-
-//        }
 
         checkDaysArr = new CheckBox[]{
                 v.findViewById(R.id.monBox),
@@ -62,7 +56,6 @@ public class HeatmapSettingDialogFragment extends DialogFragment implements View
 
         dismissBut = v.findViewById(R.id.frag_close);
         dismissBut.setOnClickListener(this);
-
         allDaysBox = (CheckBox) v.findViewById(R.id.allDaysBox);
 
         for(int i=0;i<daysSelected.length;i++){
@@ -87,11 +80,8 @@ public class HeatmapSettingDialogFragment extends DialogFragment implements View
                         box.setEnabled(true);
                     }
                 }
-
-
             }
         });
-
         return v;
     }
 
@@ -108,9 +98,7 @@ public class HeatmapSettingDialogFragment extends DialogFragment implements View
                 }
             }
             Log.d("here's what frag got: ", Arrays.toString(days));
-
             mapActivity.setDaysToMap(days);
-
             mapActivity.dismissSettings(view);
         }
 
@@ -121,18 +109,15 @@ public class HeatmapSettingDialogFragment extends DialogFragment implements View
 
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
-            // Use the current time as the default values for the picker
             final Calendar c = Calendar.getInstance();
             int hour = c.get(Calendar.HOUR_OF_DAY);
             int minute = c.get(Calendar.MINUTE);
 
-            // Create a new instance of TimePickerDialog and return it
             return new TimePickerDialog(getActivity(), this, hour, minute,
-                    DateFormat.is24HourFormat(getActivity()));
+                    true);
         }
 
         public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-            // Do something with the time chosen by the user
             Log.d("hour min = ",String.valueOf(hourOfDay) +" "+ String.valueOf(minute));
             MapsActivity mapActivity = (MapsActivity) getActivity();
             mapActivity.setStartHour(hourOfDay);
@@ -145,18 +130,15 @@ public class HeatmapSettingDialogFragment extends DialogFragment implements View
 
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
-            // Use the current time as the default values for the picker
             final Calendar c = Calendar.getInstance();
             int hour = c.get(Calendar.HOUR_OF_DAY);
             int minute = c.get(Calendar.MINUTE);
 
-            // Create a new instance of TimePickerDialog and return it
             return new TimePickerDialog(getActivity(), this, hour, minute,
-                    DateFormat.is24HourFormat(getActivity()));
+                    true);
         }
 
         public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-            // Do something with the time chosen by the user
             Log.d("hour min = ",String.valueOf(hourOfDay) +" "+ String.valueOf(minute));
             MapsActivity mapActivity = (MapsActivity) getActivity();
             mapActivity.setStopHour(hourOfDay);

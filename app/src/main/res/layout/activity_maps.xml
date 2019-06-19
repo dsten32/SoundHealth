@@ -4,7 +4,6 @@
     android:layout_height="fill_parent">
 
 <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:map="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/map"
     android:name="com.google.android.gms.maps.SupportMapFragment"
@@ -25,19 +24,6 @@
             android:layout_height="wrap_content"
             android:text="Main"
             android:onClick="goToMain"/>
-        <Button
-            android:id="@+id/userDataHeat"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="User Data Heat"
-            android:onClick="callAddHeatMapForUserData"/>
-        <Button
-            android:id="@+id/allDataHeat"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:enabled="false"
-            android:text="All Data Heat"
-            android:onClick="callAddHeatMapForAllData"/>
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

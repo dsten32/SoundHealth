@@ -30,8 +30,6 @@ import com.google.maps.android.heatmaps.Gradient;
 import com.google.maps.android.heatmaps.HeatmapTileProvider;
 import com.google.maps.android.heatmaps.WeightedLatLng;
 
-
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -60,6 +58,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Boolean mapUserData = true;
     public String[] daysToMap = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
     private int startHour=0,startMin=0,stopHour=23,stopMin=60;
+    private DialogFragment spinnerFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,7 +68,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-//        textPlace = findViewById(R.id.textPlace);
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
@@ -77,9 +76,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         new UserAsyncTask().execute();
 
         dataCollection = new DataCollection(getApplicationContext());
-
-//        new FirebaseAsyncTask().execute();
-
     }
 
 
@@ -94,7 +90,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         @Override
         protected void onPostExecute(List<Data> userData) {
             userDataList.addAll(userData);
-//            Log.d(" Heres the userdata:", userDataList.get(0).toString());
             if(userData.size()!=0) {
                 addFilteredHeatMap();
             }
@@ -112,8 +107,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         @Override
         protected void onPostExecute(List<Data> data) {
             allDataList.addAll(data);
-            allDataHeatMap = (Button) findViewById(R.id.allDataHeat);
-            allDataHeatMap.setEnabled(true);
+            spinnerFragment.dismiss();
             addFilteredHeatMap();
         }
     }
@@ -133,11 +127,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Add a marker in Sydney and move the camera
-//        LatLng sydney = new LatLng(-34, 151);
-//        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-//        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-
         if (checkSelfPermission(ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             ActivityCompat.requestPermissions(this, new String[]{ACCESS_FINE_LOCATION}, 0);
@@ -156,19 +145,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     @Override
                     public void onSuccess(Location location) {
                         if (location != null) {
-//                            textPlace.setText("Latitude: " + String.valueOf(location.getLatitude()) +"\nLongitude: "+String.valueOf(location.getLongitude()));
-//                            Toast.makeText(getApplication().getApplicationContext(), "my location is: "+location, Toast.LENGTH_LONG).show();
                             LatLng current = new LatLng(location.getLatitude(), location.getLongitude());
                             mMap.addMarker(new MarkerOptions().position(current).title("you are here"));
-
-//                            mMap.moveCamera(CameraUpdateFactory.newLatLng(current));
-//                            mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
-//                            mMap.moveCamera(CameraUpdateFactory.newLatLng(current));
-//                            mMap.setMinZoomPreference(8);
                             mMap.setMyLocationEnabled(true);
                             mMap.getUiSettings().setZoomControlsEnabled(true);
                             mMap.getUiSettings().setAllGesturesEnabled(true);
-//                            addHeatMap();
 
                             CameraPosition cameraPosition = new CameraPosition.Builder()
                                     .target(new LatLng(location.getLatitude(), location.getLongitude()))      // Sets the center of the map to location user
@@ -184,80 +165,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-    //generate user userDataList heatmap layer an add to the map
-//    private void addHeatMap() {
-//        mMap.clear();
-//        List<WeightedLatLng> list = new ArrayList<>();
-//
-//// Create the gradient.
-//        int[] colors = {
-//                Color.rgb(102, 225, 0), // green
-//
-//                Color.rgb(255, 0, 0)    // red
-//        };
-//
-//        float[] startPoints = {
-//                0.0f, 1f//0.16666f, 0.33333f, 0.5f, 0.66666f, 0.83333f,
-//        };
-//
-//        Gradient gradient = new Gradient(colors, startPoints);
-//
-//        for (Data data : userDataList) {
-//            if (data.lat != null && data.lng != null && data.dB != null) {
-//                list.add(new WeightedLatLng(new LatLng(data.lat, data.lng), ((data.dB - 30) / 10) * 0.16333));
-//            }
-//        }
-//
-//        // Create a heat map tile provider, passing it the latlngs of the datapoints.
-//        HeatmapTileProvider mProvider = new HeatmapTileProvider.Builder()
-//                .weightedData(list)
-//                .gradient(gradient)
-//                .radius(50)
-//                .build();
-//        // Add a tile overlay to the map, using the heat map tile provider.
-//        mMap.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
-//    }
-
-    //generate heatmap layer for all firestore userDataList
-    private void addHeatMapForAllData() {
-
-        mMap.clear();
-        List<WeightedLatLng> weightedLatLngs = new ArrayList<>();
-
-// Create the gradient.
-        int[] colors = {
-                Color.rgb(102, 225, 0), // green
-                Color.GREEN,    // green(0-50)
-                Color.YELLOW,    // yellow(51-100)
-                Color.rgb(255, 165, 0), //Orange(101-150)
-                Color.RED,              //red(151-200)
-                Color.rgb(153, 50, 204), //dark orchid(201-300)
-                Color.rgb(165, 42, 42), //brown(301-500)
-//                Color.BLUE,
-        };
-
-        float[] startPoints = {
-                0.0f, 0.16666f, 0.33333f, 0.5f, 0.66666f, 0.83333f, 1f
-        };
-
-        Gradient gradient = new Gradient(colors, startPoints);
-
-
-        for (Data data : allDataList) {
-            if (data.lat != null && data.lng != null && data.dB != null) {
-                weightedLatLngs.add(new WeightedLatLng(new LatLng(data.lat, data.lng), ((data.dB - 30) * 10) * 0.16333));
-            }
-        }
-
-        // Create a heat map tile provider, passing it the latlngs of the datapoints.
-        HeatmapTileProvider mProvider = new HeatmapTileProvider.Builder()
-                .weightedData(weightedLatLngs)
-                .gradient(gradient)
-                .radius(50)
-                .build();
-        // Add a tile overlay to the map, using the heat map tile provider.
-        mMap.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
-    }
 
     //generate heatmap layer based on filter settings set by user. to replace the other two methods, probably.
     private void addFilteredHeatMap() {
@@ -265,7 +172,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         List<Data> heatMapData = new ArrayList<>();
         List<WeightedLatLng> weightedLatLngs = new ArrayList<>();
 
-// Create the gradient.
+        // Create the gradient.
         int[] colors = {
                 Color.rgb(102, 225, 0), // green
                 Color.GREEN,    // green(0-50)
@@ -274,7 +181,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Color.RED,              //red(151-200)
                 Color.rgb(153, 50, 204), //dark orchid(201-300)
                 Color.rgb(165, 42, 42), //brown(301-500)
-//                Color.BLUE,
         };
 
         float[] startPoints = {
@@ -312,7 +218,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         }
 
-
         if (weightedLatLngs.size()!=0) {
             // Create a heat map tile provider, passing it the latlngs of the datapoints.
             HeatmapTileProvider mProvider = new HeatmapTileProvider.Builder()
@@ -327,22 +232,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-
     //go back to the main activity screen
     public void goToMain(View view) {
         Intent goToMain = new Intent(this, MainActivity.class);
         startActivity(goToMain);
-    }
-
-    //method for calling the user userDataList heatmap method from the view
-    public void callAddHeatMapForUserData(View view) throws ParseException {
-//        addHeatMap()
- addFilteredHeatMap();
-    }
-
-    //method for calling the all userDataList heatmap method from the view
-    public void callAddHeatMapForAllData(View view) {
-        addHeatMapForAllData();
     }
 
     //show the heatmap settings dialog fragment
@@ -355,6 +248,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         fragmentTransaction.addToBackStack(null);
         dialogFragment = new HeatmapSettingDialogFragment();
         dialogFragment.show(fragmentTransaction, "dialog");
+    }
+
+    //show the loading spinner dialog fragment
+    public void showSpinner() {
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        Fragment prev = getSupportFragmentManager().findFragmentByTag("spinner");
+        if (prev != null) {
+            fragmentTransaction.remove(prev);
+        }
+        fragmentTransaction.addToBackStack(null);
+        spinnerFragment = new SpinnerFragment();
+        spinnerFragment.show(fragmentTransaction, "spinner");
     }
 
     public void showStartTimePickerDialog(View v) {
@@ -373,6 +278,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if(mapUserData){
             addFilteredHeatMap();
         } else {
+            showSpinner();
             new FirebaseAsyncTask().execute();
         }
     }
