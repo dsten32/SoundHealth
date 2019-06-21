@@ -76,17 +76,12 @@ public class DataCollection extends Activity {
                                 e.printStackTrace();
                             }
 
-                            if(dB==null){
-                                Toast.makeText(getApplicationContext(),"datapoint dB = null. Fix mic and try again",Toast.LENGTH_SHORT).show();
-                                return;
-                            }
                             Data data =new Data(date,time,userId,lati,longi,dB);
 
                             long id=dataRepository.insert(data);
                             data.id=id;
                             sendData(data);
 
-//                            textPlace.setText(String.valueOf(location.getLatitude()));
                             if(data!=null){
                             Toast.makeText(context, "Datapoint saved: "+data.dB, Toast.LENGTH_LONG).show();
                             } else {

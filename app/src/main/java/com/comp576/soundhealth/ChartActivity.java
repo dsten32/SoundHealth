@@ -13,16 +13,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lecho.lib.hellocharts.model.*;
-//import lecho.lib.hellocharts.model.SliceValue;
-//import lecho.lib.hellocharts.model.ColumnChartData;
-//import lecho.lib.hellocharts.model.Column;
-//import lecho.lib.hellocharts.model.SubcolumnValue;
-//import lecho.lib.hellocharts.model.
+import lecho.lib.hellocharts.model.SliceValue;
+import lecho.lib.hellocharts.model.ColumnChartData;
+import lecho.lib.hellocharts.model.Column;
+import lecho.lib.hellocharts.model.SubcolumnValue;
+//import lecho.lib.hellocharts.model.*;
 import lecho.lib.hellocharts.view.PieChartView;
 import lecho.lib.hellocharts.listener.PieChartOnValueSelectListener;
+import lecho.lib.hellocharts.view.ColumnChartView;
+import lecho.lib.hellocharts.listener.ColumnChartOnValueSelectListener;
 
 public class ChartActivity extends AppCompatActivity{
-    PieChartView pieChartView;
+    private PieChartView pieChartView;
+    private ColumnChartView barChartView;
     private ArrayAdapter<Data> adapter;
     private List<Data> data = new ArrayList<>();
     private ListView dataListView;
@@ -37,6 +40,7 @@ public class ChartActivity extends AppCompatActivity{
         dataRepository = new DataRepository(this);
 
         pieChartView = findViewById(R.id.pieChart);
+        barChartView = findViewById(R.id.barChart);
 
 //get user's data for display. may want to create a dB class to only grab that info.
         AsyncTask.execute(new Runnable() {
@@ -59,23 +63,22 @@ public class ChartActivity extends AppCompatActivity{
 //Generating slice data, simple categorisation of dB levels and taking percents.
         for(Data dataPoint :data){
             double dB = dataPoint.dB;
-            float addPercent = 100/dataTotal;
-            if(dB >90){
-                nintiesPlus+=addPercent;
-            } else if (dB >80){
-                eighties+=addPercent;
-            } else if (dB >70){
-                seventies+=addPercent;
-            }else if(dB >60){
-                sixties++;
-            } else if(dB >50){
-                fifties+=addPercent;
-            }else if(dB >40){
-                fourties+=addPercent;
-            }else if(dB >30){
-                thirties+=addPercent;
-            }
-
+                float addPercent = 100 / dataTotal;
+                if (dB > 90) {
+                    nintiesPlus += addPercent;
+                } else if (dB > 80) {
+                    eighties += addPercent;
+                } else if (dB > 70) {
+                    seventies += addPercent;
+                } else if (dB > 60) {
+                    sixties++;
+                } else if (dB > 50) {
+                    fifties += addPercent;
+                } else if (dB > 40) {
+                    fourties += addPercent;
+                } else if (dB > 30) {
+                    thirties += addPercent;
+                }
         }
 
         List pieData = new ArrayList<>();
@@ -96,27 +99,11 @@ public class ChartActivity extends AppCompatActivity{
         pieChartView.startDataAnimation();
 
 
+        //users daily chart
         List barData = new ArrayList<>();
-
 
         ColumnChartData barChartData = new ColumnChartData(barData);
 
-//        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, data);
-//        //adapter setup
-//        if (findViewById(R.id.dataListView) != null) {
-//            dataListView = findViewById(R.id.dataListView);
-//            dataListView.setAdapter(adapter);
-////            dataListView.setOnItemClickListener(this);
-//        }
-//
-//        dataRepository.getAllData().observe(this, new Observer<List<Data>>() {
-//            @Override
-//            public void onChanged(List<Data> updatedData) {
-//// update the contacts list when the database changes
-//                adapter.clear();
-//                adapter.addAll(updatedData);
-//            }
-//        });
 
 
 

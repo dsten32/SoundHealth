@@ -73,6 +73,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         dataRepository = new DataRepository(this);
 
+        //should probably move this to the onMapReady callback
         new UserAsyncTask().execute();
 
         dataCollection = new DataCollection(getApplicationContext());
@@ -158,7 +159,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     .tilt(40)                   // Sets the tilt of the camera to 30 degrees
                                     .build();                   // Creates a CameraPosition from the builder
                             mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-
+                            //Async userdata here???
                         }
                     }
                 });

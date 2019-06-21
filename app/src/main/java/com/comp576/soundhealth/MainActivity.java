@@ -1,46 +1,44 @@
 package com.comp576.soundhealth;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Observer;
+import androidx.drawerlayout.widget.DrawerLayout;
 
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.navigation.NavigationView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static android.Manifest.permission.RECORD_AUDIO;
-import static androidx.core.content.ContextCompat.checkSelfPermission;
 
 public class MainActivity extends AppCompatActivity{
+    private DrawerLayout drawerLayout;
+    private ActionBarDrawerToggle drawerToggle;
+    private NavigationView navigationView;
     private TextView location,dateTime;
     private Button goToMap;
     private FusedLocationProviderClient fusedLocationProviderClient;
@@ -66,8 +64,48 @@ public class MainActivity extends AppCompatActivity{
         dateTime.setText(date);
         goToMap = (Button) findViewById(R.id.goToMap);
 
-        checkPermissions();
 
+
+        //setup navigation draw stuff
+        drawerLayout = (DrawerLayout)findViewById(R.id.activity_main);
+        drawerToggle = new ActionBarDrawerToggle(this,drawerLayout,R.string.common_open_on_phone,R.string.common_open_on_phone);
+        drawerLayout.addDrawerListener(drawerToggle);
+        drawerToggle.syncState();
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        navigationView = (NavigationView)findViewById(R.id.nv);
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                int id = menuItem.getItemId();
+                switch (id){
+                    case R.id.chart:
+                        Intent goToChart = new Intent(getApplicationContext(),ChartActivity.class);
+                        startActivity(goToChart);
+                        break;
+                    case R.id.settings:
+                        break;
+                    case R.id.mapview:
+                        Intent goToMap = new Intent(getApplicationContext(),MapsActivity.class);
+                        startActivity(goToMap);
+                        break;
+                    default:
+                        return true;
+                }
+                return true;
+            }
+        });
+
+        //check that app can access location data and record audio
+        checkPermissions();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        if(drawerToggle.onOptionsItemSelected(item))
+            return true;
+
+        return super.onOptionsItemSelected(item);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
