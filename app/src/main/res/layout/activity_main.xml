@@ -40,7 +40,7 @@
         android:onClick="callScheduleDataCollection"
         android:text="Start continuous collection"
         android:layout_alignParentRight="true"
-        android:layout_above="@id/stopCollection"
+        android:layout_below="@id/dateTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
@@ -49,7 +49,7 @@
         android:onClick="callCancelDataCollection"
         android:text="Stop collection"
         android:layout_alignParentRight="true"
-        android:layout_above="@id/getData"
+        android:layout_below="@id/startCollection"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
@@ -58,7 +58,7 @@
         android:onClick="callGetDatapoint"
         android:text="Get Single Data Point"
         android:layout_alignParentRight="true"
-        android:layout_above="@id/sendData"
+        android:layout_below="@id/stopCollection"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
@@ -67,28 +67,10 @@
         android:onClick="callSendDataCollection"
         android:text="Send Data Collection"
         android:layout_alignParentRight="true"
-        android:layout_above="@id/goToMap"
+        android:layout_below="@id/getData"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:enabled="true"/>
-
-    <Button
-        android:id="@+id/goToMap"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:onClick="goToMap"
-        android:text="Go To Map" />
-
-    <Button
-        android:id="@+id/goToChart"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:onClick="goToChart"
-        android:text="Go To Chart" />
 
 </RelativeLayout>
     <com.google.android.material.navigation.NavigationView

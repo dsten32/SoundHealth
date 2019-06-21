@@ -22,6 +22,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -40,7 +41,6 @@ public class MainActivity extends AppCompatActivity{
     private ActionBarDrawerToggle drawerToggle;
     private NavigationView navigationView;
     private TextView location,dateTime;
-    private Button goToMap;
     private FusedLocationProviderClient fusedLocationProviderClient;
     private DataRepository dataRepository;
     private ArrayAdapter<Data> adapter;
@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity{
     private ListView dataListView;
     private static int MINUTE=60;
     private int interval = 1;
+    private Switch continuousSwitch;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -62,11 +63,9 @@ public class MainActivity extends AppCompatActivity{
         dateTime = findViewById(R.id.dateTime);
         String date =new SimpleDateFormat("dd-MMM-yyyy kk:mm", Locale.getDefault()).format(new Date());
         dateTime.setText(date);
-        goToMap = (Button) findViewById(R.id.goToMap);
 
-
-
-        //setup navigation draw stuff
+        //setup navigation drawer stuff
+        continuousSwitch = findViewById(R.id.continuousSwitch);
         drawerLayout = (DrawerLayout)findViewById(R.id.activity_main);
         drawerToggle = new ActionBarDrawerToggle(this,drawerLayout,R.string.common_open_on_phone,R.string.common_open_on_phone);
         drawerLayout.addDrawerListener(drawerToggle);
@@ -88,6 +87,12 @@ public class MainActivity extends AppCompatActivity{
                         Intent goToMap = new Intent(getApplicationContext(),MapsActivity.class);
                         startActivity(goToMap);
                         break;
+                    case R.id.continuousSwitch:
+                        if (continuousSwitch.isChecked()){
+                            scheduleDataCollection();
+                        } else {
+                            cancelDataCollection();
+                        }
                     default:
                         return true;
                 }

@@ -13,7 +13,7 @@ public class AlarmReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Intent i = new Intent(context, DataCollectionService.class);
-        i.putExtra("foo", "bar");
+//        i.putExtra("foo", "bar");
         context.startService(i);
     }
 }

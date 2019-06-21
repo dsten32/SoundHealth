@@ -61,24 +61,27 @@ public class ChartActivity extends AppCompatActivity{
         dataTotal=data.size();
 
 //Generating slice data, simple categorisation of dB levels and taking percents.
-        for(Data dataPoint :data){
-            double dB = dataPoint.dB;
+        for(Data dataPoint :data) {
+            Double dB = dataPoint.dB;
+            //check if null in case I forget to enable mic.
+            if (dB != null) {
                 float addPercent = 100 / dataTotal;
-                if (dB > 90) {
-                    nintiesPlus += addPercent;
-                } else if (dB > 80) {
-                    eighties += addPercent;
-                } else if (dB > 70) {
-                    seventies += addPercent;
-                } else if (dB > 60) {
-                    sixties++;
-                } else if (dB > 50) {
-                    fifties += addPercent;
-                } else if (dB > 40) {
-                    fourties += addPercent;
-                } else if (dB > 30) {
-                    thirties += addPercent;
-                }
+            if (dB > 90) {
+                nintiesPlus += addPercent;
+            } else if (dB > 80) {
+                eighties += addPercent;
+            } else if (dB > 70) {
+                seventies += addPercent;
+            } else if (dB > 60) {
+                sixties++;
+            } else if (dB > 50) {
+                fifties += addPercent;
+            } else if (dB > 40) {
+                fourties += addPercent;
+            } else if (dB > 30) {
+                thirties += addPercent;
+            }
+        }
         }
 
         List pieData = new ArrayList<>();
