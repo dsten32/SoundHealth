@@ -5,8 +5,7 @@
         android:id="@+id/continuousSwitch"
         android:icon="@drawable/ic_autorenew_black_24dp"
         android:title="Continuous Data Collection"
-        android:checked="false"
-        app:actionLayout="@layout/switch_item" />
+        app:actionViewClass="android.widget.Switch" />
     <item android:id="@+id/mapview"
         android:icon="@drawable/ic_my_location_black_24dp"
         android:title="Map"/>

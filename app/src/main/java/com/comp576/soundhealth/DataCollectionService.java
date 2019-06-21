@@ -18,5 +18,6 @@ public class DataCollectionService extends IntentService {
         Log.i("DataCollectionService", "Service running");
         DataCollection dataCollectior = new DataCollection(getApplicationContext());
         dataCollectior.getDataPoint();
+        Log.d("scheduled datapoint","collected");
     }
 }

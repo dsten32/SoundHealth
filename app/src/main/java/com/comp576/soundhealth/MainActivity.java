@@ -17,13 +17,18 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import android.view.LayoutInflater;
+import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.material.navigation.NavigationView;
@@ -65,7 +70,6 @@ public class MainActivity extends AppCompatActivity{
         dateTime.setText(date);
 
         //setup navigation drawer stuff
-        continuousSwitch = findViewById(R.id.continuousSwitch);
         drawerLayout = (DrawerLayout)findViewById(R.id.activity_main);
         drawerToggle = new ActionBarDrawerToggle(this,drawerLayout,R.string.common_open_on_phone,R.string.common_open_on_phone);
         drawerLayout.addDrawerListener(drawerToggle);
@@ -76,6 +80,7 @@ public class MainActivity extends AppCompatActivity{
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 int id = menuItem.getItemId();
+
                 switch (id){
                     case R.id.chart:
                         Intent goToChart = new Intent(getApplicationContext(),ChartActivity.class);
@@ -88,10 +93,14 @@ public class MainActivity extends AppCompatActivity{
                         startActivity(goToMap);
                         break;
                     case R.id.continuousSwitch:
-                        if (continuousSwitch.isChecked()){
+                        if (!((Switch)menuItem.getActionView()).isChecked()){
+                            ((Switch)menuItem.getActionView()).setChecked(true);
                             scheduleDataCollection();
+                            return true;
                         } else {
+                            ((Switch)menuItem.getActionView()).setChecked(false);
                             cancelDataCollection();
+                            return true;
                         }
                     default:
                         return true;
@@ -100,6 +109,17 @@ public class MainActivity extends AppCompatActivity{
             }
         });
 
+        continuousSwitch = (Switch)navigationView.getMenu().findItem(R.id.continuousSwitch).getActionView();
+        continuousSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    scheduleDataCollection();
+                } else {
+                    cancelDataCollection();
+                }
+            }
+        });
         //check that app can access location data and record audio
         checkPermissions();
     }
@@ -131,6 +151,7 @@ public class MainActivity extends AppCompatActivity{
     // Setup a recurring alarm every half hour
     //from https://github.com/codepath/android_guides/wiki/Starting-Background-Services#using-with-alarmmanager-for-periodic-tasks
     public void scheduleDataCollection() {
+        Toast.makeText(this,"data collection started",Toast.LENGTH_SHORT).show();
         // Construct an intent that will execute the AlarmReceiver
         Intent intent = new Intent(getApplicationContext(), AlarmReceiver.class);
         // Create a PendingIntent to be triggered when the alarm goes off
@@ -147,6 +168,8 @@ public class MainActivity extends AppCompatActivity{
 
     //stop data collection service
     public void cancelDataCollection() {
+        Toast.makeText(this,"data collection stopped",Toast.LENGTH_SHORT).show();
+
         Intent intent = new Intent(getApplicationContext(), AlarmReceiver.class);
         final PendingIntent pIntent = PendingIntent.getBroadcast(this, AlarmReceiver.REQUEST_CODE,
                 intent, PendingIntent.FLAG_UPDATE_CURRENT);
