@@ -82,11 +82,7 @@ public class DataCollection extends Activity {
                             data.id=id;
                             sendData(data);
 
-                            if(data!=null){
-                            Toast.makeText(context, "Datapoint saved: "+data.dB, Toast.LENGTH_LONG).show();
-                            } else {
-                                Toast.makeText(context, "huh, null", Toast.LENGTH_LONG).show();
-                            }
+                            Toast.makeText(context, "Datapoint saved: "+(double)Math.round(data.dB*100)/100, Toast.LENGTH_LONG).show();
                         }
                     }
                 });

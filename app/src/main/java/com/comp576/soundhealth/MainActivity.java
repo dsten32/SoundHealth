@@ -17,10 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
-import android.view.LayoutInflater;
-import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -68,6 +65,16 @@ public class MainActivity extends AppCompatActivity{
         dateTime = findViewById(R.id.dateTime);
         String date =new SimpleDateFormat("dd-MMM-yyyy kk:mm", Locale.getDefault()).format(new Date());
         dateTime.setText(date);
+
+        Button mainButton = (Button) findViewById(R.id.main_btn);
+
+        mainButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Toast.makeText(getApplicationContext(),"Collecting",Toast.LENGTH_SHORT).show();
+                DataCollection dataCollectior = new DataCollection(getApplicationContext());
+                dataCollectior.getDataPoint();
+            }
+        });
 
         //setup navigation drawer stuff
         drawerLayout = (DrawerLayout)findViewById(R.id.activity_main);
@@ -175,32 +182,6 @@ public class MainActivity extends AppCompatActivity{
                 intent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
         alarm.cancel(pIntent);
-    }
-
-
-    //Navigation methods
-    public void goToChart(View view){
-        Intent goToChart = new Intent(this,ChartActivity.class);
-        startActivity(goToChart);
-    }
-
-    public void goToMap(View view){
-        Intent goToMap = new Intent(this,MapsActivity.class);
-        startActivity(goToMap);
-    }
-
-
-    public void callScheduleDataCollection(View view) {
-        scheduleDataCollection();
-    }
-
-    public void callCancelDataCollection(View view){
-        cancelDataCollection();
-    }
-
-    public void callGetDatapoint(View view){
-        DataCollection dataCollectior = new DataCollection(getApplicationContext());
-        dataCollectior.getDataPoint();
     }
 
     public void callSendDataCollection(View view){
