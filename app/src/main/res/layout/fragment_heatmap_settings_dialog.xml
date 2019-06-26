@@ -143,8 +143,7 @@
             android:focusable="false"
             android:gravity="center"
             android:inputType="date"
-            android:onClick="showStartDatePickerDialog"
-            android:text="12/12/2019" />
+            android:onClick="showStartDatePickerDialog"/>
 
         <TextView
             android:id="@+id/spacer"
@@ -165,8 +164,7 @@
             android:focusable="false"
             android:gravity="center"
             android:inputType="date"
-            android:onClick="showStopDatePickerDialog"
-            android:text="12/12/2019" />
+            android:onClick="showStopDatePickerDialog"/>
 
         <!--<Button-->
             <!--android:layout_width="wrap_content"-->

@@ -251,8 +251,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     && Arrays.asList(daysToMap).contains(datapointDay)
                     && (datapointMinutes > startTimeMinutes)
                     && (datapointMinutes < stopTimeMinutes)
-                    && (datapointDate.compareTo(dSDate) > 0)
-                    && (datapointDate.compareTo(dEDate) < 0)) {
+                    && ((datapointDate.compareTo(dSDate) > 0)
+                    && (datapointDate.compareTo(dEDate) < 0))) {
+                Log.d("Datapoint Date: ",datapointDate.toString() + "\n dSDate: " + dSDate.toString() + "\n dEDate: "+dEDate.toString());
                 weightedLatLngs.add(new WeightedLatLng(new LatLng(dataPoint.lat, dataPoint.lng), ((dataPoint.dB - 30) * 10) * 0.16333));
             }
         }
@@ -319,7 +320,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void showStopDatePickerDialog(View v) {
-        DialogFragment newFragment = new HeatmapSettingDialogFragment.StopDatePickerFragment();
+        DialogFragment newFragment = new HeatmapSettingDialogFragment.DatePickerFragment();
         HeatmapSettingDialogFragment hm = (HeatmapSettingDialogFragment) getSupportFragmentManager().findFragmentByTag("dialog");
         hm.setFlag(HeatmapSettingDialogFragment.END_DATE_FLAG);
         newFragment.show(getSupportFragmentManager(), "stopdatePicker");
@@ -387,6 +388,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     public void seteDay(int eDay) {
         this.eDay = eDay;
+    }
+
+    public int getsYear() {
+        return sYear;
+    }
+
+    public int getsMonth() {
+        return sMonth;
+    }
+
+    public int getsDay() {
+        return sDay;
+    }
+
+    public int geteYear() {
+        return eYear;
+    }
+
+    public int geteMonth() {
+        return eMonth;
+    }
+
+    public int geteDay() {
+        return eDay;
     }
 
     public Boolean getMapUserData() {
