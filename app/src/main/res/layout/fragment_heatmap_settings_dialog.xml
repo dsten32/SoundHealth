@@ -134,7 +134,7 @@
 
         <EditText
             android:id="@+id/sDate"
-            android:layout_width="wrap_content"
+            android:layout_width="110dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight=".8"
@@ -143,7 +143,7 @@
             android:focusable="false"
             android:gravity="center"
             android:inputType="date"
-            android:onClick="showStartDatePickerDialog"/>
+            android:onClick="showStartDatePickerDialog" />
 
         <TextView
             android:id="@+id/spacer"
@@ -155,7 +155,7 @@
 
         <EditText
             android:id="@+id/eDate"
-            android:layout_width="wrap_content"
+            android:layout_width="110dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight=".8"
@@ -164,7 +164,7 @@
             android:focusable="false"
             android:gravity="center"
             android:inputType="date"
-            android:onClick="showStopDatePickerDialog"/>
+            android:onClick="showStopDatePickerDialog" />
 
         <!--<Button-->
             <!--android:layout_width="wrap_content"-->
