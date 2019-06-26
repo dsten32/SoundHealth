@@ -50,16 +50,7 @@ public class ChartActivity extends AppCompatActivity{
         pieChartView = findViewById(R.id.pieChart);
         barChartView = findViewById(R.id.barChart);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-//        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
-//        setSupportActionBar(myToolbar);
-//        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp);
-//
-//        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                startActivity(new Intent(getApplicationContext(),MainActivity.class));
-//            }
-//        });
+        getSupportActionBar().setTitle("Sound Chart");
 
 //get user's data for display. may want to create a dB class to only grab that info.
         AsyncTask.execute(new Runnable() {

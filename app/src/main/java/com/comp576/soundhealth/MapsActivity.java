@@ -2,6 +2,7 @@ package com.comp576.soundhealth;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.ActionBar;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -39,6 +40,7 @@ import java.util.Date;
 import java.util.List;
 
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
@@ -47,7 +49,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
     private FusedLocationProviderClient fusedLocationProviderClient;
     private GoogleMap mMap;
     private TextView textPlace;
@@ -77,13 +79,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         dataRepository = new DataRepository(this);
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle("Sound Heatmap");
+
         //should probably move this to the onMapReady callback
         new UserAsyncTask().execute();
 
         dataCollection = new DataCollection(getApplicationContext());
-
     }
-
+    @Override
+    public boolean onSupportNavigateUp(){
+        finish();
+        return true;
+    }
     //get user userDataList from repository and add heatmap to map on complete
     private class UserAsyncTask extends AsyncTask<Void, Void, List<Data>> {
 
