@@ -222,13 +222,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         String sEDate = eDay+"/"+eMonth+"/"+eYear;
         Date dSDate = new SimpleDateFormat("dd/MM/yyyy").parse(sSDate);
         Date dEDate = new SimpleDateFormat("dd/MM/yyyy").parse(sEDate);
-        Log.d("date1", dEDate.toString());
-//        try {
-//            dSDate=new SimpleDateFormat("dd/MM/yyyy").parse(sSDate);
-//            dEDate=new SimpleDateFormat("dd/MM/yyyy").parse(sEDate);
-////            SimpleDateFormat format = new SimpleDateFormat("dd/MMM/yyyy");
-////            String formattedDate = format.format(date1);
-//        } catch (Exception e){}
 
             for (Data dataPoint : heatMapData) {
             String datapointDay = null;

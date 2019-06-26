@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.location.Location;
+import android.os.Build;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -36,6 +37,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 
 import static androidx.constraintlayout.widget.Constraints.TAG;
 
@@ -109,14 +111,17 @@ public class DataCollection extends Activity {
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     public void sendDataCollection(){
         //create a batch of fake data and send to the firestore.
         ArrayList<Data> dataList = (ArrayList<Data>) new GenerateData().getFakeData();
         WriteBatch batch = db.batch();
         int dbID=0; //want to add id to the data as it's being sent. didn't work but not sure if it was 'cos of other problems
+        String paddedID;
         for (Data data:dataList) {
             dbID = ((int)(double)(Math.random()*10000));
-            DocumentReference newDoc = db.collection("sound_data_collection").document(String.valueOf(dbID));
+            paddedID=String.format("%1$" + 4 + "s", dbID).replace(' ', '0');
+            DocumentReference newDoc = db.collection("sound_data_collection").document(paddedID);
             batch.set(newDoc, data);
         }
 

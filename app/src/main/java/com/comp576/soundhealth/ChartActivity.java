@@ -1,17 +1,25 @@
 package com.comp576.soundhealth;
 
+import android.app.ActionBar;
+import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.SpinnerAdapter;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.appcompat.widget.Toolbar;
 import lecho.lib.hellocharts.model.*;
 import lecho.lib.hellocharts.model.SliceValue;
 import lecho.lib.hellocharts.model.ColumnChartData;
@@ -41,6 +49,17 @@ public class ChartActivity extends AppCompatActivity{
 
         pieChartView = findViewById(R.id.pieChart);
         barChartView = findViewById(R.id.barChart);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
+//        setSupportActionBar(myToolbar);
+//        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp);
+//
+//        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                startActivity(new Intent(getApplicationContext(),MainActivity.class));
+//            }
+//        });
 
 //get user's data for display. may want to create a dB class to only grab that info.
         AsyncTask.execute(new Runnable() {
@@ -102,16 +121,17 @@ public class ChartActivity extends AppCompatActivity{
         pieChartView.startDataAnimation();
 
 
-        //users daily chart
+        //users daily chart, TODO
         List barData = new ArrayList<>();
 
         ColumnChartData barChartData = new ColumnChartData(barData);
-
-
-
-
     }
 
+    @Override
+    public boolean onSupportNavigateUp(){
+        finish();
+        return true;
+    }
     public void onEnterAnimationComplete(){
         if(data.isEmpty()){
             Toast.makeText(this,dataQueried.toString(),Toast.LENGTH_SHORT).show();
