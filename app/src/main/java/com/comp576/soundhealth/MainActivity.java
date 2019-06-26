@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -114,6 +115,7 @@ public class MainActivity extends AppCompatActivity{
                     default:
                         return true;
                 }
+                drawerLayout.closeDrawer(Gravity.LEFT);
                 return true;
             }
         });
