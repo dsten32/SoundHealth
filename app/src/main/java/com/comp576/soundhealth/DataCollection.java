@@ -115,7 +115,7 @@ public class DataCollection extends Activity {
         WriteBatch batch = db.batch();
         int dbID=0; //want to add id to the data as it's being sent. didn't work but not sure if it was 'cos of other problems
         for (Data data:dataList) {
-            dbID++;
+            dbID = ((int)(double)(Math.random()*10000));
             DocumentReference newDoc = db.collection("sound_data_collection").document(String.valueOf(dbID));
             batch.set(newDoc, data);
         }

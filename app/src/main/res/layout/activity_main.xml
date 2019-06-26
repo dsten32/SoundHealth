@@ -5,7 +5,7 @@
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/holo_green_dark">
+    android:background="#548e92">
 
 
 
@@ -29,12 +29,6 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Headline"
         />
 
-    <TextView
-        android:id="@+id/dateTime"
-        android:layout_below="@id/location"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        />
 
     <Button
         android:id="@+id/main_btn"
@@ -52,15 +46,6 @@
         android:shadowRadius="5"
         />
 
-    <Button
-        android:id="@+id/sendData"
-        android:onClick="callSendDataCollection"
-        android:text="Send Data Collection"
-        android:layout_alignParentRight="true"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:enabled="true"/>
-
 </RelativeLayout>
     <com.google.android.material.navigation.NavigationView
     android:layout_width="wrap_content"
@@ -68,6 +53,7 @@
         app:menu="@menu/navigation_menu"
         android:layout_gravity="start"
         app:headerLayout="@layout/nav_header"
-        android:id="@+id/nv">
+        android:id="@+id/nav">
     </com.google.android.material.navigation.NavigationView>
+
 </androidx.drawerlayout.widget.DrawerLayout>

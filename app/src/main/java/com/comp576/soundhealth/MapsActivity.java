@@ -34,6 +34,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import androidx.annotation.RequiresApi;
@@ -57,8 +59,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private DialogFragment dialogFragment;
     private Boolean mapUserData = true;
     public String[] daysToMap = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
-    private int startHour=0,startMin=0,stopHour=23,stopMin=60;
+    private int startHour = 0, startMin = 0, stopHour = 23, stopMin = 60;
+    private int sYear, sMonth, sDay, eYear, eMonth, eDay;
     private DialogFragment spinnerFragment;
+    private final Calendar myCalendar = Calendar.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,8 +81,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         new UserAsyncTask().execute();
 
         dataCollection = new DataCollection(getApplicationContext());
-    }
 
+    }
 
     //get user userDataList from repository and add heatmap to map on complete
     private class UserAsyncTask extends AsyncTask<Void, Void, List<Data>> {
@@ -91,8 +95,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         @Override
         protected void onPostExecute(List<Data> userData) {
             userDataList.addAll(userData);
-            if(userData.size()!=0) {
-                addFilteredHeatMap();
+            if (userData.size() != 0) {
+                try {
+                    addFilteredHeatMap();
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
@@ -109,7 +117,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         protected void onPostExecute(List<Data> data) {
             allDataList.addAll(data);
             spinnerFragment.dismiss();
-            addFilteredHeatMap();
+            try {
+                addFilteredHeatMap();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -168,7 +180,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     //generate heatmap layer based on filter settings set by user. to replace the other two methods, probably.
-    private void addFilteredHeatMap() {
+    private void addFilteredHeatMap() throws ParseException {
         mMap.clear();
         List<Data> heatMapData = new ArrayList<>();
         List<WeightedLatLng> weightedLatLngs = new ArrayList<>();
@@ -197,10 +209,33 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             heatMapData.addAll(allDataList);
         }
 
-        for (Data dataPoint : heatMapData) {
+        if(!(sDay+sMonth+sYear>0 && eDay+eMonth+eYear>0)){
+            sDay=1;
+            sMonth=1;
+            sYear=1900;
+            eDay=1;
+            eMonth=1;
+            eYear=3000;
+        }
+
+        String sSDate = sDay+"/"+sMonth+"/"+sYear;
+        String sEDate = eDay+"/"+eMonth+"/"+eYear;
+        Date dSDate = new SimpleDateFormat("dd/MM/yyyy").parse(sSDate);
+        Date dEDate = new SimpleDateFormat("dd/MM/yyyy").parse(sEDate);
+        Log.d("date1", dEDate.toString());
+//        try {
+//            dSDate=new SimpleDateFormat("dd/MM/yyyy").parse(sSDate);
+//            dEDate=new SimpleDateFormat("dd/MM/yyyy").parse(sEDate);
+////            SimpleDateFormat format = new SimpleDateFormat("dd/MMM/yyyy");
+////            String formattedDate = format.format(date1);
+//        } catch (Exception e){}
+
+            for (Data dataPoint : heatMapData) {
             String datapointDay = null;
+            Date datapointDate = null;
             try {
                 datapointDay = new SimpleDateFormat("EEEE").format(new SimpleDateFormat("dd-MMM-yyyy").parse(dataPoint.date));
+                datapointDate = new SimpleDateFormat("dd-MMM-yyyy").parse(dataPoint.date);
             } catch (ParseException e) {
                 e.printStackTrace();
             }
@@ -208,18 +243,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             int datapointMinutes = (Integer.parseInt(datapointTime[0]) * 60) + Integer.parseInt(datapointTime[1]);
             int startTimeMinutes = (startHour * 60) + startMin;
             int stopTimeMinutes = (stopHour * 60) + stopMin;
-            Log.d("timestuff:  ",String.valueOf(datapointMinutes)+" from: "+datapointTime[0]+" "+datapointTime[1]+" "+ String.valueOf(startTimeMinutes)+" from: "+String.valueOf(startHour)+" "+String.valueOf(startMin)+" "+String.valueOf(stopTimeMinutes));
-            if (dataPoint.lat != null
-                    && dataPoint.lng != null
-                    && dataPoint.dB != null
+
+            Log.d("timestuff:  ", String.valueOf(datapointMinutes) + " from: " + datapointTime[0] + " " + datapointTime[1] + " " + String.valueOf(startTimeMinutes) + " from: " + String.valueOf(startHour) + " " + String.valueOf(startMin) + " " + String.valueOf(stopTimeMinutes));
+            if ((dataPoint.lat != null)
+                    && (dataPoint.lng != null)
+                    && (dataPoint.dB != null)
                     && Arrays.asList(daysToMap).contains(datapointDay)
-                    && datapointMinutes > startTimeMinutes
-                    && datapointMinutes < stopTimeMinutes) {
+                    && (datapointMinutes > startTimeMinutes)
+                    && (datapointMinutes < stopTimeMinutes)
+                    && (datapointDate.compareTo(dSDate) > 0)
+                    && (datapointDate.compareTo(dEDate) < 0)) {
                 weightedLatLngs.add(new WeightedLatLng(new LatLng(dataPoint.lat, dataPoint.lng), ((dataPoint.dB - 30) * 10) * 0.16333));
             }
         }
 
-        if (weightedLatLngs.size()!=0) {
+        if (weightedLatLngs.size() != 0) {
             // Create a heat map tile provider, passing it the latlngs of the datapoints.
             HeatmapTileProvider mProvider = new HeatmapTileProvider.Builder()
                     .weightedData(weightedLatLngs)
@@ -229,7 +267,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             // Add a tile overlay to the map, using the heat map tile provider.
             mMap.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
         } else {
-            Toast.makeText(getApplicationContext(),"no data that fits the filter found",Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "no data that fits the filter found", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -265,19 +303,37 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     public void showStartTimePickerDialog(View v) {
         DialogFragment newFragment = new HeatmapSettingDialogFragment.StartTimePickerFragment();
-        newFragment.show(getSupportFragmentManager(), "timePicker");
+        newFragment.show(getSupportFragmentManager(), "starttimePicker");
     }
 
     public void showStopTimePickerDialog(View v) {
         DialogFragment newFragment = new HeatmapSettingDialogFragment.StopTimePickerFragment();
-        newFragment.show(getSupportFragmentManager(), "timePicker");
+        newFragment.show(getSupportFragmentManager(), "stoptimePicker");
+    }
+
+    public void showStartDatePickerDialog(View v) {
+        DialogFragment newFragment = new HeatmapSettingDialogFragment.DatePickerFragment();
+        HeatmapSettingDialogFragment hm = (HeatmapSettingDialogFragment) getSupportFragmentManager().findFragmentByTag("dialog");
+        hm.setFlag(HeatmapSettingDialogFragment.START_DATE_FLAG);
+        newFragment.show(getSupportFragmentManager(), "startdatePicker");
+    }
+
+    public void showStopDatePickerDialog(View v) {
+        DialogFragment newFragment = new HeatmapSettingDialogFragment.StopDatePickerFragment();
+        HeatmapSettingDialogFragment hm = (HeatmapSettingDialogFragment) getSupportFragmentManager().findFragmentByTag("dialog");
+        hm.setFlag(HeatmapSettingDialogFragment.END_DATE_FLAG);
+        newFragment.show(getSupportFragmentManager(), "stopdatePicker");
     }
 
     //dismis the settings dialog fragment
     public void dismissSettings(View view) {
         dialogFragment.dismiss();
-        if(mapUserData){
-            addFilteredHeatMap();
+        if (mapUserData) {
+            try {
+                addFilteredHeatMap();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
         } else {
             showSpinner();
             new FirebaseAsyncTask().execute();
@@ -307,6 +363,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     public void setStopMin(int stopMin) {
         this.stopMin = stopMin;
+    }
+
+    public void setsYear(int sYear) {
+        this.sYear = sYear;
+    }
+
+    public void setsMonth(int sMonth) {
+        this.sMonth = sMonth;
+    }
+
+    public void setsDay(int sDay) {
+        this.sDay = sDay;
+    }
+
+    public void seteYear(int eYear) {
+        this.eYear = eYear;
+    }
+
+    public void seteMonth(int eMonth) {
+        this.eMonth = eMonth;
+    }
+
+    public void seteDay(int eDay) {
+        this.eDay = eDay;
     }
 
     public Boolean getMapUserData() {

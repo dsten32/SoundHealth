@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:id="@+id/mapSettingFrag">
 
 
     <LinearLayout
@@ -107,25 +108,78 @@
                 android:text="All Days" />
         </TableRow>
     </TableLayout>
+    <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="showStartTimePickerDialog"
+        android:text="@string/pick_start_time" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="showStopTimePickerDialog"
+        android:text="@string/pick_stop_time" />
+</LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_weight="1"
         android:orientation="horizontal">
 
-        <Button
+        <EditText
+            android:id="@+id/sDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="showStartTimePickerDialog"
-            android:text="@string/pick_start_time" />
+            android:layout_gravity="center"
+            android:layout_weight=".8"
+            android:clickable="true"
+            android:ems="16"
+            android:focusable="false"
+            android:gravity="center"
+            android:inputType="date"
+            android:onClick="showStartDatePickerDialog"
+            android:text="12/12/2019" />
 
-        <Button
+        <TextView
+            android:id="@+id/spacer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="showStopTimePickerDialog"
-            android:text="@string/pick_stop_time" />
+            android:layout_gravity="center_vertical"
+            android:text="--"
+            android:textSize="18sp" />
+
+        <EditText
+            android:id="@+id/eDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight=".8"
+            android:clickable="true"
+            android:ems="16"
+            android:focusable="false"
+            android:gravity="center"
+            android:inputType="date"
+            android:onClick="showStopDatePickerDialog"
+            android:text="12/12/2019" />
+
+        <!--<Button-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:onClick="showStartDatePickerDialog"-->
+            <!--android:text="@string/pick_start_date" />-->
+
+        <!--<Button-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:onClick="showStopDatePickerDialog"-->
+        <!--android:text="@string/pick_stop_date" />-->
     </LinearLayout>
-
     <Button
         android:id="@+id/frag_close"
         android:layout_width="match_parent"

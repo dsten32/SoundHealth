@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity{
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
     private NavigationView navigationView;
-    private TextView location,dateTime;
+    private TextView location;
     private FusedLocationProviderClient fusedLocationProviderClient;
     private DataRepository dataRepository;
     private ArrayAdapter<Data> adapter;
@@ -62,9 +62,6 @@ public class MainActivity extends AppCompatActivity{
         location = (TextView) findViewById(R.id.location);
         location.setText("new text I put here 'cos I could");
 
-        dateTime = findViewById(R.id.dateTime);
-        String date =new SimpleDateFormat("dd-MMM-yyyy kk:mm", Locale.getDefault()).format(new Date());
-        dateTime.setText(date);
 
         Button mainButton = (Button) findViewById(R.id.main_btn);
 
@@ -82,7 +79,9 @@ public class MainActivity extends AppCompatActivity{
         drawerLayout.addDrawerListener(drawerToggle);
         drawerToggle.syncState();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        navigationView = (NavigationView)findViewById(R.id.nv);
+
+
+        navigationView = (NavigationView)findViewById(R.id.nav);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
@@ -109,6 +108,9 @@ public class MainActivity extends AppCompatActivity{
                             cancelDataCollection();
                             return true;
                         }
+                    case R.id.fakedata:
+                        DataCollection dataCollection = new DataCollection(getApplicationContext());
+                        dataCollection.sendDataCollection();
                     default:
                         return true;
                 }
@@ -182,10 +184,5 @@ public class MainActivity extends AppCompatActivity{
                 intent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
         alarm.cancel(pIntent);
-    }
-
-    public void callSendDataCollection(View view){
-        DataCollection dataCollection = new DataCollection(getApplicationContext());
-        dataCollection.sendDataCollection();
     }
 }

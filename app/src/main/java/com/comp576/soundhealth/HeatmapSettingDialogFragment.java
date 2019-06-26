@@ -1,10 +1,12 @@
 package com.comp576.soundhealth;
 
+import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.text.format.DateFormat;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,23 +14,40 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 
-public class HeatmapSettingDialogFragment extends DialogFragment implements View.OnClickListener {
+public class HeatmapSettingDialogFragment extends DialogFragment implements View.OnClickListener, DatePickerDialog.OnDateSetListener {
+    public static final int START_DATE_FLAG=1;
+    public static final int END_DATE_FLAG = 0;
+
     private CheckBox allDaysBox;
     private Button dismissBut;
     private View v;
     private MapsActivity mapActivity;
     private CheckBox[] checkDaysArr;
     private Boolean[] daysSelected = new Boolean[7];
+    public EditText sDate,eDate;
+
+    private int flag = 0;
+    public void setFlag(int i){
+        flag=i;
+    }
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -43,6 +62,8 @@ public class HeatmapSettingDialogFragment extends DialogFragment implements View
 
         ((RadioButton)v.findViewById(R.id.userData)).setChecked(mapActivity.getMapUserData());
         ((RadioButton)v.findViewById(R.id.allData)).setChecked(!mapActivity.getMapUserData());
+        sDate = v.findViewById(R.id.sDate);
+        eDate = v.findViewById(R.id.eDate);
 
         checkDaysArr = new CheckBox[]{
                 v.findViewById(R.id.monBox),
@@ -101,6 +122,25 @@ public class HeatmapSettingDialogFragment extends DialogFragment implements View
             mapActivity.setDaysToMap(days);
             mapActivity.dismissSettings(view);
         }
+    }
+
+    @Override
+    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+        int id = flag;
+        mapActivity = (MapsActivity) getActivity();
+        mapActivity.setsDay(dayOfMonth);
+        mapActivity.setsMonth(month);
+        mapActivity.setsYear(year);
+        Toast.makeText(getContext(),"hi",Toast.LENGTH_SHORT).show();
+        switch(id){
+            case 1:
+                sDate.setText(dayOfMonth+"/"+month+"/"+year);
+            case 0:
+                eDate.setText(dayOfMonth+"/"+month+"/"+year);
+            default:
+                    break;
+
+        }
 
     }
 
@@ -144,6 +184,48 @@ public class HeatmapSettingDialogFragment extends DialogFragment implements View
             mapActivity.setStopHour(hourOfDay);
             mapActivity.setStopMin(minute);
         }
+    }
+
+    public static class DatePickerFragment extends DialogFragment {
+
+
+        @NonNull
+        @Override
+        public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+            final Calendar c = Calendar.getInstance();
+            int year = c.get(Calendar.YEAR); // current year
+            int month = c.get(Calendar.MONTH); // current month
+            int day = c.get(Calendar.DAY_OF_MONTH);
+            return new DatePickerDialog(getActivity(), (DatePickerDialog.OnDateSetListener) getFragmentManager().findFragmentByTag("dialog"),year,month,day);
+        }
+
+//        @Override
+//        public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+//            MapsActivity mapActivity = (MapsActivity) getActivity();
+//            mapActivity.setsDay(dayOfMonth);
+//            mapActivity.setsMonth(month);
+//            mapActivity.setsYear(year);
+//        }
+    }
+    public static class StopDatePickerFragment extends DialogFragment {
+
+        @NonNull
+        @Override
+        public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+            final Calendar c = Calendar.getInstance();
+            int year = c.get(Calendar.YEAR); // current year
+            int month = c.get(Calendar.MONTH); // current month
+            int day = c.get(Calendar.DAY_OF_MONTH);
+            return new DatePickerDialog(getActivity(), (DatePickerDialog.OnDateSetListener) getFragmentManager().findFragmentByTag("dialog"),year,month,day);
+        }
+
+//        @Override
+//        public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+//            MapsActivity mapActivity = (MapsActivity) getActivity();
+//            mapActivity.setsDay(dayOfMonth);
+//            mapActivity.setsMonth(month);
+//            mapActivity.setsYear(year);
+//        }
     }
 }
 
