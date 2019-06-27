@@ -10,6 +10,7 @@ import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -59,6 +60,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private DataCollection dataCollection;
     private Button allDataHeatMap;
     private DialogFragment dialogFragment;
+    private long millisAllDataRetrieved;
     private Boolean mapUserData = true;
     public String[] daysToMap = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
     private int startHour = 0, startMin = 0, stopHour = 23, stopMin = 60;
@@ -123,6 +125,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         @Override
         protected void onPostExecute(List<Data> data) {
+            millisAllDataRetrieved=System.currentTimeMillis();
             allDataList.addAll(data);
             spinnerFragment.dismiss();
             try {
@@ -337,8 +340,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 e.printStackTrace();
             }
         } else {
+            if((System.currentTimeMillis()- millisAllDataRetrieved)>3600000){
             showSpinner();
             new FirebaseAsyncTask().execute();
+            } else {
+                try {
+                    addFilteredHeatMap();
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
