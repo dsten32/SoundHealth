@@ -32,10 +32,7 @@ import android.widget.Toast;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.material.navigation.NavigationView;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Locale;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static android.Manifest.permission.RECORD_AUDIO;
@@ -44,7 +41,7 @@ public class MainActivity extends AppCompatActivity{
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
     private NavigationView navigationView;
-    private TextView location;
+    private TextView introText;
     private FusedLocationProviderClient fusedLocationProviderClient;
     private DataRepository dataRepository;
     private ArrayAdapter<Data> adapter;
@@ -61,9 +58,8 @@ public class MainActivity extends AppCompatActivity{
         dataRepository = new DataRepository(this);
 
         setContentView(R.layout.activity_main);
-        location = (TextView) findViewById(R.id.location);
-        location.setText("new text I put here 'cos I could");
-
+        introText = (TextView) findViewById(R.id.intro);
+//        introText.setText("new text I put here 'cos I could");
 
         Button mainButton = (Button) findViewById(R.id.main_btn);
 
@@ -134,7 +130,7 @@ public class MainActivity extends AppCompatActivity{
                 }
             }
         });
-        //check that app can access location data and record audio
+        //check that app can access introText data and record audio
         checkPermissions();
     }
 

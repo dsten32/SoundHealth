@@ -3,10 +3,7 @@ package com.comp576.soundhealth;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
-import android.content.Context;
 import android.os.Bundle;
-import android.text.format.DateFormat;
-import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,22 +15,17 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Date;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentManager;
 
-public class HeatmapSettingDialogFragment extends DialogFragment implements View.OnClickListener, DatePickerDialog.OnDateSetListener {
-    public static final int START_DATE_FLAG=1;
-    public static final int END_DATE_FLAG = 0;
+public class HeatmapSettingDialogFragment extends DialogFragment implements View.OnClickListener, DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
+    public static final int START_FLAG =1;
+    public static final int END_FLAG = 0;
 
     private CheckBox allDaysBox;
     private Button dismissBut;
@@ -41,12 +33,16 @@ public class HeatmapSettingDialogFragment extends DialogFragment implements View
     private MapsActivity mapActivity;
     private CheckBox[] checkDaysArr;
     private Boolean[] daysSelected = new Boolean[7];
-    public EditText sDate,eDate;
+    public EditText sDate,eDate,sTime,eTime;
     private Calendar calendar;
 
-    private int flag = 0;
-    public void setFlag(int i){
-        flag=i;
+    private int dateFlag = 0;
+    private int timeFlag = 0;
+    public void setDateFlag(int i){
+        dateFlag =i;
+    }
+    public void setTimeFlag(int i){
+        timeFlag =i;
     }
 
     @Override
@@ -65,9 +61,13 @@ public class HeatmapSettingDialogFragment extends DialogFragment implements View
         ((RadioButton)v.findViewById(R.id.allData)).setChecked(!mapActivity.getMapUserData());
         sDate = v.findViewById(R.id.sDate);
         eDate = v.findViewById(R.id.eDate);
+        sTime = v.findViewById(R.id.sTime);
+        eTime = v.findViewById(R.id.eTime);
 
-        sDate.setText(mapActivity.getsDay()+"/"+mapActivity.getsMonth()+"/"+mapActivity.getsYear()); // current year
-        eDate.setText(mapActivity.geteDay()+"/"+mapActivity.geteMonth()+"/"+mapActivity.geteYear()); // current year
+        sDate.setText(mapActivity.getsDay()+"/"+String.format("%1$" + 2 + "s", mapActivity.getsMonth()).replace(' ', '0')+"/"+mapActivity.getsYear()); // current year
+        eDate.setText(mapActivity.geteDay()+"/"+String.format("%1$" + 2 + "s", mapActivity.geteMonth()).replace(' ', '0')+"/"+mapActivity.geteYear()); // current year
+        sTime.setText(String.format("%1$" + 2 + "s", mapActivity.getStartHour()).replace(' ', '0')+":"+String.format("%1$" + 2 + "s", mapActivity.getStartMin()).replace(' ', '0'));
+        eTime.setText(String.format("%1$" + 2 + "s", mapActivity.getStopHour()).replace(' ', '0')+":"+String.format("%1$" + 2 + "s", mapActivity.getStopMin()).replace(' ', '0'));
 
         checkDaysArr = new CheckBox[]{
                 v.findViewById(R.id.monBox),
@@ -130,7 +130,7 @@ public class HeatmapSettingDialogFragment extends DialogFragment implements View
 
     @Override
     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-        int id = flag;
+        int id = dateFlag;
         mapActivity = (MapsActivity) getActivity();
 
         switch(id){
@@ -138,19 +138,38 @@ public class HeatmapSettingDialogFragment extends DialogFragment implements View
                 mapActivity.setsDay(dayOfMonth);
                 mapActivity.setsMonth(month+1);
                 mapActivity.setsYear(year);
-                sDate.setText(dayOfMonth+"/"+(month+1)+"/"+year);
+                sDate.setText(dayOfMonth+"/"+String.format("%1$" + 2 + "s", (month+1)).replace(' ', '0')+"/"+year);
                 break;
             case 0:
                 mapActivity.seteDay(dayOfMonth);
                 mapActivity.seteMonth(month+1);
                 mapActivity.seteYear(year);
-                eDate.setText(dayOfMonth+"/"+(month+1)+"/"+year);
+                eDate.setText(dayOfMonth+"/"+String.format("%1$" + 2 + "s", (month+1)).replace(' ', '0')+"/"+year);
                 break;
             default:
                 break;
-
         }
+    }
 
+    @Override
+    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+        int id = timeFlag;
+        mapActivity = (MapsActivity) getActivity();
+
+        switch(id){
+            case 1:
+                mapActivity.setStartHour(hourOfDay);
+                mapActivity.setStartMin(minute);
+                sTime.setText(String.format("%1$" + 2 + "s", hourOfDay).replace(' ', '0')+":"+String.format("%1$" + 2 + "s", minute).replace(' ', '0'));
+                break;
+            case 0:
+                mapActivity.setStopHour(hourOfDay);
+                mapActivity.setStopMin(minute);
+                eTime.setText(String.format("%1$" + 2 + "s", hourOfDay).replace(' ', '0')+":"+String.format("%1$" + 2 + "s", minute).replace(' ', '0'));
+                break;
+            default:
+                break;
+        }
     }
 
     public static class StartTimePickerFragment extends DialogFragment
@@ -195,9 +214,20 @@ public class HeatmapSettingDialogFragment extends DialogFragment implements View
         }
     }
 
+    public static class TimePickerFragment extends DialogFragment {
+        @NonNull
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            final Calendar c = Calendar.getInstance();
+            int hour = c.get(Calendar.HOUR_OF_DAY);
+            int minute = c.get(Calendar.MINUTE);
+
+            return new TimePickerDialog(getActivity(), (TimePickerDialog.OnTimeSetListener) getFragmentManager().findFragmentByTag("dialog"), hour, minute,
+                    true);
+        }
+    }
+
     public static class DatePickerFragment extends DialogFragment {
-
-
         @NonNull
         @Override
         public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {

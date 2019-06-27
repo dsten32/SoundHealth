@@ -2,7 +2,6 @@ package com.comp576.soundhealth;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.ActionBar;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -10,7 +9,6 @@ import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -45,7 +43,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentTransaction;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
@@ -66,7 +63,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private int startHour = 0, startMin = 0, stopHour = 23, stopMin = 60;
     private int sYear, sMonth, sDay, eYear, eMonth, eDay;
     private DialogFragment spinnerFragment;
-    private final Calendar myCalendar = Calendar.getInstance();
+    private final Calendar calendar = Calendar.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -219,14 +216,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         } else {
             heatMapData.addAll(allDataList);
         }
+        Log.d("heatmapdatasize: ",String.valueOf(heatMapData.size()));
 
         if(!(sDay+sMonth+sYear>0 && eDay+eMonth+eYear>0)){
             sDay=1;
             sMonth=1;
-            sYear=1900;
-            eDay=1;
-            eMonth=1;
-            eYear=3000;
+            sYear=2019;
+            eDay=calendar.get(Calendar.DAY_OF_MONTH);
+            eMonth=calendar.get(Calendar.MONTH)+1;
+            eYear=calendar.get(Calendar.YEAR);
         }
 
         String sSDate = sDay+"/"+sMonth+"/"+sYear;
@@ -248,7 +246,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             int startTimeMinutes = (startHour * 60) + startMin;
             int stopTimeMinutes = (stopHour * 60) + stopMin;
 
-            Log.d("timestuff:  ", String.valueOf(datapointMinutes) + " from: " + datapointTime[0] + " " + datapointTime[1] + " " + String.valueOf(startTimeMinutes) + " from: " + String.valueOf(startHour) + " " + String.valueOf(startMin) + " " + String.valueOf(stopTimeMinutes));
             if ((dataPoint.lat != null)
                     && (dataPoint.lng != null)
                     && (dataPoint.dB != null)
@@ -257,7 +254,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     && (datapointMinutes < stopTimeMinutes)
                     && ((datapointDate.compareTo(dSDate) > 0)
                     && (datapointDate.compareTo(dEDate) < 0))) {
-                Log.d("Datapoint Date: ",datapointDate.toString() + "\n dSDate: " + dSDate.toString() + "\n dEDate: "+dEDate.toString());
                 weightedLatLngs.add(new WeightedLatLng(new LatLng(dataPoint.lat, dataPoint.lng), ((dataPoint.dB - 30) * 10) * 0.16333));
             }
         }
@@ -307,26 +303,32 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     public void showStartTimePickerDialog(View v) {
-        DialogFragment newFragment = new HeatmapSettingDialogFragment.StartTimePickerFragment();
+//        DialogFragment newFragment = new HeatmapSettingDialogFragment.StartTimePickerFragment();
+        DialogFragment newFragment = new HeatmapSettingDialogFragment.TimePickerFragment();
+        HeatmapSettingDialogFragment hm = (HeatmapSettingDialogFragment) getSupportFragmentManager().findFragmentByTag("dialog");
+        hm.setTimeFlag(1);
         newFragment.show(getSupportFragmentManager(), "starttimePicker");
     }
 
     public void showStopTimePickerDialog(View v) {
-        DialogFragment newFragment = new HeatmapSettingDialogFragment.StopTimePickerFragment();
+//        DialogFragment newFragment = new HeatmapSettingDialogFragment.StopTimePickerFragment();
+        DialogFragment newFragment = new HeatmapSettingDialogFragment.TimePickerFragment();
+        HeatmapSettingDialogFragment hm = (HeatmapSettingDialogFragment) getSupportFragmentManager().findFragmentByTag("dialog");
+        hm.setTimeFlag(0);
         newFragment.show(getSupportFragmentManager(), "stoptimePicker");
     }
 
     public void showStartDatePickerDialog(View v) {
         DialogFragment newFragment = new HeatmapSettingDialogFragment.DatePickerFragment();
         HeatmapSettingDialogFragment hm = (HeatmapSettingDialogFragment) getSupportFragmentManager().findFragmentByTag("dialog");
-        hm.setFlag(HeatmapSettingDialogFragment.START_DATE_FLAG);
+        hm.setDateFlag(HeatmapSettingDialogFragment.START_FLAG);
         newFragment.show(getSupportFragmentManager(), "startdatePicker");
     }
 
     public void showStopDatePickerDialog(View v) {
         DialogFragment newFragment = new HeatmapSettingDialogFragment.DatePickerFragment();
         HeatmapSettingDialogFragment hm = (HeatmapSettingDialogFragment) getSupportFragmentManager().findFragmentByTag("dialog");
-        hm.setFlag(HeatmapSettingDialogFragment.END_DATE_FLAG);
+        hm.setDateFlag(HeatmapSettingDialogFragment.END_FLAG);
         newFragment.show(getSupportFragmentManager(), "stopdatePicker");
     }
 
@@ -424,6 +426,22 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     public int geteDay() {
         return eDay;
+    }
+
+    public int getStartHour() {
+        return startHour;
+    }
+
+    public int getStartMin() {
+        return startMin;
+    }
+
+    public int getStopHour() {
+        return stopHour;
+    }
+
+    public int getStopMin() {
+        return stopMin;
     }
 
     public Boolean getMapUserData() {

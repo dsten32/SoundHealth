@@ -108,63 +108,136 @@
                 android:text="All Days" />
         </TableRow>
     </TableLayout>
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <TextView
+                android:id="@+id/sTimeTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/pick_start_time"
+                tools:text="@string/pick_start_time" />
+
+            <TextView
+                android:id="@+id/eTimeTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/pick_stop_time"
+                tools:text="@string/pick_stop_time" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <EditText
+                android:id="@+id/sTime"
+                android:layout_width="110dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="4"
+                android:clickable="true"
+                android:ems="16"
+                android:focusable="false"
+                android:gravity="center"
+                android:inputType="time"
+                android:onClick="showStartTimePickerDialog" />
+
+            <EditText
+                android:id="@+id/eTime"
+                android:layout_width="110dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="4"
+                android:clickable="true"
+                android:ems="16"
+                android:focusable="false"
+                android:gravity="center"
+                android:inputType="time"
+                android:onClick="showStopTimePickerDialog" />
+
+            <!--<Button-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:onClick="showStartTimePickerDialog"-->
+                <!--android:text="@string/pick_start_time" />-->
+
+            <!--<Button-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:onClick="showStopTimePickerDialog"-->
+                <!--android:text="@string/pick_stop_time" />-->
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <TextView
+                android:id="@+id/sDateTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/pick_start_date"
+                tools:text="@string/pick_start_date" />
+
+            <TextView
+                android:id="@+id/eDateTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/pick_stop_date"
+                tools:text="@string/pick_stop_date" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <EditText
+                android:id="@+id/sDate"
+                android:layout_width="110dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="4"
+                android:clickable="true"
+                android:ems="16"
+                android:focusable="false"
+                android:gravity="center"
+                android:inputType="date"
+                android:onClick="showStartDatePickerDialog" />
+
+            <EditText
+                android:id="@+id/eDate"
+                android:layout_width="110dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="4"
+                android:clickable="true"
+                android:ems="16"
+                android:focusable="false"
+                android:gravity="center"
+                android:inputType="date"
+                android:onClick="showStopDatePickerDialog" />
+        </TableRow>
+    </TableLayout>
+
     <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal">
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="showStartTimePickerDialog"
-        android:text="@string/pick_start_time" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="showStopTimePickerDialog"
-        android:text="@string/pick_stop_time" />
-</LinearLayout>
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:orientation="horizontal">
-
-        <EditText
-            android:id="@+id/sDate"
-            android:layout_width="110dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight=".8"
-            android:clickable="true"
-            android:ems="16"
-            android:focusable="false"
-            android:gravity="center"
-            android:inputType="date"
-            android:onClick="showStartDatePickerDialog" />
-
-        <TextView
-            android:id="@+id/spacer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:text="--"
-            android:textSize="18sp" />
-
-        <EditText
-            android:id="@+id/eDate"
-            android:layout_width="110dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight=".8"
-            android:clickable="true"
-            android:ems="16"
-            android:focusable="false"
-            android:gravity="center"
-            android:inputType="date"
-            android:onClick="showStopDatePickerDialog" />
 
         <!--<Button-->
             <!--android:layout_width="wrap_content"-->

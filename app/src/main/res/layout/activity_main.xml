@@ -18,10 +18,10 @@
     android:visibility="visible"
     tools:context=".MainActivity">
     <TextView
-        android:id="@+id/location"
+        android:id="@+id/intro"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:text="Initial Placeholder text"
+        android:layout_height="wrap_content"
+        android:text="Welcome to SoundHealth, push the shiny button below to get your first datapoint"
         android:textAppearance="@style/TextAppearance.AppCompat.Headline"
         />
     <Button
@@ -30,7 +30,7 @@
         android:text="Button"
         android:textColor="#FFFFFF"
         android:textSize="20sp"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="100dp"
         android:layout_width="220dp"
         android:layout_height="220dp"
         android:background="@drawable/button"
