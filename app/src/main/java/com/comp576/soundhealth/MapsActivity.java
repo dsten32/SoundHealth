@@ -177,7 +177,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                     .build();                   // Creates a CameraPosition from the builder
                             mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
                             //Async userdata here???
-                            if (userDataList.size() != 0 && mapUserData) {
+                            Log.d("userDataList.size = ",String.valueOf(userDataList.size() +" mapud: "+String.valueOf(mapUserData)));
+
+                            if (userDataList.size() == 0 && mapUserData) {
+                                Log.d("getting user data","true");
                                 new UserAsyncTask().execute();
                             } else if (((System.currentTimeMillis() - millisAllDataRetrieved) > 3600000) && !mapUserData) {
                                 showSpinner();
@@ -200,6 +203,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap.clear();
         List<Data> heatMapData = new ArrayList<>();
         List<WeightedLatLng> weightedLatLngs = new ArrayList<>();
+        Log.d("adding filt ",String.valueOf(userDataList.size()));
 
         // Create the gradient.
         int[] colors = {

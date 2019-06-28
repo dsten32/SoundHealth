@@ -14,16 +14,17 @@ public class Data implements Parcelable {
     public Double lat;
     public Double lng;
     public Double dB;
+    public boolean isBlurred;
 
 
-    public Data(String date, String time, String userId, Double lat, Double lng, Double dB) {
-//        this.id = id;
+    public Data(String date, String time, String userId, Double lat, Double lng, Double dB, boolean isBlurred) {
         this.date = date;
         this.time = time;
         this.userId = userId;
         this.lat = lat;
         this.lng = lng;
         this.dB = dB;
+        this.isBlurred = isBlurred;
     }
 
 
@@ -55,6 +56,9 @@ public class Data implements Parcelable {
         } else {
             dB = in.readDouble();
         }
+        boolean[] isBlurredArray = new boolean[1];
+        in.readBooleanArray(isBlurredArray);
+        isBlurred = isBlurredArray[0];
     }
 
 
@@ -83,6 +87,8 @@ public class Data implements Parcelable {
             dest.writeByte((byte) 1);
             dest.writeDouble(dB);
         }
+        boolean[] isBlurredArray = {isBlurred};
+        dest.writeBooleanArray(isBlurredArray);
     }
 
     @Override

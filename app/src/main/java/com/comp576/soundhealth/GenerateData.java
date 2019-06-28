@@ -18,6 +18,7 @@ import androidx.annotation.RequiresApi;
 //for generating lots of fake data in and around hamilton if I need it.
 public class GenerateData {
     String date, time, userId;
+    boolean isBlurred;
     double lat, lng, dB;
     List<Data> dataList = new ArrayList<>();
 
@@ -32,8 +33,9 @@ public class GenerateData {
             lat = ((Math.random() * 0.11751) + 37.717258) * -1;
             lng = (Math.random() * 0.177837) + 175.193019;
             dB = (Math.random() * 70) + 30;
+            isBlurred = Math.random() < 0.5;
 
-            Data data = new Data(date, time, userId, lat, lng, dB);
+            Data data = new Data(date, time, userId, lat, lng, dB,isBlurred);
             dataList.add(data);
         }
         return dataList;

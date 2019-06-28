@@ -69,8 +69,17 @@ public class DataCollection extends Activity {
                             String time =new SimpleDateFormat("kk:mm", Locale.getDefault()).format(new Date());
                             Log.d("time is", time);
                             String userId = "some text I haven't decided yet";
-                            Double lati = location.getLatitude();
-                            Double longi = location.getLongitude();
+                            Double lat,lng;
+                            //adding a random change to the location data based on user's selected perturbation value 0-0.8km
+                            //should probably add a variable to Data pojo to capture if data is perturbed in this fashion.
+                            int blurFactor = ((int)(MainActivity.blurValue * 10));
+                            if(blurFactor!=0 && MainActivity.isBlurred){
+                                lat = (Math.random() * (blurFactor * 0.0005))+(location.getLatitude()-(blurFactor * 0.0005));
+                                lng = (Math.random() * (blurFactor * 0.0005))+(location.getLongitude()-(blurFactor * 0.0005));
+                            } else {
+                                lat = location.getLatitude();
+                                lng = location.getLongitude();
+                            }
                             Double dB=null;
                             try {
                                 dB = new Recorder().getNoiseLevel();
@@ -78,7 +87,7 @@ public class DataCollection extends Activity {
                                 e.printStackTrace();
                             }
 
-                            Data data =new Data(date,time,userId,lati,longi,dB);
+                            Data data =new Data(date,time,userId,lat,lng,dB,MainActivity.isBlurred);
 
                             long id=dataRepository.insert(data);
                             data.id=id;
@@ -144,7 +153,7 @@ public class DataCollection extends Activity {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                dataList.add(new Data(document.getString("date"),document.getString("time"),document.getString("userId"),document.getDouble("lat"),document.getDouble("lng"),document.getDouble("dB")));
+                                dataList.add(new Data(document.getString("date"),document.getString("time"),document.getString("userId"),document.getDouble("lat"),document.getDouble("lng"),document.getDouble("dB"),document.getBoolean("isBlurred")));
 
 //                                Log.d(TAG,dataList.get(dataList.size()-1).toString());
                             }

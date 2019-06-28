@@ -44,8 +44,8 @@ public class MainActivity extends AppCompatActivity{
     private int interval;
     private Switch continuousSwitch;
     private DialogFragment dialogFragment;
-    private boolean isBlurred, isStopTime;
-    private float blurValue;
+    public static boolean isBlurred, isStopTime;
+    public static float blurValue;
     public static int stopHour,stopMin;
     private String dataStopTime;
     private DialogFragment timePicker = new DataCollectionSettingsFragment.TimePickerFragment();
