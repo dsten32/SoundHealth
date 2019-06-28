@@ -112,7 +112,6 @@ public class HeatmapSettingDialogFragment extends DialogFragment implements View
 
     @Override
     public void onClick(View view) {
-        Log.d("onclIck:","yep");
         if(view.getId()==R.id.frag_close) {
             mapActivity.setMapUserData(((RadioButton) v.findViewById(R.id.userData)).isChecked());
 
@@ -132,15 +131,14 @@ public class HeatmapSettingDialogFragment extends DialogFragment implements View
     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
         int id = dateFlag;
         mapActivity = (MapsActivity) getActivity();
-
         switch(id){
-            case 1:
+            case HeatmapSettingDialogFragment.START_FLAG:
                 mapActivity.setsDay(dayOfMonth);
                 mapActivity.setsMonth(month+1);
                 mapActivity.setsYear(year);
                 sDate.setText(dayOfMonth+"/"+String.format("%1$" + 2 + "s", (month+1)).replace(' ', '0')+"/"+year);
                 break;
-            case 0:
+            case HeatmapSettingDialogFragment.END_FLAG:
                 mapActivity.seteDay(dayOfMonth);
                 mapActivity.seteMonth(month+1);
                 mapActivity.seteYear(year);
@@ -154,63 +152,19 @@ public class HeatmapSettingDialogFragment extends DialogFragment implements View
     @Override
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
         int id = timeFlag;
-        mapActivity = (MapsActivity) getActivity();
-
         switch(id){
-            case 1:
+            case HeatmapSettingDialogFragment.START_FLAG:
                 mapActivity.setStartHour(hourOfDay);
                 mapActivity.setStartMin(minute);
                 sTime.setText(String.format("%1$" + 2 + "s", hourOfDay).replace(' ', '0')+":"+String.format("%1$" + 2 + "s", minute).replace(' ', '0'));
                 break;
-            case 0:
+            case HeatmapSettingDialogFragment.END_FLAG:
                 mapActivity.setStopHour(hourOfDay);
                 mapActivity.setStopMin(minute);
                 eTime.setText(String.format("%1$" + 2 + "s", hourOfDay).replace(' ', '0')+":"+String.format("%1$" + 2 + "s", minute).replace(' ', '0'));
                 break;
             default:
                 break;
-        }
-    }
-
-    public static class StartTimePickerFragment extends DialogFragment
-            implements TimePickerDialog.OnTimeSetListener {
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            final Calendar c = Calendar.getInstance();
-            int hour = c.get(Calendar.HOUR_OF_DAY);
-            int minute = c.get(Calendar.MINUTE);
-
-            return new TimePickerDialog(getActivity(), this, hour, minute,
-                    true);
-        }
-
-        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-            Log.d("hour min = ",String.valueOf(hourOfDay) +" "+ String.valueOf(minute));
-            MapsActivity mapActivity = (MapsActivity) getActivity();
-            mapActivity.setStartHour(hourOfDay);
-            mapActivity.setStartMin(minute);
-        }
-    }
-
-    public static class StopTimePickerFragment extends DialogFragment
-            implements TimePickerDialog.OnTimeSetListener {
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            final Calendar c = Calendar.getInstance();
-            int hour = c.get(Calendar.HOUR_OF_DAY);
-            int minute = c.get(Calendar.MINUTE);
-
-            return new TimePickerDialog(getActivity(), this, hour, minute,
-                    true);
-        }
-
-        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-            Log.d("hour min = ",String.valueOf(hourOfDay) +" "+ String.valueOf(minute));
-            MapsActivity mapActivity = (MapsActivity) getActivity();
-            mapActivity.setStopHour(hourOfDay);
-            mapActivity.setStopMin(minute);
         }
     }
 

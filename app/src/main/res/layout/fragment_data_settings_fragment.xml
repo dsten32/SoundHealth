@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="5dp">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingBottom="9dp">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingRight="3dp"
+        android:text="Set recording interval:"/>
+
+    <EditText
+        android:id="@+id/interval"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:background="@color/common_google_signin_btn_text_light_disabled"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="3dp"
+        android:text="min"/>
+</LinearLayout>
+    <CheckBox
+        android:id="@+id/setDataStopTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Set Stop Time" />
+
+    <EditText
+        android:id="@+id/dataStopTimeEntry"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="hh:mm"
+        android:enabled="false"
+        android:focusable="false"
+        android:onClick="showPickerDialog"/>
+    <CheckBox
+        android:id="@+id/setBlur"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Blur my location"/>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <SeekBar
+            android:id="@+id/blurBarValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:enabled="false"
+            android:max="8"
+            android:min="0"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:saveEnabled="true" />
+
+        <TextView
+            android:id="@+id/showBlurValue"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:text="0.0 Km"/>
+    </LinearLayout>
+    <Button
+        android:id="@+id/frag_close"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="close"/>
+</LinearLayout>

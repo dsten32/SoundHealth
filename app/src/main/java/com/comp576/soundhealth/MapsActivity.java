@@ -2,7 +2,6 @@ package com.comp576.soundhealth;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -11,8 +10,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -50,12 +47,10 @@ import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
     private FusedLocationProviderClient fusedLocationProviderClient;
     private GoogleMap mMap;
-    private TextView textPlace;
     private List<Data> userDataList = new ArrayList<>();
     private List<Data> allDataList = new ArrayList<>();
     private DataRepository dataRepository;
     private DataCollection dataCollection;
-    private Button allDataHeatMap;
     private DialogFragment dialogFragment;
     private long millisAllDataRetrieved;
     private Boolean mapUserData = true;
@@ -64,6 +59,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private int sYear, sMonth, sDay, eYear, eMonth, eDay;
     private DialogFragment spinnerFragment;
     private final Calendar calendar = Calendar.getInstance();
+    private DialogFragment datePicker = new HeatmapSettingDialogFragment.DatePickerFragment();
+    private DialogFragment timePicker = new HeatmapSettingDialogFragment.TimePickerFragment();
+    private HeatmapSettingDialogFragment heatmapDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,16 +79,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("Sound Heatmap");
 
-        //should probably move this to the onMapReady callback
-        new UserAsyncTask().execute();
-
         dataCollection = new DataCollection(getApplicationContext());
     }
+
     @Override
-    public boolean onSupportNavigateUp(){
+    public boolean onSupportNavigateUp() {
         finish();
         return true;
     }
+
     //get user userDataList from repository and add heatmap to map on complete
     private class UserAsyncTask extends AsyncTask<Void, Void, List<Data>> {
 
@@ -122,7 +119,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         @Override
         protected void onPostExecute(List<Data> data) {
-            millisAllDataRetrieved=System.currentTimeMillis();
+            millisAllDataRetrieved = System.currentTimeMillis();
             allDataList.addAll(data);
             spinnerFragment.dismiss();
             try {
@@ -180,10 +177,21 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                     .build();                   // Creates a CameraPosition from the builder
                             mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
                             //Async userdata here???
+                            if (userDataList.size() != 0 && mapUserData) {
+                                new UserAsyncTask().execute();
+                            } else if (((System.currentTimeMillis() - millisAllDataRetrieved) > 3600000) && !mapUserData) {
+                                showSpinner();
+                                new FirebaseAsyncTask().execute();
+                            } else {
+                                try {
+                                    addFilteredHeatMap();
+                                } catch (ParseException e) {
+                                    e.printStackTrace();
+                                }
+                            }
                         }
                     }
                 });
-
     }
 
 
@@ -216,23 +224,23 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         } else {
             heatMapData.addAll(allDataList);
         }
-        Log.d("heatmapdatasize: ",String.valueOf(heatMapData.size()));
+        Log.d("heatmapdatasize: ", String.valueOf(heatMapData.size()));
 
-        if(!(sDay+sMonth+sYear>0 && eDay+eMonth+eYear>0)){
-            sDay=1;
-            sMonth=1;
-            sYear=2019;
-            eDay=calendar.get(Calendar.DAY_OF_MONTH);
-            eMonth=calendar.get(Calendar.MONTH)+1;
-            eYear=calendar.get(Calendar.YEAR);
+        if (!(sDay + sMonth + sYear > 0 && eDay + eMonth + eYear > 0)) {
+            sDay = 1;
+            sMonth = 1;
+            sYear = 2019;
+            eDay = calendar.get(Calendar.DAY_OF_MONTH);
+            eMonth = calendar.get(Calendar.MONTH) + 1;
+            eYear = calendar.get(Calendar.YEAR);
         }
 
-        String sSDate = sDay+"/"+sMonth+"/"+sYear;
-        String sEDate = eDay+"/"+eMonth+"/"+eYear;
+        String sSDate = sDay + "/" + sMonth + "/" + sYear;
+        String sEDate = eDay + "/" + eMonth + "/" + eYear;
         Date dSDate = new SimpleDateFormat("dd/MM/yyyy").parse(sSDate);
         Date dEDate = new SimpleDateFormat("dd/MM/yyyy").parse(sEDate);
 
-            for (Data dataPoint : heatMapData) {
+        for (Data dataPoint : heatMapData) {
             String datapointDay = null;
             Date datapointDate = null;
             try {
@@ -272,12 +280,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    //go back to the main activity screen
-    public void goToMain(View view) {
-        Intent goToMain = new Intent(this, MainActivity.class);
-        startActivity(goToMain);
-    }
-
     //show the heatmap settings dialog fragment
     public void showDialog(View view) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
@@ -302,37 +304,33 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         spinnerFragment.show(fragmentTransaction, "spinner");
     }
 
-    public void showStartTimePickerDialog(View v) {
-//        DialogFragment newFragment = new HeatmapSettingDialogFragment.StartTimePickerFragment();
-        DialogFragment newFragment = new HeatmapSettingDialogFragment.TimePickerFragment();
-        HeatmapSettingDialogFragment hm = (HeatmapSettingDialogFragment) getSupportFragmentManager().findFragmentByTag("dialog");
-        hm.setTimeFlag(1);
-        newFragment.show(getSupportFragmentManager(), "starttimePicker");
+    public void showPickerDialog(View v) {
+        int id = v.getId();
+        heatmapDialog = (HeatmapSettingDialogFragment) getSupportFragmentManager().findFragmentByTag("dialog");
+        switch (id) {
+            case R.id.sTime:
+                heatmapDialog.setTimeFlag(HeatmapSettingDialogFragment.START_FLAG);
+                timePicker.show(getSupportFragmentManager(), "startTimePicker");
+                break;
+            case R.id.eTime:
+                heatmapDialog.setTimeFlag(HeatmapSettingDialogFragment.END_FLAG);
+                timePicker.show(getSupportFragmentManager(), "stopTimePicker");
+                break;
+            case R.id.sDate:
+                heatmapDialog.setDateFlag(HeatmapSettingDialogFragment.START_FLAG);
+                datePicker.show(getSupportFragmentManager(), "startDatePicker");
+                break;
+            case R.id.eDate:
+                heatmapDialog.setDateFlag(HeatmapSettingDialogFragment.END_FLAG);
+                datePicker.show(getSupportFragmentManager(), "stopDatePicker");
+                break;
+            default:
+                break;
+        }
+
     }
 
-    public void showStopTimePickerDialog(View v) {
-//        DialogFragment newFragment = new HeatmapSettingDialogFragment.StopTimePickerFragment();
-        DialogFragment newFragment = new HeatmapSettingDialogFragment.TimePickerFragment();
-        HeatmapSettingDialogFragment hm = (HeatmapSettingDialogFragment) getSupportFragmentManager().findFragmentByTag("dialog");
-        hm.setTimeFlag(0);
-        newFragment.show(getSupportFragmentManager(), "stoptimePicker");
-    }
-
-    public void showStartDatePickerDialog(View v) {
-        DialogFragment newFragment = new HeatmapSettingDialogFragment.DatePickerFragment();
-        HeatmapSettingDialogFragment hm = (HeatmapSettingDialogFragment) getSupportFragmentManager().findFragmentByTag("dialog");
-        hm.setDateFlag(HeatmapSettingDialogFragment.START_FLAG);
-        newFragment.show(getSupportFragmentManager(), "startdatePicker");
-    }
-
-    public void showStopDatePickerDialog(View v) {
-        DialogFragment newFragment = new HeatmapSettingDialogFragment.DatePickerFragment();
-        HeatmapSettingDialogFragment hm = (HeatmapSettingDialogFragment) getSupportFragmentManager().findFragmentByTag("dialog");
-        hm.setDateFlag(HeatmapSettingDialogFragment.END_FLAG);
-        newFragment.show(getSupportFragmentManager(), "stopdatePicker");
-    }
-
-    //dismis the settings dialog fragment
+    //dismiss the settings dialog fragment
     public void dismissSettings(View view) {
         dialogFragment.dismiss();
         if (mapUserData) {
@@ -342,9 +340,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 e.printStackTrace();
             }
         } else {
-            if((System.currentTimeMillis()- millisAllDataRetrieved)>3600000){
-            showSpinner();
-            new FirebaseAsyncTask().execute();
+            if ((System.currentTimeMillis() - millisAllDataRetrieved) > 3600000) {
+                showSpinner();
+                new FirebaseAsyncTask().execute();
             } else {
                 try {
                     addFilteredHeatMap();
@@ -355,7 +353,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    //setters
+    //setters&getters
     public void setMapUserData(Boolean mapUserData) {
         this.mapUserData = mapUserData;
     }

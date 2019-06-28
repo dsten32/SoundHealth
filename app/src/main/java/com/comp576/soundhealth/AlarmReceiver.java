@@ -3,6 +3,7 @@ package com.comp576.soundhealth;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 //from https://github.com/codepath/android_guides/wiki/Starting-Background-Services#using-with-alarmmanager-for-periodic-tasks
 public class AlarmReceiver extends BroadcastReceiver {
@@ -14,6 +15,6 @@ public class AlarmReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         Intent i = new Intent(context, DataCollectionService.class);
 //        i.putExtra("foo", "bar");
-        context.startService(i);
+            context.startService(i);
     }
 }
