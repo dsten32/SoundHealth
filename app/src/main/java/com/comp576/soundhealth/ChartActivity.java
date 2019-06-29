@@ -7,6 +7,7 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.widget.ArrayAdapter;
+import android.widget.HorizontalScrollView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -40,6 +41,8 @@ public class ChartActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Sound Chart");
 
         setContentView(R.layout.activity_chart);
+        HorizontalScrollView hScrollView =(HorizontalScrollView) findViewById(R.id.barChartScroll);
+
         dataRepository = new DataRepository(this);
 
         pieChartView = findViewById(R.id.pieChart);
@@ -131,6 +134,11 @@ public class ChartActivity extends AppCompatActivity {
         barChartData.setStacked(true);
 
         barChartView.setColumnChartData(barChartData);
+        hScrollView.post(new Runnable() {
+            public void run() {
+                hScrollView.fullScroll(HorizontalScrollView.FOCUS_RIGHT);
+            }
+        });
         barChartView.setHorizontalScrollBarEnabled(true);
         barChartView.setOnValueTouchListener(new ColumnChartOnValueSelectListener() {
             @Override

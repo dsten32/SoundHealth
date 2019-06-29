@@ -15,7 +15,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" >
+            android:gravity="start"
+            android:orientation="vertical">
 
             <lecho.lib.hellocharts.view.PieChartView
                 android:id="@+id/pieChart"
@@ -23,12 +24,30 @@
                 android:layout_height="550dp"
                 android:visibility="visible" />
 
-            <lecho.lib.hellocharts.view.ColumnChartView
-                android:id="@+id/barChart"
+            <HorizontalScrollView
+                android:id="@+id/barChartScroll"
                 android:layout_width="match_parent"
-                android:layout_height="300dp"
-                android:paddingTop="20dp"
-                android:scrollbars="vertical" />
+                android:layout_height="match_parent"
+                android:layout_gravity="end"
+                android:orientation="horizontal"
+                android:scrollbars="horizontal">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
+                    android:orientation="vertical">
+
+                    <lecho.lib.hellocharts.view.ColumnChartView
+                        android:id="@+id/barChart"
+                        android:layout_width="600dp"
+                        android:layout_height="300dp"
+                        android:layout_gravity="end"
+                        android:paddingTop="20dp"
+                        android:scrollbars="vertical" />
+                </LinearLayout>
+            </HorizontalScrollView>
+
         </LinearLayout>
     </ScrollView>
 
