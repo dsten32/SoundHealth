@@ -6,13 +6,19 @@ import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.HorizontalScrollView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.TreeMap;
 
 import lecho.lib.hellocharts.model.*;
 import lecho.lib.hellocharts.model.SliceValue;
@@ -27,13 +33,10 @@ import lecho.lib.hellocharts.view.ColumnChartView;
 public class ChartActivity extends AppCompatActivity {
     private PieChartView pieChartView;
     private ColumnChartView barChartView;
-    private ArrayAdapter<Data> adapter;
     private List<Data> data = new ArrayList<>();
-    private ListView dataListView;
     private DataRepository dataRepository;
     private Boolean dataQueried = false;
-    private float thirties, fourties, fifties, sixties, seventies, eighties, nintiesPlus;
-    private int dataTotal;
+    private float totalThirties, totalForties, totalFifties, totalSixties, totalSeventies, totalEighties, totalNintiesPlus;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,7 +44,23 @@ public class ChartActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Sound Chart");
 
         setContentView(R.layout.activity_chart);
-        HorizontalScrollView hScrollView =(HorizontalScrollView) findViewById(R.id.barChartScroll);
+        HorizontalScrollView hScrollView = (HorizontalScrollView) findViewById(R.id.barChartScroll);
+
+        HashMap<String,Integer> chartColours = new HashMap<>();
+        int thirties = Color.GREEN;
+        chartColours.put("thirties", thirties);
+        int forties = Color.BLUE;
+        chartColours.put("forties", forties);
+        int fifties = Color.CYAN;
+        chartColours.put("fifties", fifties);
+        int sixties = Color.GRAY;
+        chartColours.put("sixties", sixties);
+        int seventies = Color.YELLOW;
+        chartColours.put("seventies", seventies);
+        int eighties = Color.MAGENTA;
+        chartColours.put("eighties", eighties);
+        int ninties = Color.RED;
+        chartColours.put("ninties", ninties);
 
         dataRepository = new DataRepository(this);
 
@@ -64,7 +83,7 @@ public class ChartActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        dataTotal = data.size();
+        int dataTotal = data.size();
 
 //Generating slice data, simple categorisation of dB levels and taking percents.
         for (Data dataPoint : data) {
@@ -72,32 +91,24 @@ public class ChartActivity extends AppCompatActivity {
             //check if null in case I forget to enable mic.
             if (dB != null) {
                 float addPercent = 100 / dataTotal;
-                if (dB > 90) {
-                    nintiesPlus += addPercent;
-                } else if (dB > 80) {
-                    eighties += addPercent;
-                } else if (dB > 70) {
-                    seventies += addPercent;
-                } else if (dB > 60) {
-                    sixties++;
-                } else if (dB > 50) {
-                    fifties += addPercent;
-                } else if (dB > 40) {
-                    fourties += addPercent;
-                } else if (dB > 30) {
-                    thirties += addPercent;
-                }
+                if (dB > 90) totalNintiesPlus += addPercent;
+                else if (dB > 80) totalEighties += addPercent;
+                else if (dB > 70) totalSeventies += addPercent;
+                else if (dB > 60) totalSixties += addPercent;
+                else if (dB > 50) totalFifties += addPercent;
+                else if (dB > 40) totalForties += addPercent;
+                else if (dB > 30) totalThirties += addPercent;
             }
         }
 
         List pieData = new ArrayList<>();
-        pieData.add(new SliceValue(0, Color.GREEN).setLabel("30-39 dB").setTarget(thirties));
-        pieData.add(new SliceValue(0, Color.BLUE).setLabel("40-49 dB").setTarget(fourties));
-        pieData.add(new SliceValue(0, Color.CYAN).setLabel("50-59 dB").setTarget(fifties));
-        pieData.add(new SliceValue(0, Color.GRAY).setLabel("60-69 dB").setTarget(sixties));
-        pieData.add(new SliceValue(0, Color.YELLOW).setLabel("70-79 dB").setTarget(seventies));
-        pieData.add(new SliceValue(0, Color.MAGENTA).setLabel("80-89 dB").setTarget(eighties));
-        pieData.add(new SliceValue(0, Color.RED).setLabel(">90 dB").setTarget(nintiesPlus));
+        pieData.add(new SliceValue(0, chartColours.get("thirties")).setLabel("30-39 dB").setTarget(totalThirties));
+        pieData.add(new SliceValue(0, chartColours.get("forties")).setLabel("40-49 dB").setTarget(totalForties));
+        pieData.add(new SliceValue(0, chartColours.get("fifties")).setLabel("50-59 dB").setTarget(totalFifties));
+        pieData.add(new SliceValue(0, chartColours.get("sixties")).setLabel("60-69 dB").setTarget(totalSixties));
+        pieData.add(new SliceValue(0, chartColours.get("seventies")).setLabel("70-79 dB").setTarget(totalSeventies));
+        pieData.add(new SliceValue(0, chartColours.get("eighties")).setLabel("80-89 dB").setTarget(totalEighties));
+        pieData.add(new SliceValue(0, chartColours.get("ninties")).setLabel(">90 dB").setTarget(totalNintiesPlus));
 
         PieChartData pieChartData = new PieChartData(pieData);
         pieChartData.setHasLabels(true).setValueLabelTextSize(14);
@@ -108,32 +119,168 @@ public class ChartActivity extends AppCompatActivity {
         pieChartView.startDataAnimation();
 
         //users daily chart, TODO
-        int numColumns = 7;
+        //ok, lest try creating a hashmap of date:datapoint pairs. need to convert the datapoint date string back into a date
+        //after that add the hashmap to a TreeMap, should sort on date. then can loop through,
+        // use the key as column label and datapoints as column values. how will that work?
+        // could be instead of using adat points we do similar to the piechart.
+        // for each map key there are 7 string: int pairs. if dB value in category then increment the int with that key.
 
+        TreeMap<Date, TreeMap> dailyValues = new TreeMap<>();
+        float dailyThirties, dailyForties, dailyFifties, dailySixties, dailySeventies, dailyEighties, dailyNintiesPlus;
+
+        TreeMap<String, Float> dayValues = new TreeMap<>();
+
+        for (Data data : data) {
+            Date datapointDate = null;
+            try {
+                datapointDate = new SimpleDateFormat("dd-MMM-yyyy").parse(data.date);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            //idea here is to have each day with it's own set of total dB range values. not sure order of operations to get that working right.
+            dailyValues.put(datapointDate, dayValues);
+            //get number of datapoints in each category for the day.
+            Double dB = data.dB;
+            //check if null in case I forget to enable mic.
+            if (dB != null) {
+                if (dB > 90) {
+                    if (dailyValues.containsKey(datapointDate)) {
+                        dayValues = dailyValues.get(datapointDate);
+                        dailyNintiesPlus = dayValues.containsKey("ninties") ? dayValues.get("ninties") : 0;
+                        dayValues.put("ninties", dailyNintiesPlus+=1.0f);
+                        dailyValues.put(datapointDate, dayValues);
+                    } else {
+                        dailyNintiesPlus = 1;
+                        dayValues.put("ninties", dailyNintiesPlus);
+                        dailyValues.put(datapointDate, dayValues);
+                    }
+                } else if (dB > 80) {
+                    if (dailyValues.containsKey(datapointDate)) {
+                        dayValues = dailyValues.get(datapointDate);
+                        dailyEighties = dayValues.containsKey("eighties") ? dayValues.get("eighties") : 0;
+                        dayValues.put("eighties", dailyEighties+=1.0f);
+                        dailyValues.put(datapointDate, dayValues);
+                    } else {
+                        dailyEighties = 1;
+                        dayValues.put("eighties", dailyEighties);
+                        dailyValues.put(datapointDate, dayValues);
+                    }
+                } else if (dB > 70) {
+                    if (dailyValues.containsKey(datapointDate)) {
+                        dayValues = dailyValues.get(datapointDate);
+                        dailySeventies = dayValues.containsKey("seventies") ? dayValues.get("seventies") : 0;
+                        dayValues.put("seventies", dailySeventies+=1.0f);
+                        dailyValues.put(datapointDate, dayValues);
+                    } else {
+                        dailySeventies = 1;
+                        dayValues.put("seventies", dailySeventies);
+                        dailyValues.put(datapointDate, dayValues);
+                    }
+                } else if (dB > 60) {
+                    if (dailyValues.containsKey(datapointDate)) {
+                        dayValues = dailyValues.get(datapointDate);
+                        dailySixties = dayValues.containsKey("sixties") ? dayValues.get("sixties") : 0;
+                        dayValues.put("sixties", dailySixties+=1.0f);
+                        dailyValues.put(datapointDate, dayValues);
+                    } else {
+                        dailySixties = 1;
+                        dayValues.put("sixties", dailySixties);
+                        dailyValues.put(datapointDate, dayValues);
+                    }
+                } else if (dB > 50) {
+                    if (dailyValues.containsKey(datapointDate)) {
+                        dayValues = dailyValues.get(datapointDate);
+                        dailyFifties = dayValues.containsKey("fifties") ? dayValues.get("fifties") : 0;
+                        dayValues.put("fifties", dailyFifties+=1.0f);
+                        dailyValues.put(datapointDate, dayValues);
+                    } else {
+                        dailyFifties = 1;
+                        dayValues.put("fifties", dailyFifties);
+                        dailyValues.put(datapointDate, dayValues);
+                    }
+                } else if (dB > 40) {
+                    if (dailyValues.containsKey(datapointDate)) {
+                        dayValues = dailyValues.get(datapointDate);
+                        dailyForties = dayValues.containsKey("forties") ? dayValues.get("forties") : 0;
+                        dayValues.put("forties", dailyForties+=1.0f);
+                        dailyValues.put(datapointDate, dayValues);
+                    } else {
+                        dailyForties = 1;
+                        dayValues.put("forties", dailyForties);
+                        dailyValues.put(datapointDate, dayValues);
+                    }
+                } else if (dB > 30) {
+                    if (dailyValues.containsKey(datapointDate)) {
+                        dayValues = dailyValues.get(datapointDate);
+                        dailyThirties = dayValues.containsKey("thirties") ? dayValues.get("thirties") : 0;
+                        dayValues.put("thirties", dailyThirties+=1.0f);
+                        dailyValues.put(datapointDate, dayValues);
+                        Log.d("thirties val: ",String.valueOf(dayValues.get("thirties")));
+                    } else {
+                        dailyThirties = 1;
+                        dayValues.put("thirties", dailyThirties);
+                        dailyValues.put(datapointDate, dayValues);
+                    }
+                }
+            }
+        }
+
+
+        //setup columns w/data
         List<Column> columns = new ArrayList<>();
         List<SubcolumnValue> values;
 
-        for (int i = 0; i < numColumns; i++) {
+
+
+        for (Date key : dailyValues.keySet()) {
             values = new ArrayList<>();
-//            for(int j=0;j<7;j++){
-            //placeholder subcolumn value for testing, need to split data by type and add colours and labels.
-            values.add(new SubcolumnValue(thirties, Color.GREEN));
-            values.add(new SubcolumnValue(fourties, Color.BLUE));
-            values.add(new SubcolumnValue(fifties, Color.CYAN));
-            values.add(new SubcolumnValue(sixties, Color.GRAY));
-            values.add(new SubcolumnValue(seventies, Color.YELLOW));
-            values.add(new SubcolumnValue(eighties, Color.MAGENTA));
-            values.add(new SubcolumnValue(nintiesPlus, Color.RED));
-//            }
+            dayValues = dailyValues.get(key);
+            Log.d("date key: ",key.toString());
+            for(String dbKey:dayValues.keySet()){
+                Log.d("dbkey: ",dbKey);
+                values.add(new SubcolumnValue(dayValues.get(dbKey),chartColours.get(dbKey)).setLabel(dbKey));
+            }
+            Log.d("values #1: ",String.valueOf(values.get(0)));
+            Log.d("values #2: ",String.valueOf(values.get(1)));
+            Log.d("values #3: ",String.valueOf(values.get(2)));
             Column column = new Column(values);
             column.setHasLabels(true);
+//            column.setHasLabelsOnlyForSelected(true);
             columns.add(column);
         }
 
         ColumnChartData barChartData = new ColumnChartData(columns);
         barChartData.setStacked(true);
 
+        List<AxisValue> xAxisValues = new ArrayList<>();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yy");
+
+        int i = 0;
+        for(Date date:dailyValues.keySet()){
+            AxisValue value = new AxisValue(i); //= dateFormat.format(date);
+            value.setLabel(dateFormat.format(date));
+            xAxisValues.add(value);
+            i++;
+        }
+
+        Axis xAxis = new Axis();
+        xAxis.setValues(xAxisValues);
+        xAxis.setName("Days");
+        xAxis.setHasLines(true);
+        xAxis.setHasSeparationLine(true);
+        xAxis.setTextColor(Color.BLUE);
+
+        Axis yAxis = new Axis();
+        yAxis.setName("%");
+
+        barChartData.setAxisXBottom(xAxis);
+        barChartData.setAxisYRight(yAxis);
+        barChartData.setFillRatio(0.7f);
+
         barChartView.setColumnChartData(barChartData);
+        barChartView.setMinimumWidth(240*dailyValues.keySet().size());
+
         hScrollView.post(new Runnable() {
             public void run() {
                 hScrollView.fullScroll(HorizontalScrollView.FOCUS_RIGHT);
