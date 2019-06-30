@@ -24,27 +24,35 @@
                 android:layout_height="550dp"
                 android:visibility="visible" />
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="Daily Percentages"
+                android:textAlignment="center"/>
+
             <HorizontalScrollView
                 android:id="@+id/barChartScroll"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_gravity="end"
                 android:orientation="horizontal"
                 android:scrollbars="horizontal">
 
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="end"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:layout_marginBottom="10dp">
 
                     <lecho.lib.hellocharts.view.ColumnChartView
                         android:id="@+id/barChart"
                         android:layout_height="300dp"
                         android:layout_gravity="end"
                         android:paddingTop="20dp"
+                        android:layout_marginRight="10dp"
                         android:scrollbars="vertical"
-                        android:layout_width="wrap_content" />
+                        android:layout_width="wrap_content"
+                        android:layout_marginEnd="15dp" />
                 </LinearLayout>
             </HorizontalScrollView>
 

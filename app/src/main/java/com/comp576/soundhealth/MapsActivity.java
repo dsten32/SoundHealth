@@ -266,7 +266,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     && (datapointMinutes <= stopTimeMinutes)
                     && ((datapointDate.compareTo(dSDate) >= 0)
                     && (datapointDate.compareTo(dEDate) <= 0))) {
-                weightedLatLngs.add(new WeightedLatLng(new LatLng(dataPoint.lat, dataPoint.lng), ((dataPoint.dB - 30) * 10) * 0.16333));
+                weightedLatLngs.add(new WeightedLatLng(new LatLng(dataPoint.lat, dataPoint.lng), ((dataPoint.dB - 30) * 100) * 0.16333));
+
             }
         }
 
