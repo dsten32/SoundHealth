@@ -115,6 +115,7 @@ public class DataCollectionSettingsFragment extends DialogFragment implements Co
 
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+        hideKeyboard(seekBar);
         mainActivity.setBlurValue(((float) progress / 10));
         showBlurValue.setText(String.valueOf(mainActivity.getBlurValue()) + "km");
         Log.d("blurval: ", String.valueOf(mainActivity.getBlurValue()));
@@ -130,11 +131,13 @@ public class DataCollectionSettingsFragment extends DialogFragment implements Co
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        hideKeyboard(buttonView);
         Log.d("buttoncheck", "changed");
         switch (buttonView.getId()) {
             case R.id.setDataStopTime:
                 mainActivity.setStopTime(isChecked);
                 dataStopTimeEntry.setEnabled(isChecked);
+                dataStopTimeEntry.requestFocus();
                 break;
             case R.id.setBlur:
                 mainActivity.setBlurred(isChecked);
