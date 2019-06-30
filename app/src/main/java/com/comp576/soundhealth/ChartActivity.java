@@ -216,7 +216,6 @@ public class ChartActivity extends AppCompatActivity {
                         dailyThirties = dayValues.containsKey("thirties") ? dayValues.get("thirties") : 0;
                         dayValues.put("thirties", dailyThirties+=1.0f);
                         dailyValues.put(datapointDate, dayValues);
-                        Log.d("thirties val: ",String.valueOf(dayValues.get("thirties")));
                     } else {
                         dailyThirties = 1;
                         dayValues.put("thirties", dailyThirties);
@@ -232,21 +231,14 @@ public class ChartActivity extends AppCompatActivity {
         List<SubcolumnValue> values;
 
 
-
         for (Date key : dailyValues.keySet()) {
             values = new ArrayList<>();
             dayValues = dailyValues.get(key);
-            Log.d("date key: ",key.toString());
             for(String dbKey:dayValues.keySet()){
-                Log.d("dbkey: ",dbKey);
                 values.add(new SubcolumnValue(dayValues.get(dbKey),chartColours.get(dbKey)).setLabel(dbKey));
             }
-            Log.d("values #1: ",String.valueOf(values.get(0)));
-            Log.d("values #2: ",String.valueOf(values.get(1)));
-            Log.d("values #3: ",String.valueOf(values.get(2)));
             Column column = new Column(values);
             column.setHasLabels(true);
-//            column.setHasLabelsOnlyForSelected(true);
             columns.add(column);
         }
 
@@ -290,7 +282,7 @@ public class ChartActivity extends AppCompatActivity {
         barChartView.setOnValueTouchListener(new ColumnChartOnValueSelectListener() {
             @Override
             public void onValueSelected(int columnIndex, int subcolumnIndex, SubcolumnValue value) {
-
+                Toast.makeText(getApplicationContext(),String.valueOf(value.getValue()),Toast.LENGTH_SHORT).show();
             }
 
             @Override
