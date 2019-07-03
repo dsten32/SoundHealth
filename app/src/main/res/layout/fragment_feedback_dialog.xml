@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/settings_background"
+    android:padding="5dp"
+    android:gravity="center|center_horizontal|center_vertical"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Feedback Form"
+        android:textAlignment="center" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Rate this app"
+        android:textAlignment="center" />
+
+    <!--https://www.mkyong.com/android/android-rating-bar-example/-->
+    <!--https://www.tutorialspoint.com/how-to-use-ratingbar-in-android-->
+    <RatingBar
+        android:id="@+id/rating_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimaryDark"
+        android:numStars="5"
+        android:rating="5"
+        android:stepSize="1" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Please leave a comment"
+        android:textAlignment="center" />
+
+    <!--https://stackoverflow.com/questions/35762006/how-to-have-edittext-with-border-in-android-lollipop-->
+    <EditText
+        android:id="@+id/feedback_text"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:background="@android:color/background_light"
+        android:ems="10"
+        android:gravity="start|top|left"
+        android:imeOptions="actionDone"
+        android:inputType="textImeMultiLine"
+        />
+
+    <Button
+        android:id="@+id/feedback_submit"
+        android:layout_width="90dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/submit_button"
+        android:shadowColor="#A8A8A8"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="5"
+        android:text="Submit"
+        android:textColor="#FFFFFF"
+        android:textSize="20sp" />
+
+</LinearLayout>

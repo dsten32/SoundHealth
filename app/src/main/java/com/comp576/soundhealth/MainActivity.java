@@ -46,6 +46,8 @@ public class MainActivity extends AppCompatActivity{
     private DialogFragment dialogFragment;
     public static boolean isBlurred, isStopTime;
     public static float blurValue;
+    public static float feedbackRating;
+    public static String feedbackText;
     public static int stopHour,stopMin;
     private String dataStopTime;
     private DialogFragment timePicker = new DataCollectionSettingsFragment.TimePickerFragment();
@@ -90,7 +92,7 @@ public class MainActivity extends AppCompatActivity{
                         startActivity(goToChart);
                         break;
                     case R.id.settings:
-                        showDialog();
+                        showSettingsDialog();
                         break;
                     case R.id.mapview:
                         Intent goToMap = new Intent(getApplicationContext(),MapsActivity.class);
@@ -109,6 +111,9 @@ public class MainActivity extends AppCompatActivity{
                     case R.id.fakedata:
                         DataCollection dataCollection = new DataCollection(getApplicationContext());
                         dataCollection.sendDataCollection();
+                    case R.id.feedback:
+                        showFeedbackDiaolog();
+                        break;
                     default:
                         return true;
                 }
@@ -182,15 +187,29 @@ public class MainActivity extends AppCompatActivity{
     }
 
     //show the data collection settings dialog fragment
-    public void showDialog() {
+    public void showSettingsDialog() {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         Fragment prev = getSupportFragmentManager().findFragmentByTag("dataDialog");
         if (prev != null) {
             fragmentTransaction.remove(prev);
         }
         fragmentTransaction.addToBackStack(null);
+
         dialogFragment = new DataCollectionSettingsFragment();
         dialogFragment.show(fragmentTransaction, "dataDialog");
+    }
+
+    public void showFeedbackDiaolog(){
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        Fragment prev = getSupportFragmentManager().findFragmentByTag("feedbackDialog");
+        if (prev != null) {
+            fragmentTransaction.remove(prev);
+        }
+        fragmentTransaction.addToBackStack(null);
+
+        dialogFragment = new FeedbackFragment();
+        dialogFragment.show(fragmentTransaction, "feedbackDialog");
+//        FeedbackFragment.newInstance().show(getSupportFragmentManager(), "feedbackDialog");;
     }
 
     public void showPickerDialog(View view) {

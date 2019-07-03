@@ -3,9 +3,8 @@ package com.comp576.soundhealth;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
-import android.content.DialogInterface;
+import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,9 +21,9 @@ import android.widget.TimePicker;
 
 import java.util.Calendar;
 
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.DialogFragment;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
@@ -36,20 +35,21 @@ public class DataCollectionSettingsFragment extends DialogFragment implements Co
     private TextView showBlurValue;
     private CheckBox setDataStopTime, setBlur;
     private SeekBar blurBarValue;
-    private boolean isBlurred, isStopTime;
-    private String dataStopTime;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @NonNull
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mainActivity = (MainActivity) getActivity();
 
         view = inflater.inflate(R.layout.fragment_data_settings_fragment, container, false);
+        view.setClipToOutline(true);
+
         interval = view.findViewById(R.id.interval);
         interval.setText(String.valueOf(mainActivity.getInterval()));
         interval.setOnKeyListener(this);
@@ -89,6 +89,12 @@ public class DataCollectionSettingsFragment extends DialogFragment implements Co
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        getDialog().getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+    }
+
+    @Override
     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
 
     }
@@ -107,7 +113,6 @@ public class DataCollectionSettingsFragment extends DialogFragment implements Co
             case R.id.frag_close:
                 mainActivity.setInterval(Integer.parseInt(String.valueOf(interval.getText())));
                 mainActivity.dismissSettings(view);
-                Log.d("here's what frag got: ", "dialog: " + String.valueOf(setBlur.isChecked()) + "mainactivity: " + String.valueOf(mainActivity.isBlurred()));
             default:
                 break;
         }
@@ -118,7 +123,6 @@ public class DataCollectionSettingsFragment extends DialogFragment implements Co
         hideKeyboard(seekBar);
         mainActivity.setBlurValue(((float) progress / 10));
         showBlurValue.setText(String.valueOf(mainActivity.getBlurValue()) + "km");
-        Log.d("blurval: ", String.valueOf(mainActivity.getBlurValue()));
     }
 
     @Override
@@ -132,25 +136,24 @@ public class DataCollectionSettingsFragment extends DialogFragment implements Co
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         hideKeyboard(buttonView);
-        Log.d("buttoncheck", "changed");
         switch (buttonView.getId()) {
             case R.id.setDataStopTime:
                 mainActivity.setStopTime(isChecked);
                 dataStopTimeEntry.setEnabled(isChecked);
                 dataStopTimeEntry.requestFocus();
+                if(isChecked) {
+                    mainActivity.showPickerDialog(buttonView);
+                }
                 break;
             case R.id.setBlur:
                 mainActivity.setBlurred(isChecked);
                 blurBarValue.setEnabled(isChecked);
-                Log.d("click blur", "yep");
                 break;
         }
     }
 
     @Override
     public boolean onKey(View v, int keyCode, KeyEvent event) {
-        Log.d("keycode: ", String.valueOf(keyCode));
-        Log.d("is enter?: ", String.valueOf(keyCode == KeyEvent.KEYCODE_ENTER));
         if (v.getId() == R.id.interval && keyCode == KeyEvent.KEYCODE_ENTER) {
             setDataStopTime.requestFocus();
             hideKeyboard(v);
