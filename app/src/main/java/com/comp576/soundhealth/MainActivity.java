@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity{
     private TextView introText;
     private static int MINUTE=60;
     private int interval;
-    private Switch continuousSwitch;
+    public static Switch continuousSwitch;
     private DialogFragment dialogFragment;
     public static boolean isBlurred, isStopTime,isCollecting;
     public static float blurValue;

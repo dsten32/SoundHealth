@@ -109,16 +109,15 @@ public class DataCollectionSettingsFragment extends DialogFragment implements Co
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.frag_close:
-                mainActivity.setInterval(Integer.parseInt(String.valueOf(interval.getText())));
-                mainActivity.dismissSettings(view);
-                if(!mainActivity.isCollecting){
-                    mainActivity.scheduleDataCollection();
-                }
-                break;
-            default:
-                break;
+        if(String.valueOf(interval.getText()).contains(".")){
+            interval.setError("Sorry, interval value has to be a whole number");
+        }
+        if (interval.getError() == null) {
+            mainActivity.setInterval(Integer.parseInt(String.valueOf(interval.getText())));
+            mainActivity.dismissSettings(view);
+            if (!mainActivity.isCollecting && mainActivity.continuousSwitch.isChecked()) {
+                mainActivity.scheduleDataCollection();
+            }
         }
     }
 
@@ -145,7 +144,7 @@ public class DataCollectionSettingsFragment extends DialogFragment implements Co
                 mainActivity.setStopTime(isChecked);
                 dataStopTimeEntry.setEnabled(isChecked);
                 dataStopTimeEntry.requestFocus();
-                if(isChecked) {
+                if (isChecked) {
                     mainActivity.showPickerDialog(buttonView);
                 }
                 break;

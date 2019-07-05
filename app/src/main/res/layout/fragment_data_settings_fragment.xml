@@ -24,7 +24,7 @@
 
         <EditText
             android:id="@+id/interval"
-            android:layout_width="40dp"
+            android:layout_width="50dp"
             android:layout_height="wrap_content"
             android:background="@color/common_google_signin_btn_text_light_disabled" />
 
