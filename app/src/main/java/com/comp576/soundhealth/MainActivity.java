@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity{
     private int interval;
     private Switch continuousSwitch;
     private DialogFragment dialogFragment;
-    public static boolean isBlurred, isStopTime;
+    public static boolean isBlurred, isStopTime,isCollecting;
     public static float blurValue;
     public static float feedbackRating;
     public static String feedbackText;
@@ -101,7 +101,8 @@ public class MainActivity extends AppCompatActivity{
                     case R.id.continuousSwitch:
                         if (!((Switch)menuItem.getActionView()).isChecked()){
                             ((Switch)menuItem.getActionView()).setChecked(true);
-                            scheduleDataCollection();
+                            showSettingsDialog();
+//                            scheduleDataCollection();
                             return true;
                         } else {
                             ((Switch)menuItem.getActionView()).setChecked(false);
@@ -127,13 +128,14 @@ public class MainActivity extends AppCompatActivity{
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked){
-                    scheduleDataCollection();
+                    showSettingsDialog();
+//                    scheduleDataCollection();
                 } else {
                     cancelDataCollection();
                 }
             }
         });
-        //check that app can access introText data and record audio
+        //check that app can access location data and record audio
         checkPermissions();
     }
 
@@ -160,6 +162,7 @@ public class MainActivity extends AppCompatActivity{
     // Setup a recurring alarm for user settable (eventually) number of minutes
     //from https://github.com/codepath/android_guides/wiki/Starting-Background-Services#using-with-alarmmanager-for-periodic-tasks
     public void scheduleDataCollection() {
+        isCollecting=true;
         Toast.makeText(this,"data collection started",Toast.LENGTH_SHORT).show();
         // Construct an intent that will execute the AlarmReceiver
         Intent intent = new Intent(getApplicationContext(), AlarmReceiver.class);
@@ -177,6 +180,7 @@ public class MainActivity extends AppCompatActivity{
 
     //stop data collection service
     public void cancelDataCollection() {
+        isCollecting=false;
         Toast.makeText(this,"data collection stopped",Toast.LENGTH_SHORT).show();
 
         Intent intent = new Intent(getApplicationContext(), AlarmReceiver.class);

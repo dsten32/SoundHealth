@@ -113,6 +113,10 @@ public class DataCollectionSettingsFragment extends DialogFragment implements Co
             case R.id.frag_close:
                 mainActivity.setInterval(Integer.parseInt(String.valueOf(interval.getText())));
                 mainActivity.dismissSettings(view);
+                if(!mainActivity.isCollecting){
+                    mainActivity.scheduleDataCollection();
+                }
+                break;
             default:
                 break;
         }

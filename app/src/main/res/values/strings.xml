@@ -6,4 +6,6 @@
     <string name="pick_stop_time">Stop Time</string>
     <string name="pick_start_date">Start Date</string>
     <string name="pick_stop_date">Stop Date</string>
+    <string name="default_notification_channel_id">default_id</string>
+    <string name="fcm_message">default_message</string>
 </resources>
