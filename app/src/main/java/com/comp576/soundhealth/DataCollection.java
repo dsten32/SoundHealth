@@ -15,13 +15,19 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+//import com.google.auth.oauth2.GoogleCredentials;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.WriteBatch;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -52,6 +58,7 @@ public class DataCollection extends Activity {
         this.context=context;
         dataRepository = new DataRepository(context);
         db = FirebaseFirestore.getInstance();
+
     }
 
     //data collection method move to own class?
@@ -92,7 +99,12 @@ public class DataCollection extends Activity {
                             long id=dataRepository.insert(data);
                             data.id=id;
                             sendData(data);
-
+                            //get the street address of the lat,lng coord see:https://stackoverflow.com/questions/12797198/how-to-get-locations-address-when-i-have-latitude-and-longitude-in-java
+                            MainActivity.mainButton.setText("Most recent noise data:\nDate:"
+                                    + data.date
+                                    + "\nTime:" + data.time
+                                    + "\nLoc:" + data.lat + "-" + data.lng
+                                    + "\ndB:" + String.valueOf(Math.round(data.dB*100)/100));
                             Toast.makeText(context, "Datapoint saved: "+(double)Math.round(data.dB*100)/100, Toast.LENGTH_LONG).show();
                         }
                     }
@@ -100,8 +112,6 @@ public class DataCollection extends Activity {
     }
 
     public void sendData(Data data){
-//        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
 // Add a new document with a generated ID
         db.collection("sound_data_collection")
                 .add(data)
@@ -154,8 +164,6 @@ public class DataCollection extends Activity {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 dataList.add(new Data(document.getString("date"),document.getString("time"),document.getString("userId"),document.getDouble("lat"),document.getDouble("lng"),document.getDouble("dB"),document.getBoolean("isBlurred")));
-
-//                                Log.d(TAG,dataList.get(dataList.size()-1).toString());
                             }
                         } else {
                             Log.d(TAG, "Error getting documents: ", task.getException());

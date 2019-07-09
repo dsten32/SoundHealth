@@ -10,7 +10,9 @@ import android.net.Uri;
 import android.os.Build;
 import androidx.core.app.NotificationCompat;
 import android.util.Log;
+import android.widget.Toast;
 
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 //import com.google.firebase.quickstart.fcm.R;
@@ -168,5 +170,18 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         }
 
         notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
+    }
+
+    public void sendUpstream() {
+        final String SENDER_ID = "516223389380";
+        final int messageId = 0; // Increment for each
+        // [START fcm_send_upstream]
+        FirebaseMessaging fm = FirebaseMessaging.getInstance();
+        fm.send(new RemoteMessage.Builder(SENDER_ID + "@fcm.googleapis.com")
+                .setMessageId(Integer.toString(messageId))
+                .addData("my_message", "Hello World")
+                .addData("my_action","SAY_HELLO")
+                .build());
+        // [END fcm_send_upstream]
     }
 }

@@ -23,9 +23,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.maps.android.heatmaps.Gradient;
-import com.google.maps.android.heatmaps.HeatmapTileProvider;
-import com.google.maps.android.heatmaps.WeightedLatLng;
+import com.google.maps.android.heatmaps.*;
+//import com.google.maps.android.heatmaps.HeatmapTileProvider;
+//import com.google.maps.android.heatmaps.WeightedLatLng;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -275,7 +275,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             HeatmapTileProvider mProvider = new HeatmapTileProvider.Builder()
                     .weightedData(weightedLatLngs)
                     .gradient(gradient)
-                    .radius(50)
+                    .radius(30)
                     .build();
             // Add a tile overlay to the map, using the heat map tile provider.
             mMap.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));

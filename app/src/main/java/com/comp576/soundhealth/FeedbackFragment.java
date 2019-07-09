@@ -72,7 +72,13 @@ public class FeedbackFragment extends DialogFragment implements RatingBar.OnRati
             mainActivity.feedbackText = feedbackText.getText().toString();
             mainActivity.feedbackRating = rateBar.getRating();
             mainActivity.dismissSettings(v);
+            sendMess();
             Toast.makeText(getContext(),"rating= "+ mainActivity.feedbackRating +' '+mainActivity.feedbackText,Toast.LENGTH_LONG).show();
         }
+    }
+
+    public void sendMess(){
+        MyFirebaseMessagingService fms = new MyFirebaseMessagingService();
+        fms.sendUpstream();
     }
 }
