@@ -4,43 +4,41 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Build;
+import android.text.Html;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-//import com.google.auth.oauth2.GoogleCredentials;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.FirebaseOptions;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.WriteBatch;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import org.glassfish.jersey.client.ClientConfig;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.MediaType;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -53,12 +51,14 @@ public class DataCollection extends Activity {
     private DataRepository dataRepository;
     private Context context;
     private FirebaseFirestore db;
+    private String addressString;
+    private Data data;
 
     public DataCollection (Context context){
         this.context=context;
         dataRepository = new DataRepository(context);
         db = FirebaseFirestore.getInstance();
-
+        data=null;
     }
 
     //data collection method move to own class?
@@ -69,6 +69,7 @@ public class DataCollection extends Activity {
 
         fusedLocationProviderClient.getLastLocation()
                 .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @SuppressLint("SetTextI18n")
                     @Override
                     public void onSuccess(Location location) {
                         if (location != null) {
@@ -94,21 +95,55 @@ public class DataCollection extends Activity {
                                 e.printStackTrace();
                             }
 
-                            Data data =new Data(date,time,userId,lat,lng,dB,MainActivity.isBlurred);
+                            data = new Data(date,time,userId,lat,lng,dB,MainActivity.isBlurred);
 
                             long id=dataRepository.insert(data);
                             data.id=id;
                             sendData(data);
-                            //get the street address of the lat,lng coord see:https://stackoverflow.com/questions/12797198/how-to-get-locations-address-when-i-have-latitude-and-longitude-in-java
-                            MainActivity.mainButton.setText("Most recent noise data:\nDate:"
-                                    + data.date
-                                    + "\nTime:" + data.time
-                                    + "\nLoc:" + data.lat + "-" + data.lng
-                                    + "\ndB:" + String.valueOf(Math.round(data.dB*100)/100));
+                            new AddressAsyncTask().execute(data);
                             Toast.makeText(context, "Datapoint saved: "+(double)Math.round(data.dB*100)/100, Toast.LENGTH_LONG).show();
                         }
                     }
                 });
+    }
+    //get address from google geolocation api using the datapoint latlng
+    private class AddressAsyncTask extends AsyncTask<Data, Void, String> {
+
+        @Override
+        protected String doInBackground(Data... data) {
+            double lat = data[0].lat;
+            double lng = data[0].lng;
+            String address = null;
+            try {
+                //one connection method
+                ClientConfig config=new ClientConfig();
+                Client client = ClientBuilder.newClient(config);
+                URI apiURI = new URI("https://maps.googleapis.com/maps/api/geocode/json?latlng="+lat+","+lng+"&key=AIzaSyC8avA0VDGZmk6m1sAI7feb1HCEBDK41BY");
+                WebTarget target = client.target(apiURI);
+                String jsonResponse = target.request().accept(MediaType.APPLICATION_JSON).get(String.class);
+                JSONParser parser = new JSONParser();
+                Object obj = parser.parse(jsonResponse);
+                JSONObject jsonObject = (JSONObject) obj;
+                JSONArray results = (JSONArray) jsonObject.get("results");
+                JSONObject jsonObject1 = (JSONObject) parser.parse(results.get(0).toString());
+                address = jsonObject1.get("formatted_address").toString();
+            } catch (URISyntaxException | ParseException  e) {
+                e.printStackTrace();
+            }
+            return address;
+        }
+
+        @SuppressLint("SetTextI18n")
+        @Override
+        protected void onPostExecute(String address) {
+            addressString = address;
+            String htmlButtonText = "<br><h5>Most recent noise data</h5>"
+                    + "<b>Date: </b><em>" + data.date + "</em>"
+                    + "<br><b>Time: </b><em>" + data.time + "</em>"
+                    + "<br><b>Location: </b><em>" + addressString.replace(",","<br>") + "</em>"
+                    + "<br><b>dB: </b><em>" + String.valueOf((Math.round(data.dB))) + "</em>";
+            MainActivity.mainButton.setText(Html.fromHtml(htmlButtonText));
+        }
     }
 
     public void sendData(Data data){
@@ -127,7 +162,6 @@ public class DataCollection extends Activity {
                         Log.w(TAG, "Error adding document", e);
                     }
                 });
-
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
