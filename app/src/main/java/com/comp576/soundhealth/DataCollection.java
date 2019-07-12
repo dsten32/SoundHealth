@@ -53,7 +53,6 @@ public class DataCollection extends Activity {
     private FirebaseFirestore db;
     private String addressString;
     private Data data;
-    private Data lastData;
 
     public DataCollection (Context context){
         this.context=context;
@@ -97,7 +96,6 @@ public class DataCollection extends Activity {
                             }
 
                             data = new Data(date,time,userId,lat,lng,dB,MainActivity.isBlurred);
-//                            lastData = new LastDataAsyncTask().doInBackground();
 
                             long id=dataRepository.insert(data);
                             data.id=id;
@@ -151,14 +149,6 @@ public class DataCollection extends Activity {
             MainActivity.mainButton.setText(Html.fromHtml(htmlButtonText));
         }
     }
-
-    private class LastDataAsyncTask extends AsyncTask<Void,Void,Data>{
-
-        @Override
-        protected Data doInBackground(Void... voids) {
-            return dataRepository.lastItem();        }
-    }
-
 
 
     public void sendData(Data data){
