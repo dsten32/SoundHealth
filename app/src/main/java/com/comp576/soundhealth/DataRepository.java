@@ -4,6 +4,8 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.widget.Toast;
 
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -101,4 +103,26 @@ public class DataRepository {
     public LiveData<List<Data>> getAllData() {
         return allData;
     }
+
+    public Data lastItem() {
+        ExecutorService executorService = Executors.newFixedThreadPool(10);
+        Callable<Data> insertCallable = () -> dataDao.getLast();
+        Data data = null;
+
+        Future<Data> future = executorService.submit(insertCallable);
+        try {
+            data = future.get();
+        } catch (InterruptedException e1) {
+            e1.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        return data;
+    }
+//    private class LastAsyncTask extends AsyncTask<Void, Void, Data> {
+//        @Override
+//        protected Data doInBackground(Void... voids) {
+//            return dataDao.getLast();
+//        }
+//    }
 }

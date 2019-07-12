@@ -1,12 +1,14 @@
 package com.comp576.soundhealth;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -21,6 +23,7 @@ import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.text.Html;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,6 +35,20 @@ import android.widget.Toast;
 
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.messaging.FirebaseMessagingService;
+
+import org.glassfish.jersey.client.ClientConfig;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.MediaType;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static android.Manifest.permission.INTERNET;
@@ -54,22 +71,29 @@ public class MainActivity extends AppCompatActivity {
     public static Button mainButton;
     private String dataStopTime;
     private DialogFragment timePicker = new DataCollectionSettingsFragment.TimePickerFragment();
+    private DataRepository repo;
+    private Data data;
+    private DataCollection dataCollectior;
+    private  String addressString;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        repo = new DataRepository(getApplicationContext());
         setContentView(R.layout.activity_main);
         introText = (TextView) findViewById(R.id.intro);
+        dataCollectior = new DataCollection(getApplicationContext());
         interval = 30;
 //        introText.setText("new text I put here 'cos I could");
-
+        data = repo.lastItem();
         mainButton = (Button) findViewById(R.id.main_btn);
+
+        new AddressAsyncTask().execute(data);
 
         mainButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Toast.makeText(getApplicationContext(), "Collecting", Toast.LENGTH_SHORT).show();
-                DataCollection dataCollectior = new DataCollection(getApplicationContext());
                 dataCollectior.getDataPoint();
             }
         });
@@ -140,6 +164,48 @@ public class MainActivity extends AppCompatActivity {
         });
         //check that app can access location data and record audio
         checkPermissions();
+    }
+
+    //get address from google geolocation api using the datapoint latlng
+    public class AddressAsyncTask extends AsyncTask<Data, Void, String> {
+
+        @Override
+        protected String doInBackground(Data... data) {
+            double lat = data[0].lat;
+            double lng = data[0].lng;
+            String address = null;
+            try {
+                //one connection method
+                ClientConfig config=new ClientConfig();
+                Client client = ClientBuilder.newClient(config);
+                URI apiURI = new URI("https://maps.googleapis.com/maps/api/geocode/json?latlng="+lat+","+lng+"&key=AIzaSyC8avA0VDGZmk6m1sAI7feb1HCEBDK41BY");
+                WebTarget target = client.target(apiURI);
+                String jsonResponse = target.request().accept(MediaType.APPLICATION_JSON).get(String.class);
+                JSONParser parser = new JSONParser();
+                Object obj = parser.parse(jsonResponse);
+                JSONObject jsonObject = (JSONObject) obj;
+                JSONArray results = (JSONArray) jsonObject.get("results");
+                JSONObject jsonObject1 = (JSONObject) parser.parse(results.get(0).toString());
+                address = jsonObject1.get("formatted_address").toString();
+            } catch (URISyntaxException | ParseException e) {
+                e.printStackTrace();
+            }
+            return address;
+        }
+
+        @SuppressLint("SetTextI18n")
+        @Override
+        protected void onPostExecute(String address) {
+            addressString = address;
+            String htmlButtonText = "<br><h5>Most recent noise data</h5>"
+                    + "<b>Date: </b><em>" + data.date + "</em>"
+                    + "<br><b>Time: </b><em>" + data.time + "</em>"
+                    + "<br><b>location Blurred: </b><<em>" + String.valueOf(data.isBlurred) + "</em>"
+                    + "<br><b>Location: </b><em>" + addressString.replace(",","<br>") + "</em>"
+                    + "<br><b>dB: </b><em>" + String.valueOf((Math.round(data.dB))) + "</em>"
+                    ;
+            mainButton.setText(Html.fromHtml(htmlButtonText));
+        }
     }
 
     @Override

@@ -53,6 +53,7 @@ public class DataCollection extends Activity {
     private FirebaseFirestore db;
     private String addressString;
     private Data data;
+    private Data lastData;
 
     public DataCollection (Context context){
         this.context=context;
@@ -96,18 +97,25 @@ public class DataCollection extends Activity {
                             }
 
                             data = new Data(date,time,userId,lat,lng,dB,MainActivity.isBlurred);
+//                            lastData = new LastDataAsyncTask().doInBackground();
 
                             long id=dataRepository.insert(data);
                             data.id=id;
                             sendData(data);
                             new AddressAsyncTask().execute(data);
-                            Toast.makeText(context, "Datapoint saved: "+(double)Math.round(data.dB*100)/100, Toast.LENGTH_LONG).show();
+                            Toast.makeText(context, "Datapoint saved: "+(double)Math.round(data.dB*100)/100, Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(context,lastData.toString(),Toast.LENGTH_LONG).show();
                         }
                     }
                 });
     }
+
+    public String getLast(Data data) {
+        return new AddressAsyncTask().doInBackground(data);
+    }
+
     //get address from google geolocation api using the datapoint latlng
-    private class AddressAsyncTask extends AsyncTask<Data, Void, String> {
+    public class AddressAsyncTask extends AsyncTask<Data, Void, String> {
 
         @Override
         protected String doInBackground(Data... data) {
@@ -140,11 +148,22 @@ public class DataCollection extends Activity {
             String htmlButtonText = "<br><h5>Most recent noise data</h5>"
                     + "<b>Date: </b><em>" + data.date + "</em>"
                     + "<br><b>Time: </b><em>" + data.time + "</em>"
+                    + "<br><b>location Blurred: </b><<em>" + String.valueOf(data.isBlurred) + "</em>"
                     + "<br><b>Location: </b><em>" + addressString.replace(",","<br>") + "</em>"
-                    + "<br><b>dB: </b><em>" + String.valueOf((Math.round(data.dB))) + "</em>";
+                    + "<br><b>dB: </b><em>" + String.valueOf((Math.round(data.dB))) + "</em>"
+                    ;
             MainActivity.mainButton.setText(Html.fromHtml(htmlButtonText));
         }
     }
+
+    private class LastDataAsyncTask extends AsyncTask<Void,Void,Data>{
+
+        @Override
+        protected Data doInBackground(Void... voids) {
+            return dataRepository.lastItem();        }
+    }
+
+
 
     public void sendData(Data data){
 // Add a new document with a generated ID
