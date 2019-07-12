@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -112,10 +113,15 @@ public class DataCollectionSettingsFragment extends DialogFragment implements Co
         if(String.valueOf(interval.getText()).contains(".")){
             interval.setError("Sorry, interval value has to be a whole number");
         }
+        Log.d("dismiss button", " pressed");
         if (interval.getError() == null) {
+            Log.d("dismiss button", " no error "+String.valueOf(interval.getText()));
+            mainActivity.dismissSettings(v);
             mainActivity.setInterval(Integer.parseInt(String.valueOf(interval.getText())));
-            mainActivity.dismissSettings(view);
+
             if (!mainActivity.isCollecting && mainActivity.continuousSwitch.isChecked()) {
+                Log.d("dismiss button", " scheduling collection");
+
                 mainActivity.scheduleDataCollection();
             }
         }

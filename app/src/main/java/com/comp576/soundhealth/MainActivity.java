@@ -128,8 +128,6 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.continuousSwitch:
                         if (!((Switch) menuItem.getActionView()).isChecked()) {
                             ((Switch) menuItem.getActionView()).setChecked(true);
-                            showSettingsDialog();
-//                            scheduleDataCollection();
                             return true;
                         } else {
                             ((Switch) menuItem.getActionView()).setChecked(false);
@@ -156,7 +154,6 @@ public class MainActivity extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     showSettingsDialog();
-//                    scheduleDataCollection();
                 } else {
                     cancelDataCollection();
                 }
