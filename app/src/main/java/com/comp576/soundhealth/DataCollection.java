@@ -110,9 +110,6 @@ public class DataCollection extends Activity {
                 });
     }
 
-    public String getLast(Data data) {
-        return new AddressAsyncTask().doInBackground(data);
-    }
 
     //get address from google geolocation api using the datapoint latlng
     public class AddressAsyncTask extends AsyncTask<Data, Void, String> {
@@ -148,10 +145,9 @@ public class DataCollection extends Activity {
             String htmlButtonText = "<br><h5>Most recent noise data</h5>"
                     + "<b>Date: </b><em>" + data.date + "</em>"
                     + "<br><b>Time: </b><em>" + data.time + "</em>"
-                    + "<br><b>location Blurred: </b><<em>" + String.valueOf(data.isBlurred) + "</em>"
+                    + "<br><b>location Blurred: </b><em>" + String.valueOf(data.isBlurred) + "</em>"
                     + "<br><b>Location: </b><em>" + addressString.replace(",","<br>") + "</em>"
-                    + "<br><b>dB: </b><em>" + String.valueOf((Math.round(data.dB))) + "</em>"
-                    ;
+                    + "<br><b>dB: </b><em>" + String.valueOf((Math.round(data.dB))) + "</em>";
             MainActivity.mainButton.setText(Html.fromHtml(htmlButtonText));
         }
     }
