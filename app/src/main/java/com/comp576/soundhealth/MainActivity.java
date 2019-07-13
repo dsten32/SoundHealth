@@ -162,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
                     drawerLayout.closeDrawer(Gravity.LEFT);
                 } else {
                     cancelDataCollection();
-                    ((Switch)navigationView.getMenu().findItem(R.id.continuousSwitch).getActionView()).setChecked(false);
+//                    ((Switch)navigationView.getMenu().findItem(R.id.continuousSwitch).getActionView()).setChecked(false);
                 }
             }
         });
@@ -260,6 +260,7 @@ public class MainActivity extends AppCompatActivity {
                 intent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
         alarm.cancel(pIntent);
+
     }
 
     //show the data collection settings dialog fragment
