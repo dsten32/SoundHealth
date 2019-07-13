@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import android.widget.Switch;
 
 import java.util.Calendar;
 
@@ -31,6 +32,8 @@ public class DataCollectionService extends IntentService {
                     cancelint, PendingIntent.FLAG_UPDATE_CURRENT);
             AlarmManager alarm = (AlarmManager) getApplication().getSystemService(Context.ALARM_SERVICE);
             alarm.cancel(pIntent);
+            MainActivity.continuousSwitch.toggle();
+
             Log.d("scheduled datapoint","cancelled");
         } else {
             Log.i("DataCollectionService", "Service running" +"hour: "+String.valueOf(MainActivity.stopHour));

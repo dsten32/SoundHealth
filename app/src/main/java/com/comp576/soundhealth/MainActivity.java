@@ -27,6 +27,7 @@ import android.text.Html;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Switch;
@@ -106,6 +107,8 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         navigationView = (NavigationView) findViewById(R.id.nav);
+
+
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @TargetApi(Build.VERSION_CODES.O)
             @RequiresApi(api = Build.VERSION_CODES.O)
@@ -156,8 +159,10 @@ public class MainActivity extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     showSettingsDialog();
+                    drawerLayout.closeDrawer(Gravity.LEFT);
                 } else {
                     cancelDataCollection();
+                    ((Switch)navigationView.getMenu().findItem(R.id.continuousSwitch).getActionView()).setChecked(false);
                 }
             }
         });
@@ -250,7 +255,6 @@ public class MainActivity extends AppCompatActivity {
     public void cancelDataCollection() {
         isCollecting = false;
         Toast.makeText(this, "data collection stopped", Toast.LENGTH_SHORT).show();
-
         Intent intent = new Intent(getApplicationContext(), AlarmReceiver.class);
         final PendingIntent pIntent = PendingIntent.getBroadcast(this, AlarmReceiver.REQUEST_CODE,
                 intent, PendingIntent.FLAG_UPDATE_CURRENT);
