@@ -113,15 +113,11 @@ public class DataCollectionSettingsFragment extends DialogFragment implements Co
         if(String.valueOf(interval.getText()).contains(".")){
             interval.setError("Sorry, interval value has to be a whole number");
         }
-        Log.d("dismiss button", " pressed");
         if (interval.getError() == null) {
-            Log.d("dismiss button", " no error "+String.valueOf(interval.getText()));
             mainActivity.dismissSettings(v);
             mainActivity.setInterval(Integer.parseInt(String.valueOf(interval.getText())));
 
             if (!mainActivity.isCollecting && mainActivity.continuousSwitch.isChecked()) {
-                Log.d("dismiss button", " scheduling collection");
-
                 mainActivity.scheduleDataCollection();
             }
         }

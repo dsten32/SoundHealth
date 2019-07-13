@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
     public static float blurValue;
     public static float feedbackRating;
     public static String feedbackText;
-    public static int stopHour, stopMin;
+    public static int stopHour = 24, stopMin=60;
     public static Button mainButton;
     private String dataStopTime;
     private DialogFragment timePicker = new DataCollectionSettingsFragment.TimePickerFragment();
@@ -128,10 +128,12 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.continuousSwitch:
                         if (!((Switch) menuItem.getActionView()).isChecked()) {
                             ((Switch) menuItem.getActionView()).setChecked(true);
+                            drawerLayout.closeDrawer(Gravity.LEFT);
                             return true;
                         } else {
                             ((Switch) menuItem.getActionView()).setChecked(false);
                             cancelDataCollection();
+                            drawerLayout.closeDrawer(Gravity.LEFT);
                             return true;
                         }
                     case R.id.fakedata:

@@ -25,7 +25,7 @@ public class DataCollectionService extends IntentService {
         int hour = c.get(Calendar.HOUR_OF_DAY);
         int minute = c.get(Calendar.MINUTE);
         //checks if stop time has been reached and stops schedule, else takes datapoint measurements.
-        if(MainActivity.stopHour>=hour && MainActivity.stopMin>=minute) {
+        if(MainActivity.stopHour<=hour && MainActivity.stopMin<=minute) {
             Intent cancelint = new Intent(getApplicationContext(), AlarmReceiver.class);
             final PendingIntent pIntent = PendingIntent.getBroadcast(getApplicationContext(), AlarmReceiver.REQUEST_CODE,
                     cancelint, PendingIntent.FLAG_UPDATE_CURRENT);

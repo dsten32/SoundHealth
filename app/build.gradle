@@ -70,6 +70,5 @@ dependencies {
 
     implementation "org.glassfish.jersey.core:jersey-client:2.21"
 
-
 }
 apply plugin: 'com.google.gms.google-services'
