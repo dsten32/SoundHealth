@@ -22,4 +22,10 @@ public class SpinnerFragment extends DialogFragment {
         View v = inflater.inflate(R.layout.fragment_dataloading_spinner, container, false);
         return v;
     }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        getDialog().getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+    }
 }

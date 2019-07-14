@@ -21,8 +21,6 @@ public class DataCollectionService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        Log.d("DataCollection","accessed");
-        // Do the task here
         final Calendar c = Calendar.getInstance();
         int hour = c.get(Calendar.HOUR_OF_DAY);
         int minute = c.get(Calendar.MINUTE);
@@ -35,7 +33,6 @@ public class DataCollectionService extends IntentService {
             alarm.cancel(pIntent);
             MainActivity.continuousSwitch.setChecked(false);
             MainActivity.continuousSwitch.jumpDrawablesToCurrentState();
-
             Log.d("scheduled datapoint","cancelled");
         } else {
             Log.i("DataCollectionService", "Service running" +"hour: "+String.valueOf(MainActivity.stopHour));
