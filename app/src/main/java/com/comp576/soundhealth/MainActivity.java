@@ -86,11 +86,14 @@ public class MainActivity extends AppCompatActivity {
         introText = (TextView) findViewById(R.id.intro);
         dataCollectior = new DataCollection(getApplicationContext());
         interval = 30;
-//        introText.setText("new text I put here 'cos I could");
-        data = repo.lastItem();
         mainButton = (Button) findViewById(R.id.main_btn);
 
-        new AddressAsyncTask().execute(data);
+        data = repo.lastItem();
+        if (data == null){
+            data = new Data("01-Jan-1900", "00:00", "astring", 90.0000, 135.0000, 0.0,false);
+        } else {
+            new AddressAsyncTask().execute(data);
+        }
 
         mainButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
