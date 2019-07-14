@@ -50,6 +50,12 @@ public class HeatmapSettingDialogFragment extends DialogFragment implements View
         super.onCreate(savedInstanceState);
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        getDialog().getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

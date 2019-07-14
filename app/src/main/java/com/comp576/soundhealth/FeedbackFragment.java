@@ -24,7 +24,11 @@ public class FeedbackFragment extends DialogFragment implements RatingBar.OnRati
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
-
+    @Override
+    public void onStart() {
+        super.onStart();
+        getDialog().getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_feedback_dialog, container, false);
@@ -40,11 +44,7 @@ public class FeedbackFragment extends DialogFragment implements RatingBar.OnRati
         return view;
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        getDialog().getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-    }
+
 
     @Override
     public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {

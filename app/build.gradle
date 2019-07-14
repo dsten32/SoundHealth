@@ -4,11 +4,12 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "com.comp576.soundhealth"
-        minSdkVersion 16
+        minSdkVersion 21
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -67,8 +68,9 @@ dependencies {
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.9'
 
-
     implementation "org.glassfish.jersey.core:jersey-client:2.21"
+
+    implementation 'androidx.multidex:multidex:2.0.1'
 
 }
 apply plugin: 'com.google.gms.google-services'
