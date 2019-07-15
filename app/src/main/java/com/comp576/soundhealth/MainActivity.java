@@ -87,10 +87,11 @@ public class MainActivity extends AppCompatActivity {
         dataCollectior = new DataCollection(getApplicationContext());
         interval = 30;
         mainButton = (Button) findViewById(R.id.main_btn);
-
         data = repo.lastItem();
         if (data == null){
-            data = new Data("01-Jan-1900", "00:00", "astring", 90.0000, 135.0000, 0.0,false);
+            data = new Data("01-Jan-1900", "01:30", "astring", 53.678361, -1.688494, 31.0,false);
+            new AddressAsyncTask().execute(data);
+
         } else {
             new AddressAsyncTask().execute(data);
         }
