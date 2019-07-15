@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
     private DataRepository repo;
     private Data data;
     private DataCollection dataCollectior;
-    private  String addressString;
+    private String addressString;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override

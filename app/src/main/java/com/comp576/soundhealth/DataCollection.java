@@ -99,14 +99,19 @@ public class DataCollection extends Activity {
                                 e.printStackTrace();
                             }
 
-                            data = new Data(date,time,userId,lat,lng,dB,MainActivity.isBlurred);
-
-                            long id=dataRepository.insert(data);
-                            data.id=id;
-                            sendData(data);
-                            new AddressAsyncTask().execute(data);
-                            Toast.makeText(context, "Datapoint saved: "+(double)Math.round(data.dB*100)/100, Toast.LENGTH_SHORT).show();
+                            if(dB!=null) {
+                                data = new Data(date, time, userId, lat, lng, dB, MainActivity.isBlurred);
+                                long id=dataRepository.insert(data);
+                                data.id=id;
+                                sendData(data);
+                                new AddressAsyncTask().execute(data);
+                                Toast.makeText(context, "Datapoint saved: "+(double)Math.round(data.dB*100)/100, Toast.LENGTH_SHORT).show();
 //                            Toast.makeText(context,lastData.toString(),Toast.LENGTH_LONG).show();
+                            } else {
+                                Toast.makeText(context, "Datapoint not collected, turn the mic on!", Toast.LENGTH_LONG).show();
+                            }
+
+
                         }
                     }
                 });
