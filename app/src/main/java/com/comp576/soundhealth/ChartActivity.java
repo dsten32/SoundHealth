@@ -78,13 +78,20 @@ public class ChartActivity extends AppCompatActivity {
 
         //quick and dirty fix. need to implement async class and use onPostExecute
         try {
-            Thread.sleep(500);
+            Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
+
         int dataTotal = data.size();
-        float addPercent = 100 / dataTotal;
+        float addPercent;
+        if(dataTotal!=0) {
+            addPercent = 100 / dataTotal;
+        } else {
+            addPercent = 1;
+        }
+
 //Generating slice data, simple categorisation of dB levels and taking percents.
         for (Data dataPoint : data) {
             Double dB = dataPoint.dB;

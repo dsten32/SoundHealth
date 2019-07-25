@@ -21,8 +21,6 @@ public interface DataDao {
     LiveData<List<Data>> getAllData();
     @Query("SELECT * FROM Data")
     List<Data> getDataList();
-    @Query("SELECT count(id) from Data")
-    int getRowCount();
     @Query("SELECT * from Data where id=(SELECT count(id) from Data)")
     Data getLast();
 }

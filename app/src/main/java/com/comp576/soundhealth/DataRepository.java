@@ -46,17 +46,6 @@ public class DataRepository {
         return rowId;
     }
 
-    //replaced with executorservice above in insert method.
-    private class InsertAsyncTask extends AsyncTask<Data, Void, Void> {
-        public long id=2000;
-        @Override
-        protected Void doInBackground(final Data... params) {
-//            for (Data data : params) {
-                this.id=dataDao.insert(params[0]);
-//            }
-            return null;
-        }
-    }
     public void update(Data data) {
         new UpdateAsyncTask().execute(data);
     }
@@ -119,10 +108,4 @@ public class DataRepository {
         }
         return data;
     }
-//    private class LastAsyncTask extends AsyncTask<Void, Void, Data> {
-//        @Override
-//        protected Data doInBackground(Void... voids) {
-//            return dataDao.getLast();
-//        }
-//    }
 }
