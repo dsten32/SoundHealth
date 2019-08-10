@@ -21,6 +21,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.TreeMap;
 
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import lecho.lib.hellocharts.model.*;
 import lecho.lib.hellocharts.model.SliceValue;
 import lecho.lib.hellocharts.model.ColumnChartData;
@@ -44,6 +47,7 @@ public class ChartActivity extends AppCompatActivity {
     private Boolean dataQueried = false;
     private Axis xAxis;
     private float totalThirties, totalForties, totalFifties, totalSixties, totalSeventies, totalEighties, totalNintiesPlus,longTouchx,longTouchy;
+    public static String[] barInfoArray;
 
     public void onCreate(Bundle savedInstanceState) {
         this.context=getApplicationContext();
@@ -76,7 +80,7 @@ public class ChartActivity extends AppCompatActivity {
         pieChartView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                Toast.makeText(context, "hi", Toast.LENGTH_LONG).show();
+                Toast.makeText(context, "long touch", Toast.LENGTH_LONG).show();
                 return false;
             }
         });
@@ -107,8 +111,6 @@ public class ChartActivity extends AppCompatActivity {
         } else {
             addPercent = 1.0f;
         }
-
-
 
         //Generating slice dataList, simple categorisation of dB levels and taking percents.
         for (Data dataPoint : dataList) {
@@ -158,7 +160,8 @@ public class ChartActivity extends AppCompatActivity {
             Date datapointDate = null;
             try {
                 datapointDate = new SimpleDateFormat("dd-MMM-yyyy").parse(data.date);
-                //for making a bunch of days in the graph
+                //to ensure there is a bunch of days in the graph even if all the datapoints
+                // were collected on one day, for demo purposes.
                 long day = (long) 1000 * 60 * 60 * 24;
                 if (changeDateCount % 14 == 0) {
                     datapointDate.setTime(datapointDate.getTime() - day);
@@ -206,9 +209,10 @@ public class ChartActivity extends AppCompatActivity {
                 daysOfData.put(datapointDate,dailyDatapoints);
             }
 
-            //idea here is to have each day with it's own set of total dB range values. not sure order of operations to get that working right.
-//            dailyValues.put(datapointDate, dayValues);
-            //get number of datapoints in each category for the day.
+            /* idea here is to have each day with it's own set of total dB range values. not sure
+            order of operations to get that working right.
+            dailyValues.put(datapointDate, dayValues);
+            get number of datapoints in each category for the day.*/
             Double dB = data.dB;
             //check if null in case I forget to enable mic.
             if (dB != null) {
@@ -250,15 +254,12 @@ public class ChartActivity extends AppCompatActivity {
                     tempDayValues.put("thirties", dailyThirties);
                     dailyValues.put(datapointDate, tempDayValues);
                 }
-
             }
         }
-
 
         //setup columns w/dataList
         List<Column> columns = new ArrayList<>();
         List<SubcolumnValue> values;
-
 
         for (Date key : dailyValues.keySet()) {
             values = new ArrayList<>();
@@ -325,19 +326,14 @@ public class ChartActivity extends AppCompatActivity {
         barChartView.setHorizontalScrollBarEnabled(true);
         //unless I can think of a useful purpose for this value selection listener... dispose.
         barChartView.setOnValueTouchListener(new ColumnChartOnValueSelectListener() {
-
             @Override
             public void onValueSelected(int columnIndex, int subcolumnIndex, SubcolumnValue value) {
-                //attempting to have action on long click reference the currently clicked column,
-                // but it only seems to update after release so it's always 1 column behind.
-
-//                Toast.makeText(context, String.valueOf(Math.round(value.getValue() * 100) + "%"), Toast.LENGTH_SHORT).show();
+                //not sure if i should do anything with this
             }
 
             @Override
             public void onValueDeselected() {
             }
-
         });
         //attach listeners
         barChartView.setOnTouchListener(barChartTouchListener);
@@ -350,6 +346,7 @@ public class ChartActivity extends AppCompatActivity {
         public boolean onTouch(View v, MotionEvent event) {
             longTouchx = event.getX();
             longTouchy = event.getY();
+            v.performClick();
             return false;
         }
     };
@@ -358,39 +355,28 @@ public class ChartActivity extends AppCompatActivity {
     View.OnLongClickListener longClickListener = new View.OnLongClickListener() {
         @Override
         public boolean onLongClick(View v) {
-            int dayCount=0;
             double highestDB=0;
             List<Integer> dayMinutes = new ArrayList<>();
-            Date datapointDate;
-            String columnDate,date;
+            String columnDate;
             ((ColumnChartView)v).getChartRenderer().checkTouch(longTouchx,longTouchy);
             SelectedValue val = ((ColumnChartView)v).getChartRenderer().getSelectedValue();
             columnDate = String.valueOf(xAxis.getValues().get(Integer.parseInt(String.valueOf(val.getFirstIndex()))).getLabelAsChars());
             try {
             dailyDatapoints = daysOfData.get(new SimpleDateFormat("dd-MMM-yy").parse(columnDate));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
             for (Data data : dailyDatapoints) {
                 if(data.dB>highestDB){
                     highestDB = data.dB;
                 }
                 //get the datapoint time and turn into minutes, add to a list so we can get
                 //the first datapoint time, last datapoint time and the average
-                // number of mind between datapoints
+                //number of mind between datapoints
                 String[] sarr = data.time.split(":");
                 dayMinutes.add(Integer.parseInt(sarr[0])*60 + Integer.parseInt(sarr[1]));
-//                //turn data.date into Date obj
-//                datapointDate= new SimpleDateFormat("dd-MMM-yyyy").parse(data.date);
-//
-//                if (datapointDate != null) {
-//                        //turn datapoint date back into string with the same format as the column label for comparison
-//                        date = new SimpleDateFormat("dd-MMM-yy").format(datapointDate);
-//                    if(columnDate.equals(date)) {
-//                        dayCount+=1;
-//                    }
-//                }
             }
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
+
             highestDB = (double)Math.round(highestDB*100)/100;
             Collections.sort(dayMinutes);
             int summedDiffs = 0;
@@ -401,8 +387,19 @@ public class ChartActivity extends AppCompatActivity {
             String firstTime,lastTime;
             firstTime = String.valueOf(dayMinutes.get(0) / 60) +":"+ String.format("%1$" + 2 + "s", dayMinutes.get(0)%60).replace(' ', '0');
             lastTime = String.valueOf(dayMinutes.get(dayMinutes.size()-1) / 60) +":"+ String.format("%1$" + 2 + "s", dayMinutes.get(dayMinutes.size()-1)%60).replace(' ', '0');
-            Toast.makeText(context,"first: "+firstTime +" "+"last: "+lastTime +"\n"+"highest: "+String.valueOf(highestDB),Toast.LENGTH_LONG).show();
 
+            //start dialog stuff
+            barInfoArray = new String[]{String.valueOf(dailyDatapoints.size()),firstTime,lastTime,String.valueOf(averageMins),String.valueOf(highestDB)};
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            Fragment prev = getSupportFragmentManager().findFragmentByTag("barDialog");
+            if (prev != null) {
+                fragmentTransaction.remove(prev);
+            }
+            fragmentTransaction.addToBackStack(null);
+
+            DialogFragment dialogFragment = new BarInfoFragment();
+            dialogFragment.show(fragmentTransaction, "barDialog");
+            //end dialog stuff
             if(((ColumnChartView)v).getChartRenderer().isTouched()){
 //                Toast.makeText(context,String.valueOf(dayCount),Toast.LENGTH_LONG).show();
 //                Toast.makeText(context, String.valueOf(xAxis.getValues().get(Integer.parseInt(String.valueOf(val.getFirstIndex()))).getLabelAsChars()),Toast.LENGTH_LONG).show();

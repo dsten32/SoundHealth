@@ -62,20 +62,19 @@ public class MainActivity extends AppCompatActivity {
     private TextView introText;
     private static int MINUTE = 60;
     private int interval;
-    public static Switch continuousSwitch;
     private DialogFragment dialogFragment;
-    public static boolean isBlurred, isStopTime, isCollecting;
-    public static float blurValue;
-    public static float feedbackRating;
-    public static String feedbackText;
-    public static int stopHour = 24, stopMin=60;
-    public static Button mainButton;
-    private String dataStopTime;
+    private String dataStopTime,addressString;
     private DialogFragment timePicker = new DataCollectionSettingsFragment.TimePickerFragment();
     private DataRepository repo;
     private Data data;
     private DataCollection dataCollectior;
-    private String addressString;
+    public static Switch continuousSwitch;
+    public static boolean isBlurred, isStopTime, isCollecting;
+    public static float blurValue,feedbackRating;
+    public static String feedbackText;
+    public static int stopHour = 24, stopMin=60;
+    public static Button mainButton;
+
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override

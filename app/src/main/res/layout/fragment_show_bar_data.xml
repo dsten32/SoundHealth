@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/bar_info_frag"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/settings_background"
+    android:orientation="vertical"
+    android:padding="5dp"
+
+    >
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:paddingBottom="9dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingRight="3dp"
+            android:text="Number of datapoints:"
+            android:textColor="@android:color/white" />
+
+        <TextView
+            android:id="@+id/numPoints"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+             />
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:paddingBottom="9dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingRight="3dp"
+            android:text="First datapoint recorded at:"
+            android:textColor="@android:color/white" />
+
+        <TextView
+            android:id="@+id/firstPoint"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+             />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:paddingBottom="9dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingRight="3dp"
+            android:text="Last datapoint recorded at:"
+            android:textColor="@android:color/white" />
+
+        <TextView
+            android:id="@+id/lastPoint"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+             />
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:paddingBottom="9dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingRight="3dp"
+            android:text="Average minutes between recordings:"
+            android:textColor="@android:color/white" />
+
+        <TextView
+            android:id="@+id/avgMins"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+             />
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:paddingBottom="9dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingRight="3dp"
+            android:text="Highest dB reading:"
+            android:textColor="@android:color/white" />
+
+        <TextView
+            android:id="@+id/highestPoint"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+</LinearLayout>
