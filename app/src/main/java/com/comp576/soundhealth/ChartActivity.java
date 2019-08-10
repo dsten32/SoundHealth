@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -151,10 +152,10 @@ public class ChartActivity extends AppCompatActivity {
         // could be instead of using adat points we do similar to the piechart.
         // for each map key there are 7 string: int pairs. if dB value in category then increment the int with that key.
 
-        TreeMap<Date, TreeMap> dailyValues = new TreeMap<>();
+        TreeMap<Date, LinkedHashMap> dailyValues = new TreeMap<>();
         float dailyThirties, dailyForties, dailyFifties, dailySixties, dailySeventies, dailyEighties, dailyNintiesPlus;
 
-        TreeMap<String, Float> dayValues = new TreeMap<>();
+        LinkedHashMap<String, Float> dayValues = new LinkedHashMap<>();
         int changeDateCount = 0;
         for (Data data : dataList) {
             Date datapointDate = null;
@@ -196,6 +197,8 @@ public class ChartActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
             changeDateCount++;
+
+
             data.date = new SimpleDateFormat("dd-MMM-yyyy").format(datapointDate);
             dataDate.add(data);
             //adding datapoint to date keyed hashmap
@@ -209,14 +212,13 @@ public class ChartActivity extends AppCompatActivity {
                 daysOfData.put(datapointDate,dailyDatapoints);
             }
 
-            /* idea here is to have each day with it's own set of total dB range values. not sure
-            order of operations to get that working right.
-            dailyValues.put(datapointDate, dayValues);
-            get number of datapoints in each category for the day.*/
+            /* idea here is to have each day with it's own set of total dB range values.
+            not sure why I chose treemap here, to make best use
+            */
             Double dB = data.dB;
             //check if null in case I forget to enable mic.
             if (dB != null) {
-                TreeMap<String, Float> tempDayValues = new TreeMap<>();
+                LinkedHashMap<String, Float> tempDayValues = new LinkedHashMap<>();
                 dailyThirties = dailyForties = dailyFifties = dailySixties = dailySeventies = dailyEighties = dailyNintiesPlus = 0.0f;
 
                 if (dB > 90) dailyNintiesPlus = 1f;
