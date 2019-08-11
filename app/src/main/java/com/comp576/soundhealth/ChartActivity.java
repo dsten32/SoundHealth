@@ -15,6 +15,7 @@ import android.widget.Toast;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -49,6 +50,7 @@ public class ChartActivity extends AppCompatActivity {
     private Axis xAxis;
     private float totalThirties, totalForties, totalFifties, totalSixties, totalSeventies, totalEighties, totalNintiesPlus,longTouchx,longTouchy;
     public static String[] barInfoArray;
+    public static int lowestDB = 0, highestDB=7;
 
     public void onCreate(Bundle savedInstanceState) {
         this.context=getApplicationContext();
@@ -60,20 +62,13 @@ public class ChartActivity extends AppCompatActivity {
         HorizontalScrollView hScrollView = (HorizontalScrollView) findViewById(R.id.barChartScroll);
 
         HashMap<String, Integer> chartColours = new HashMap<>();
-        int thirties = Color.GREEN;
-        chartColours.put("thirties", thirties);
-        int forties = Color.BLUE;
-        chartColours.put("forties", forties);
-        int fifties = Color.CYAN;
-        chartColours.put("fifties", fifties);
-        int sixties = Color.GRAY;
-        chartColours.put("sixties", sixties);
-        int seventies = Color.YELLOW;
-        chartColours.put("seventies", seventies);
-        int eighties = Color.MAGENTA;
-        chartColours.put("eighties", eighties);
-        int ninties = Color.RED;
-        chartColours.put("ninties", ninties);
+        chartColours.put("thirties", Color.GREEN);
+        chartColours.put("forties", Color.BLUE);
+        chartColours.put("fifties", Color.CYAN);
+        chartColours.put("sixties", Color.GRAY);
+        chartColours.put("seventies", Color.YELLOW);
+        chartColours.put("eighties", Color.MAGENTA);
+        chartColours.put("ninties", Color.RED);
 
         dataRepository = new DataRepository(this);
 
@@ -128,14 +123,25 @@ public class ChartActivity extends AppCompatActivity {
             }
         }
 
+        List<ArrayList> sliceParamsList = new ArrayList<>();
+
+        sliceParamsList.add(new ArrayList(Arrays.asList("thirties","30-39 dB",totalThirties)));
+        sliceParamsList.add(new ArrayList(Arrays.asList("forties","40-49 dB",totalForties)));
+        sliceParamsList.add(new ArrayList(Arrays.asList("fifties","50-59 dB",totalFifties)));
+        sliceParamsList.add(new ArrayList(Arrays.asList("sixties","60-69 dB",totalSixties)));
+        sliceParamsList.add(new ArrayList(Arrays.asList("seventies","70-79 dB",totalSeventies)));
+        sliceParamsList.add(new ArrayList(Arrays.asList("eighties","80-89 dB",totalEighties)));
+        sliceParamsList.add(new ArrayList(Arrays.asList("ninties","<90 dB",totalNintiesPlus)));
+
+
         List pieData = new ArrayList<>();
-        pieData.add(new SliceValue(0, chartColours.get("thirties")).setLabel("30-39 dB").setTarget(totalThirties));
-        pieData.add(new SliceValue(0, chartColours.get("forties")).setLabel("40-49 dB").setTarget(totalForties));
-        pieData.add(new SliceValue(0, chartColours.get("fifties")).setLabel("50-59 dB").setTarget(totalFifties));
-        pieData.add(new SliceValue(0, chartColours.get("sixties")).setLabel("60-69 dB").setTarget(totalSixties));
-        pieData.add(new SliceValue(0, chartColours.get("seventies")).setLabel("70-79 dB").setTarget(totalSeventies));
-        pieData.add(new SliceValue(0, chartColours.get("eighties")).setLabel("80-89 dB").setTarget(totalEighties));
-        pieData.add(new SliceValue(0, chartColours.get("ninties")).setLabel(">90 dB").setTarget(totalNintiesPlus));
+        //need to work out how to exclude slices based on user db range choice.
+        for(int slice=lowestDB;slice<highestDB;slice++){
+            float dB = (float) sliceParamsList.get(slice).get(2);
+            int colour = chartColours.get(sliceParamsList.get(slice).get(0).toString());
+            String label = sliceParamsList.get(slice).get(1).toString();
+            pieData.add(new SliceValue(dB,colour).setLabel(label));
+        }
 
         PieChartData pieChartData = new PieChartData(pieData);
         pieChartData.setHasLabels(true).setValueLabelTextSize(14);
@@ -143,10 +149,13 @@ public class ChartActivity extends AppCompatActivity {
         pieChartView.setPieChartData(pieChartData);
 
         pieChartView.setOnValueTouchListener(new ValueTouchListener(pieChartData, pieChartView));
+        //this wa supposed to animate the chart such that the segments would grow to final size.
+        //but it turns out animations aren't implemented for the piechart view. to remove this stuff
+        // ie slice value as 0 and target values above.
         pieChartView.startDataAnimation();
 
         //users daily chart
-        //ok, lets try creating a hashmap of date:datapoint pairs. need to convert the datapoint date string back into a date
+        //ok, lets try creating a linkedhashmap of date:datapoint pairs. need to convert the datapoint date string back into a date
         //after that add the hashmap to a TreeMap, should sort on date. then can loop through,
         // use the key as column label and datapoints as column values. how will that work?
         // could be instead of using adat points we do similar to the piechart.
