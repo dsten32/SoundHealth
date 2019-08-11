@@ -210,6 +210,7 @@ public class DataCollection extends Activity {
     public ArrayList<Data> getDataCollection(){
         ArrayList<Data> dataList = new ArrayList<>();
 
+
         db.collection("sound_data_collection")
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -231,6 +232,19 @@ public class DataCollection extends Activity {
             e.printStackTrace();
         }
         return dataList;
+    }
+
+    private class FirebaseDataAsyncTask extends AsyncTask<Void, Void,ArrayList<Data>>{
+
+        @Override
+        protected ArrayList doInBackground(Void... voids) {
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList data) {
+            super.onPostExecute(data);
+        }
     }
 
 }
