@@ -76,7 +76,18 @@ public class ChartActivity extends AppCompatActivity {
         pieChartView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                Toast.makeText(context, "long touch", Toast.LENGTH_LONG).show();
+                //start dialog stuff
+                FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                Fragment prev = getSupportFragmentManager().findFragmentByTag("pieDialog");
+                if (prev != null) {
+                    fragmentTransaction.remove(prev);
+                }
+                fragmentTransaction.addToBackStack(null);
+
+                DialogFragment dialogFragment = new PiechartFragment();
+                dialogFragment.show(fragmentTransaction, "pieDialog");
+                //end dialog stuff
+//                Toast.makeText(context, "long touch", Toast.LENGTH_LONG).show();
                 return false;
             }
         });

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="tick_colors">
+        <item>#FF5722</item>
+        <item>#F00000</item>
+        <item>#070772</item>
+        <item>#16C450</item>
+    </string-array>
+
+    <string-array name="connecting_colors">
+        <item>#000</item>
+        <item>#F00000</item>
+        <item>#0000FF</item>
+        <item>#00F000</item>
+    </string-array>
+
+    <string-array name="ticks_labels">
+        <item><![CDATA[&lt30–39]]></item>
+        <item><![CDATA[40–39]]></item>
+        <item><![CDATA[50–39]]></item>
+        <item><![CDATA[60–39]]></item>
+        <item><![CDATA[70–39]]></item>
+        <item><![CDATA[80–39]]></item>
+        <item><![CDATA[&gt90]]></item>
+    </string-array>
+
+</resources>
