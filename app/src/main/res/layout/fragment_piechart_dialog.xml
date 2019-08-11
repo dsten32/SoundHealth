@@ -26,35 +26,35 @@
         android:id="@+id/range_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
         android:background="@color/colorPrimaryDark"
         app:mrb_barWeight="2dp"
-        app:mrb_connectingLineColors="@array/connecting_colors"
         app:mrb_connectingLineWeight="4dp"
-        app:mrb_leftSelectorColor="#FFB300"
+        app:mrb_connectingLineColors="@array/connecting_colors"
+        app:mrb_leftSelectorColor="#00FFA6"
+        app:mrb_rightSelectorColor="#00FFA6"
+        app:mrb_selectorBoundaryColor="@color/colorAccent"
+        app:mrb_selectorBoundarySize="2dp"
+        app:mrb_selectorSize="8dp"
         app:mrb_pinColor="#6c3f6a"
         app:mrb_pinMaxFont="15sp"
         app:mrb_pinMinFont="12sp"
-        app:mrb_pinRadius="14dp"
+        app:mrb_pinRadius="12dp"
         app:mrb_pinTextColor="@android:color/white"
         app:mrb_rangeBar="true"
-        app:mrb_rangeBarPaddingBottom="30dp"
+        app:mrb_rangeBarPaddingBottom="20dp"
         app:mrb_rangeBar_rounded="true"
-        app:mrb_rightSelectorColor="#1E88E5"
-        app:mrb_selectorBoundaryColor="@color/colorAccent"
-        app:mrb_selectorBoundarySize="2dp"
-        app:mrb_selectorSize="10dp"
         app:mrb_temporaryPins="true"
-        app:mrb_tickBottomLabels="@array/ticks_labels"
         app:mrb_tickColors="@array/tick_colors"
-        app:mrb_tickDefaultColor="@color/colorPrimaryDark"
+        app:mrb_tickDefaultColor="#16C450"
         app:mrb_tickDefaultLabel="label"
-        app:mrb_tickEnd="7"
+        app:mrb_tickStart="0"
+        app:mrb_tickEnd="6"
         app:mrb_tickHeight="4dp"
         app:mrb_tickInterval="1"
-        app:mrb_tickLabelColor="@color/colorPrimaryDark"
-        app:mrb_tickLabelSelectedColor="@color/colorAccent"
+        app:mrb_tickLabelColor="@color/colorAccent"
+        app:mrb_tickLabelSelectedColor="@color/colorPrimary"
         app:mrb_tickLabelSize="4sp"
-        app:mrb_tickStart="0"
         app:mrb_tickTopLabels="@array/ticks_labels"/>
 
     <!--<TextView-->
@@ -75,18 +75,18 @@
         <!--android:inputType="textImeMultiLine"-->
         <!--/>-->
 
-    <Button
-        android:id="@+id/feedback_submit"
-        android:layout_width="90dp"
-        android:layout_height="40dp"
-        android:layout_marginTop="10dp"
-        android:background="@drawable/submit_button"
-        android:shadowColor="#A8A8A8"
-        android:shadowDx="0"
-        android:shadowDy="0"
-        android:shadowRadius="5"
-        android:text="Submit"
-        android:textColor="#FFFFFF"
-        android:textSize="20sp" />
+    <!--<Button-->
+        <!--android:id="@+id/feedback_submit"-->
+        <!--android:layout_width="90dp"-->
+        <!--android:layout_height="40dp"-->
+        <!--android:layout_marginTop="10dp"-->
+        <!--android:background="@drawable/submit_button"-->
+        <!--android:shadowColor="#A8A8A8"-->
+        <!--android:shadowDx="0"-->
+        <!--android:shadowDy="0"-->
+        <!--android:shadowRadius="5"-->
+        <!--android:text="Submit"-->
+        <!--android:textColor="#FFFFFF"-->
+        <!--android:textSize="20sp" />-->
 
 </LinearLayout>

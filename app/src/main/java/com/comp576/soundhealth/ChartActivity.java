@@ -38,6 +38,7 @@ import lecho.lib.hellocharts.view.ColumnChartView;
 
 public class ChartActivity extends AppCompatActivity {
     private Context context;
+    HashMap<String, Integer> chartColours;
     private PieChartView pieChartView;
     private ColumnChartView barChartView;
     private List<Data> dataList = new ArrayList<>();
@@ -50,27 +51,21 @@ public class ChartActivity extends AppCompatActivity {
     private Axis xAxis;
     private float totalThirties, totalForties, totalFifties, totalSixties, totalSeventies, totalEighties, totalNintiesPlus,longTouchx,longTouchy;
     public static String[] barInfoArray;
-    public static int lowestDB = 0, highestDB=7;
+    public int lowestDB = 0, highestDB=7;
 
     public void onCreate(Bundle savedInstanceState) {
         this.context=getApplicationContext();
         super.onCreate(savedInstanceState);
+        dataRepository = new DataRepository(this);
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("Sound Chart");
 
         setContentView(R.layout.activity_chart);
         HorizontalScrollView hScrollView = (HorizontalScrollView) findViewById(R.id.barChartScroll);
 
-        HashMap<String, Integer> chartColours = new HashMap<>();
-        chartColours.put("thirties", Color.GREEN);
-        chartColours.put("forties", Color.BLUE);
-        chartColours.put("fifties", Color.CYAN);
-        chartColours.put("sixties", Color.GRAY);
-        chartColours.put("seventies", Color.YELLOW);
-        chartColours.put("eighties", Color.MAGENTA);
-        chartColours.put("ninties", Color.RED);
 
-        dataRepository = new DataRepository(this);
+
 
         pieChartView = findViewById(R.id.pieChart);
         pieChartView.setOnLongClickListener(new View.OnLongClickListener() {
@@ -91,7 +86,21 @@ public class ChartActivity extends AppCompatActivity {
                 return false;
             }
         });
+
         barChartView = findViewById(R.id.barChart);
+        barChartView.setOnValueTouchListener(new ColumnChartOnValueSelectListener() {
+            @Override
+            public void onValueSelected(int columnIndex, int subcolumnIndex, SubcolumnValue value) {
+                //not sure if i should do anything with this
+            }
+
+            @Override
+            public void onValueDeselected() {
+            }
+        });
+        //attach listeners
+        barChartView.setOnTouchListener(barChartTouchListener);
+        barChartView.setOnLongClickListener(longClickListener);
 
 //get user's dataList for display. may want to create a dB class to only grab that info.
         AsyncTask.execute(new Runnable() {
@@ -109,61 +118,9 @@ public class ChartActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        //get total number of user datapoints so a percentage value
-        // for each category can be displayed in the piechart
-        float dataTotal = dataList.size();
-        float addPercent;
-        if (dataTotal != 0) {
-            addPercent = 100 / dataTotal;
-        } else {
-            addPercent = 1.0f;
-        }
-
-        //Generating slice dataList, simple categorisation of dB levels and taking percents.
-        for (Data dataPoint : dataList) {
-            Double dB = dataPoint.dB;
-            //check if null in case I forget to enable mic.
-            if (dB != null) {
-                if (dB > 90) totalNintiesPlus += addPercent;
-                else if (dB > 80) totalEighties += addPercent;
-                else if (dB > 70) totalSeventies += addPercent;
-                else if (dB > 60) totalSixties += addPercent;
-                else if (dB > 50) totalFifties += addPercent;
-                else if (dB > 40) totalForties += addPercent;
-                else if (dB < 40) totalThirties += addPercent;
-            }
-        }
-
-        List<ArrayList> sliceParamsList = new ArrayList<>();
-
-        sliceParamsList.add(new ArrayList(Arrays.asList("thirties","30-39 dB",totalThirties)));
-        sliceParamsList.add(new ArrayList(Arrays.asList("forties","40-49 dB",totalForties)));
-        sliceParamsList.add(new ArrayList(Arrays.asList("fifties","50-59 dB",totalFifties)));
-        sliceParamsList.add(new ArrayList(Arrays.asList("sixties","60-69 dB",totalSixties)));
-        sliceParamsList.add(new ArrayList(Arrays.asList("seventies","70-79 dB",totalSeventies)));
-        sliceParamsList.add(new ArrayList(Arrays.asList("eighties","80-89 dB",totalEighties)));
-        sliceParamsList.add(new ArrayList(Arrays.asList("ninties","<90 dB",totalNintiesPlus)));
+        pieChartAddData();
 
 
-        List pieData = new ArrayList<>();
-        //need to work out how to exclude slices based on user db range choice.
-        for(int slice=lowestDB;slice<highestDB;slice++){
-            float dB = (float) sliceParamsList.get(slice).get(2);
-            int colour = chartColours.get(sliceParamsList.get(slice).get(0).toString());
-            String label = sliceParamsList.get(slice).get(1).toString();
-            pieData.add(new SliceValue(dB,colour).setLabel(label));
-        }
-
-        PieChartData pieChartData = new PieChartData(pieData);
-        pieChartData.setHasLabels(true).setValueLabelTextSize(14);
-        pieChartData.setHasCenterCircle(true).setCenterCircleScale(0.7f).setCenterText1("Your Sound Profile").setCenterText1FontSize(20).setCenterText1Color(Color.parseColor("#0097A7"));
-        pieChartView.setPieChartData(pieChartData);
-
-        pieChartView.setOnValueTouchListener(new ValueTouchListener(pieChartData, pieChartView));
-        //this wa supposed to animate the chart such that the segments would grow to final size.
-        //but it turns out animations aren't implemented for the piechart view. to remove this stuff
-        // ie slice value as 0 and target values above.
-        pieChartView.startDataAnimation();
 
         //users daily chart
         //ok, lets try creating a linkedhashmap of date:datapoint pairs. need to convert the datapoint date string back into a date
@@ -347,20 +304,74 @@ public class ChartActivity extends AppCompatActivity {
         });
         barChartView.setHorizontalScrollBarEnabled(true);
         //unless I can think of a useful purpose for this value selection listener... dispose.
-        barChartView.setOnValueTouchListener(new ColumnChartOnValueSelectListener() {
-            @Override
-            public void onValueSelected(int columnIndex, int subcolumnIndex, SubcolumnValue value) {
-                //not sure if i should do anything with this
-            }
 
-            @Override
-            public void onValueDeselected() {
-            }
-        });
-        //attach listeners
-        barChartView.setOnTouchListener(barChartTouchListener);
-        barChartView.setOnLongClickListener(longClickListener);
     }
+
+    public void pieChartAddData() {
+        //set up chart colours
+        chartColours = new HashMap<>();
+        chartColours.put("thirties", Color.GREEN);
+        chartColours.put("forties", Color.BLUE);
+        chartColours.put("fifties", Color.CYAN);
+        chartColours.put("sixties", Color.GRAY);
+        chartColours.put("seventies", Color.YELLOW);
+        chartColours.put("eighties", Color.MAGENTA);
+        chartColours.put("ninties", Color.RED);
+
+        //get total number of user datapoints so a percentage value
+        // for each category can be displayed in the piechart
+        float dataTotal = dataList.size();
+        float addPercent;
+        if (dataTotal != 0) {
+            addPercent = 100 / dataTotal;
+        } else {
+            addPercent = 1.0f;
+        }
+
+        //Generating piechart slice dataList, simple categorisation of dB levels and taking percents.
+        for (Data dataPoint : dataList) {
+            Double dB = dataPoint.dB;
+            //check if null in case I forget to enable mic.
+            if (dB != null) {
+                if (dB > 90) totalNintiesPlus += addPercent;
+                else if (dB > 80) totalEighties += addPercent;
+                else if (dB > 70) totalSeventies += addPercent;
+                else if (dB > 60) totalSixties += addPercent;
+                else if (dB > 50) totalFifties += addPercent;
+                else if (dB > 40) totalForties += addPercent;
+                else if (dB < 40) totalThirties += addPercent;
+            }
+        }
+
+        List<ArrayList> sliceParamsList = new ArrayList<>();
+
+        sliceParamsList.add(new ArrayList(Arrays.asList("thirties","30-39 dB",totalThirties)));
+        sliceParamsList.add(new ArrayList(Arrays.asList("forties","40-49 dB",totalForties)));
+        sliceParamsList.add(new ArrayList(Arrays.asList("fifties","50-59 dB",totalFifties)));
+        sliceParamsList.add(new ArrayList(Arrays.asList("sixties","60-69 dB",totalSixties)));
+        sliceParamsList.add(new ArrayList(Arrays.asList("seventies","70-79 dB",totalSeventies)));
+        sliceParamsList.add(new ArrayList(Arrays.asList("eighties","80-89 dB",totalEighties)));
+        sliceParamsList.add(new ArrayList(Arrays.asList("ninties","<90 dB",totalNintiesPlus)));
+
+
+        List pieData = new ArrayList<>();
+        //need to work out how to exclude slices based on user db range choice.
+        for(int slice=lowestDB;slice<highestDB;slice++){
+            float dB = (float) sliceParamsList.get(slice).get(2);
+            int colour = chartColours.get(sliceParamsList.get(slice).get(0).toString());
+            String label = sliceParamsList.get(slice).get(1).toString();
+            pieData.add(new SliceValue(dB,colour).setLabel(label));
+        }
+
+        PieChartData pieChartData = new PieChartData(pieData);
+        pieChartData.setHasLabels(true).setValueLabelTextSize(14);
+        pieChartData.setHasCenterCircle(true).setCenterCircleScale(0.7f).setCenterText1("Your Sound Profile").setCenterText1FontSize(20).setCenterText1Color(Color.parseColor("#0097A7"));
+        pieChartView.setPieChartData(pieChartData);
+
+        pieChartView.setOnValueTouchListener(new ValueTouchListener(pieChartData, pieChartView));
+
+    }
+
     //adding custom touch listener to get bar chart
     // column selected so the long click listener can access
     View.OnTouchListener barChartTouchListener = new View.OnTouchListener() {
