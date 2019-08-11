@@ -329,6 +329,8 @@ public class ChartActivity extends AppCompatActivity {
         }
 
         //Generating piechart slice dataList, simple categorisation of dB levels and taking percents.
+        //first reset the percent variables so they are correct when piechart updates
+        totalThirties=totalForties=totalFifties=totalSixties=totalSeventies=totalEighties=totalNintiesPlus=0.0f;
         for (Data dataPoint : dataList) {
             Double dB = dataPoint.dB;
             //check if null in case I forget to enable mic.
