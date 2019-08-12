@@ -225,7 +225,6 @@ public class DataCollection extends Activity {
                         }
                     }
                 });
-
         try {
             Thread.sleep(20000);
         } catch (InterruptedException e) {
