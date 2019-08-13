@@ -83,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
         repo = new DataRepository(getApplicationContext());
         setContentView(R.layout.activity_main);
         introText = (TextView) findViewById(R.id.intro);
+        //TODO here's (prbably) why the app crashes without an internet connection. move this datacollection out ouf the on create. duh!
         dataCollectior = new DataCollection(getApplicationContext());
         interval = 30;
         mainButton = (Button) findViewById(R.id.main_btn);
