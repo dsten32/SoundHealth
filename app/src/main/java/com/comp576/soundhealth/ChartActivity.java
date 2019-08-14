@@ -63,8 +63,8 @@ public class ChartActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         this.context=getApplicationContext();
         super.onCreate(savedInstanceState);
-        isRelative=true;
-
+//        isRelative=true;
+        isAbsolute=true;
         dataRepository = new DataRepository(this);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -124,6 +124,7 @@ public class ChartActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+            Toast.makeText(context,String.valueOf(dataList.size()),Toast.LENGTH_LONG).show();
             pieChartAddData();
             barChartAddData();
         }
@@ -220,10 +221,10 @@ public class ChartActivity extends AppCompatActivity {
                 datapointDate = new SimpleDateFormat("dd-MMM-yyyy").parse(data.date);
                 //to ensure there is a bunch of days in the graph even if all the datapoints
                 //were collected on one day, for demo purposes.
-                long day = (long) 1000 * 60 * 60 * 24;
-                datapointDate.setTime(datapointDate.getTime() - (changeDateCount % 14)*day);
-                data.date = new SimpleDateFormat("dd-MMM-yyyy").format(datapointDate);
-                changeDateCount++;
+//                long day = (long) 1000 * 60 * 60 * 24;
+//                datapointDate.setTime(datapointDate.getTime() - (changeDateCount % 14)*day);
+//                data.date = new SimpleDateFormat("dd-MMM-yyyy").format(datapointDate);
+//                changeDateCount++;
             } catch (ParseException e) {
                 e.printStackTrace();
             }
@@ -243,8 +244,7 @@ public class ChartActivity extends AppCompatActivity {
                 dataListByDate.put(datapointDate,dailyDatapoints);
             }
 
-            /* idea here is to have each day with it's own set of total dB range values.
-            */
+            /* idea here is to have each day with it's own set of total dB range values.*/
             Double dB = data.dB;
             //check if null in case I forget to enable mic.
             if (dB != null) {
@@ -295,33 +295,41 @@ public class ChartActivity extends AppCompatActivity {
         List<AxisValue> xAxisValues = new ArrayList<>();
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MMM-yy");
 
-//        for (Date date : dailyValues.keySet()) {
-//
-//        }
         int xAxisIndex = 0;
-        for (Date key : dailyValues.keySet()) {
-            values = new ArrayList<>();
-            AxisValue value = new AxisValue(xAxisIndex); //= dateFormat.format(date);
-            value.setLabel(dateFormat.format(key));
-            xAxisValues.add(value);
-            xAxisIndex++;
-            dayValues = dailyValues.get(key);
-            float dayTotal = 0.0f;
-            for (String dbKey : dayValues.keySet()) {
-                dayTotal += dayValues.get(dbKey);
+        values = new ArrayList<>();
+        AxisValue value = new AxisValue(xAxisIndex); //= dateFormat.format(date);
+        if(isAbsolute||isRelative) {
+            for (Date key : dailyValues.keySet()) {
+                value.setLabel(dateFormat.format(key));
+                xAxisValues.add(value);
+                xAxisIndex++;
+                dayValues = dailyValues.get(key);
+                float dayTotal = 0.0f;
+                for (String dbKey : dayValues.keySet()) {
+                    dayTotal += dayValues.get(dbKey);
+                }
+                for (String dbKey : dayValues.keySet()) {
+                    if (isRelative) {
+                        values.add(new SubcolumnValue(dayValues.get(dbKey) / dayTotal, chartColours.get(dbKey)).setLabel(dbKey));
+                    } else if (isAbsolute) {
+                        values.add(new SubcolumnValue(dayValues.get(dbKey), chartColours.get(dbKey)).setLabel(dbKey));
+                    }
+                }
+                Column column = new Column(values);
+                column.setHasLabels(true);
+                columns.add(column);
             }
-            for (String dbKey : dayValues.keySet()) {
-                if(isRelative) {
-                    values.add(new SubcolumnValue(dayValues.get(dbKey) / dayTotal, chartColours.get(dbKey)).setLabel(dbKey));
-                } else if (isAbsolute){
-                    values.add(new SubcolumnValue(dayValues.get(dbKey), chartColours.get(dbKey)).setLabel(dbKey));
-                } else if (isTimeline){
-                    //todo
+        } else if (isTimeline){
+            //todo, how should the value be set up, for each hour? not sure.
+            for(Date date : dataListByDate.keySet()){
+                TreeMap<LocalTime,Data> timeList = dataListByDate.get(date);
+                value.setLabel(dateFormat.format(date));
+                xAxisValues.add(value);
+                xAxisIndex++;
+                for(LocalTime time : timeList.keySet()){
+
                 }
             }
-            Column column = new Column(values);
-            column.setHasLabels(true);
-            columns.add(column);
         }
 
         //generate yaxis
@@ -337,13 +345,21 @@ public class ChartActivity extends AppCompatActivity {
         } else if (isAbsolute){
             yAxis.setName("number of points");
             //todo, figure out how to get the scale on this axis
-            int percLabel = 0;
-            for (float perc = 0.0f; perc < 1.1f; perc += 0.1f) {
-                yAxisValues.add(new AxisValue(perc, ("" + percLabel).toCharArray()));
-                percLabel += 10;
+            int maxDayPoints =0;
+            for(Date date : dataListByDate.keySet()){
+                TreeMap<LocalTime,Data> timeMap = dataListByDate.get(date);
+                if(timeMap.size()>maxDayPoints){
+                    maxDayPoints=timeMap.size();
+                }
+            }
+            int absLabel = 0;
+            for (int abs = 0; abs < maxDayPoints+5; abs += 1) {
+                yAxisValues.add(new AxisValue(abs, ("" + absLabel).toCharArray()));
+                absLabel += 1;
             }
         } else if (isTimeline){
             //todo
+
         }
 
         ColumnChartData barChartData = new ColumnChartData(columns);
@@ -367,7 +383,7 @@ public class ChartActivity extends AppCompatActivity {
 
         barChartView.setColumnChartData(barChartData);
         //make sure the bars are set at a decent size relative to the number of days represented
-        barChartView.setMinimumWidth(210 * dailyValues.keySet().size());
+        barChartView.setMinimumWidth(210 * (dailyValues.keySet().size()+1));
 
         //make sure the barchart is scrolled to the latest day inside the horizontal scrollview.
         hScrollView.post(new Runnable() {
@@ -400,51 +416,52 @@ public class ChartActivity extends AppCompatActivity {
             String columnDate;
             ((ColumnChartView)v).getChartRenderer().checkTouch(longTouchx,longTouchy);
             SelectedValue val = ((ColumnChartView)v).getChartRenderer().getSelectedValue();
-            columnDate = String.valueOf(xAxis.getValues().get(Integer.parseInt(String.valueOf(val.getFirstIndex()))).getLabelAsChars());
-            try {
-            dailyDatapoints = dataListByDate.get(new SimpleDateFormat("dd-MMM-yy").parse(columnDate));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-
-
-            for (LocalTime time : dailyDatapoints.keySet()) {
-                if(dailyDatapoints.get(time).dB>highestDB){
-                    highestDB = dailyDatapoints.get(time).dB;
+            if(val.getFirstIndex() >= 0) {
+                columnDate = String.valueOf(xAxis.getValues().get(Integer.parseInt(String.valueOf(val.getFirstIndex()))).getLabelAsChars());
+                try {
+                    dailyDatapoints = dataListByDate.get(new SimpleDateFormat("dd-MMM-yy").parse(columnDate));
+                } catch (ParseException e) {
+                    e.printStackTrace();
                 }
-                //get the datapoint time and turn into minutes, add to a list so we can get
-                //the first datapoint time, last datapoint time and the average
-                //number of mind between datapoints
-                String[] sarr = dailyDatapoints.get(time).time.split(":");
-                dayMinutes.add(Integer.parseInt(sarr[0])*60 + Integer.parseInt(sarr[1]));
-            }
 
-            highestDB = (double)Math.round(highestDB*100)/100;
-            Collections.sort(dayMinutes);
-            int summedDiffs = 0;
-            for(int i=dayMinutes.size()-1;i>0;i--){
-                summedDiffs += dayMinutes.get(i) - dayMinutes.get(i-1);
-            }
-            int averageMins = summedDiffs/dayMinutes.size();
-            String firstTime,lastTime;
-            firstTime = String.valueOf(dayMinutes.get(0) / 60) +":"+ String.format("%1$" + 2 + "s", dayMinutes.get(0)%60).replace(' ', '0');
-            lastTime = String.valueOf(dayMinutes.get(dayMinutes.size()-1) / 60) +":"+ String.format("%1$" + 2 + "s", dayMinutes.get(dayMinutes.size()-1)%60).replace(' ', '0');
+                for (LocalTime time : dailyDatapoints.keySet()) {
+                    if (dailyDatapoints.get(time).dB > highestDB) {
+                        highestDB = dailyDatapoints.get(time).dB;
+                    }
+                    //get the datapoint time and turn into minutes, add to a list so we can get
+                    //the first datapoint time, last datapoint time and the average
+                    //number of mind between datapoints
+                    String[] sarr = dailyDatapoints.get(time).time.split(":");
+                    dayMinutes.add(Integer.parseInt(sarr[0]) * 60 + Integer.parseInt(sarr[1]));
+                }
 
-            //start dialog stuff
-            barInfoArray = new String[]{String.valueOf(dailyDatapoints.size()),firstTime,lastTime,String.valueOf(averageMins),String.valueOf(highestDB)};
-            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-            Fragment prev = getSupportFragmentManager().findFragmentByTag("barDialog");
-            if (prev != null) {
-                fragmentTransaction.remove(prev);
-            }
-            fragmentTransaction.addToBackStack(null);
+                highestDB = (double) Math.round(highestDB * 100) / 100;
+                Collections.sort(dayMinutes);
+                int summedDiffs = 0;
+                for (int i = dayMinutes.size() - 1; i > 0; i--) {
+                    summedDiffs += dayMinutes.get(i) - dayMinutes.get(i - 1);
+                }
+                int averageMins = summedDiffs / dayMinutes.size();
+                String firstTime, lastTime;
+                firstTime = String.valueOf(dayMinutes.get(0) / 60) + ":" + String.format("%1$" + 2 + "s", dayMinutes.get(0) % 60).replace(' ', '0');
+                lastTime = String.valueOf(dayMinutes.get(dayMinutes.size() - 1) / 60) + ":" + String.format("%1$" + 2 + "s", dayMinutes.get(dayMinutes.size() - 1) % 60).replace(' ', '0');
 
-            DialogFragment dialogFragment = new BarInfoFragment();
-            dialogFragment.show(fragmentTransaction, "barDialog");
-            //end dialog stuff
-            if(((ColumnChartView)v).getChartRenderer().isTouched()){
+                //start dialog stuff
+                barInfoArray = new String[]{String.valueOf(dailyDatapoints.size()), firstTime, lastTime, String.valueOf(averageMins), String.valueOf(highestDB)};
+                FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                Fragment prev = getSupportFragmentManager().findFragmentByTag("barDialog");
+                if (prev != null) {
+                    fragmentTransaction.remove(prev);
+                }
+                fragmentTransaction.addToBackStack(null);
+
+                DialogFragment dialogFragment = new BarInfoFragment();
+                dialogFragment.show(fragmentTransaction, "barDialog");
+                //end dialog stuff
+                if (((ColumnChartView) v).getChartRenderer().isTouched()) {
 //                Toast.makeText(context,String.valueOf(dayCount),Toast.LENGTH_LONG).show();
 //                Toast.makeText(context, String.valueOf(xAxis.getValues().get(Integer.parseInt(String.valueOf(val.getFirstIndex()))).getLabelAsChars()),Toast.LENGTH_LONG).show();
+                }
             }
             return false;
         }
