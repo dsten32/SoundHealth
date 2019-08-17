@@ -58,13 +58,12 @@ public class ChartActivity extends AppCompatActivity {
     private float totalThirties, totalForties, totalFifties, totalSixties, totalSeventies, totalEighties, totalNintiesPlus,longTouchx,longTouchy;
     public static String[] barInfoArray;
     public int lowestDB = 0, highestDB=7;
-    public boolean isRelative, isAbsolute, isTimeline;
+    public boolean isRelative, isAbsolute=true, isTimeline;
 
     public void onCreate(Bundle savedInstanceState) {
         this.context=getApplicationContext();
         super.onCreate(savedInstanceState);
 //        isRelative=true;
-        isAbsolute=true;
         dataRepository = new DataRepository(this);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -201,7 +200,7 @@ public class ChartActivity extends AppCompatActivity {
 
     //method for setting up barchart.
     @RequiresApi(api = Build.VERSION_CODES.O)
-    private void barChartAddData() {
+    protected void barChartAddData() {
         //users daily chart
         //ok, lets try creating a linkedhashmap of date:datapoint pairs. need to convert the datapoint date string back into a date
         //after that add the hashmap to a TreeMap, should sort on date. then can loop through,
@@ -244,7 +243,8 @@ public class ChartActivity extends AppCompatActivity {
                 dataListByDate.put(datapointDate,dailyDatapoints);
             }
 
-            /* idea here is to have each day with it's own set of total dB range values.*/
+            /* idea here is to have each day with it's own set of total dB range values.
+            */
             Double dB = data.dB;
             //check if null in case I forget to enable mic.
             if (dB != null) {
@@ -295,41 +295,33 @@ public class ChartActivity extends AppCompatActivity {
         List<AxisValue> xAxisValues = new ArrayList<>();
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MMM-yy");
 
+//        for (Date date : dailyValues.keySet()) {
+//
+//        }
         int xAxisIndex = 0;
-        values = new ArrayList<>();
-        AxisValue value = new AxisValue(xAxisIndex); //= dateFormat.format(date);
-        if(isAbsolute||isRelative) {
-            for (Date key : dailyValues.keySet()) {
-                value.setLabel(dateFormat.format(key));
-                xAxisValues.add(value);
-                xAxisIndex++;
-                dayValues = dailyValues.get(key);
-                float dayTotal = 0.0f;
-                for (String dbKey : dayValues.keySet()) {
-                    dayTotal += dayValues.get(dbKey);
-                }
-                for (String dbKey : dayValues.keySet()) {
-                    if (isRelative) {
-                        values.add(new SubcolumnValue(dayValues.get(dbKey) / dayTotal, chartColours.get(dbKey)).setLabel(dbKey));
-                    } else if (isAbsolute) {
-                        values.add(new SubcolumnValue(dayValues.get(dbKey), chartColours.get(dbKey)).setLabel(dbKey));
-                    }
-                }
-                Column column = new Column(values);
-                column.setHasLabels(true);
-                columns.add(column);
+        for (Date key : dailyValues.keySet()) {
+            values = new ArrayList<>();
+            AxisValue value = new AxisValue(xAxisIndex); //= dateFormat.format(date);
+            value.setLabel(dateFormat.format(key));
+            xAxisValues.add(value);
+            xAxisIndex++;
+            dayValues = dailyValues.get(key);
+            float dayTotal = 0.0f;
+            for (String dbKey : dayValues.keySet()) {
+                dayTotal += dayValues.get(dbKey);
             }
-        } else if (isTimeline){
-            //todo, how should the value be set up, for each hour? not sure.
-            for(Date date : dataListByDate.keySet()){
-                TreeMap<LocalTime,Data> timeList = dataListByDate.get(date);
-                value.setLabel(dateFormat.format(date));
-                xAxisValues.add(value);
-                xAxisIndex++;
-                for(LocalTime time : timeList.keySet()){
-
+            for (String dbKey : dayValues.keySet()) {
+                if(isRelative) {
+                    values.add(new SubcolumnValue(dayValues.get(dbKey) / dayTotal, chartColours.get(dbKey)).setLabel(dbKey));
+                } else if (isAbsolute){
+                    values.add(new SubcolumnValue(dayValues.get(dbKey), chartColours.get(dbKey)).setLabel(dbKey));
+                } else if (isTimeline){
+                    //todo
                 }
             }
+            Column column = new Column(values);
+            column.setHasLabels(true);
+            columns.add(column);
         }
 
         //generate yaxis
@@ -359,7 +351,6 @@ public class ChartActivity extends AppCompatActivity {
             }
         } else if (isTimeline){
             //todo
-
         }
 
         ColumnChartData barChartData = new ColumnChartData(columns);
@@ -504,5 +495,18 @@ public class ChartActivity extends AppCompatActivity {
             pieChartView.setPieChartData(pieChartData);
         }
     }
+
+    public void showDialog(View view) {
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        Fragment prev = getSupportFragmentManager().findFragmentByTag("chartDialog");
+        if (prev != null) {
+            fragmentTransaction.remove(prev);
+        }
+        fragmentTransaction.addToBackStack(null);
+
+        DialogFragment dialogFragment = new ChartSettingsFragment();
+        dialogFragment.show(fragmentTransaction, "chartDialog");
+    }
+
 
 }

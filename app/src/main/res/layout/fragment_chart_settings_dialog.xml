@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:background="@drawable/settings_background"
+    android:padding="5dp">
+
+    <include layout="@layout/fragment_piechart_dialog"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Choose Barchart type"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+
+        <RadioGroup
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+
+            <RadioButton
+                android:id="@+id/dataRelative"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="Relative" />
+
+            <RadioButton
+                android:id="@+id/dataAbsolute"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Absolute" />
+
+            <RadioButton
+                android:id="@+id/dataTimeline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Timeline" />
+        </RadioGroup>
+    </LinearLayout>
+
+
+</LinearLayout>
+
