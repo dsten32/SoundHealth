@@ -54,8 +54,10 @@ public class ChartActivity extends AppCompatActivity {
     private DataRepository dataRepository;
     private Boolean dataQueried = false;
     private Axis xAxis;
-    private TreeMap<Date, HashMap> dailyValues;
-    private HashMap<String, Float> dayValues;
+    private TreeMap<Date, LinkedHashMap> dailyValues;
+    //this is a linkedhashmap rather than a plain hashmap so that columns will
+    //always have the same order. probably a better way to do this
+    private LinkedHashMap<String, Float> dayValues;
     private float totalThirties, totalForties, totalFifties, totalSixties, totalSeventies, totalEighties, totalNintiesPlus, longTouchx, longTouchy;
     public static String[] barInfoArray;
     public int lowestDB = 0, highestDB = 7;
@@ -209,11 +211,20 @@ public class ChartActivity extends AppCompatActivity {
         // could be instead of using data points we do similar to the piechart.
         // for each map key there are 7 string: int pairs. if dB value in category then increment the int with that key.
         HorizontalScrollView hScrollView = (HorizontalScrollView) findViewById(R.id.barChartScroll);
+        //set up map that can get labels for db ranges
+        HashMap<Range, String[]> categoryList = new HashMap<>();
+        categoryList.put(Range.create(0, 39), new String[]{"thirties", "<30-39dB"});
+        categoryList.put(Range.create(40, 49), new String[]{"forties", "40-49dB"});
+        categoryList.put(Range.create(50, 59), new String[]{"fifties", "50-59dB"});
+        categoryList.put(Range.create(60, 69), new String[]{"sixties", "60-69dB"});
+        categoryList.put(Range.create(70, 79), new String[]{"seventies", "70-79dB"});
+        categoryList.put(Range.create(80, 89), new String[]{"eighties", "80-89dB"});
+        categoryList.put(Range.create(90, 99), new String[]{"nineties", "90-9dB"});
 
         dailyValues = new TreeMap<>();
         float dailyThirties, dailyForties, dailyFifties, dailySixties, dailySeventies, dailyEighties, dailyNintiesPlus;
 
-        dayValues = new HashMap<>();
+        dayValues = new LinkedHashMap<>();
         int changeDateCount = 0;
         for (Data data : dataList) {
             Date datapointDate = null;
@@ -246,46 +257,31 @@ public class ChartActivity extends AppCompatActivity {
 
             /* idea here is to have each day with it's own set of total dB range values.
              */
-            Double dB = data.dB;
             //check if null in case I forget to enable mic.
-            if (dB != null) {
-                HashMap<String, Float> tempDayValues = new HashMap<>();
-                dailyThirties = dailyForties = dailyFifties = dailySixties = dailySeventies = dailyEighties = dailyNintiesPlus = 0.0f;
-
-                if (dB > 90) dailyNintiesPlus = 1f;
-                else if (dB > 80) dailyEighties = 1f;
-                else if (dB > 70) dailySeventies = 1f;
-                else if (dB > 60) dailySixties = 1f;
-                else if (dB > 50) dailyFifties = 1f;
-                else if (dB > 40) dailyForties = 1f;
-                else if (dB < 40) dailyThirties = 1f;
+            if (data.dB != null) {
+                int dB = (int) Math.round(data.dB);
+                LinkedHashMap<String, Float> tempDayValues = new LinkedHashMap<>();
 
                 if (dailyValues.containsKey(datapointDate)) {
                     tempDayValues = dailyValues.get(datapointDate);
-                    dailyNintiesPlus += tempDayValues.containsKey("ninties") ? tempDayValues.get("ninties") : 0.0f;
-                    tempDayValues.put("ninties", dailyNintiesPlus);
-                    dailyEighties += tempDayValues.containsKey("eighties") ? tempDayValues.get("eighties") : 0.0f;
-                    tempDayValues.put("eighties", dailyEighties);
-                    dailySeventies += tempDayValues.containsKey("seventies") ? tempDayValues.get("seventies") : 0.0f;
-                    tempDayValues.put("seventies", dailySeventies);
-                    dailySixties += tempDayValues.containsKey("sixties") ? tempDayValues.get("sixties") : 0.0f;
-                    tempDayValues.put("sixties", dailySixties);
-                    dailyFifties += tempDayValues.containsKey("fifties") ? tempDayValues.get("fifties") : 0.0f;
-                    tempDayValues.put("fifties", dailyFifties);
-                    dailyForties += tempDayValues.containsKey("forties") ? tempDayValues.get("forties") : 0.0f;
-                    tempDayValues.put("forties", dailyForties);
-                    dailyThirties += tempDayValues.containsKey("thirties") ? tempDayValues.get("thirties") : 0.0f;
-                    tempDayValues.put("thirties", dailyThirties);
-                    dailyValues.put(datapointDate, tempDayValues);
+                    for (Range range : categoryList.keySet()) {
+                        if (range.contains(dB)) {
+                            if (tempDayValues.containsKey(categoryList.get(range)[0])) {
+                                tempDayValues.put(categoryList.get(range)[0], tempDayValues.get(categoryList.get(range)[0]) + 1f);
+                                dailyValues.put(datapointDate, tempDayValues);
+                            } else {
+                                tempDayValues.put(categoryList.get(range)[0], 1f);
+                                dailyValues.put(datapointDate, tempDayValues);
+                            }
+                        }
+                    }
                 } else {
-                    tempDayValues.put("ninties", dailyNintiesPlus);
-                    tempDayValues.put("eighties", dailyEighties);
-                    tempDayValues.put("seventies", dailySeventies);
-                    tempDayValues.put("sixties", dailySixties);
-                    tempDayValues.put("fifties", dailyFifties);
-                    tempDayValues.put("forties", dailyForties);
-                    tempDayValues.put("thirties", dailyThirties);
-                    dailyValues.put(datapointDate, tempDayValues);
+                    for (Range range : categoryList.keySet()) {
+                        if (range.contains(dB)) {
+                            tempDayValues.put(categoryList.get(range)[0], 1f);
+                            dailyValues.put(datapointDate, tempDayValues);
+                        }
+                    }
                 }
             }
         }
@@ -295,49 +291,43 @@ public class ChartActivity extends AppCompatActivity {
         List<AxisValue> xAxisValues = new ArrayList<>();
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MMM-yy");
 
-        //set up map that can get labels for db ranges
-        HashMap<Range, String[]> catergoryList = new HashMap<>();
-        catergoryList.put(Range.create(0, 39), new String[]{"thirties", "<30-39dB"});
-        catergoryList.put(Range.create(40, 49), new String[]{"forties", "40-49dB"});
-        catergoryList.put(Range.create(50, 59), new String[]{"fifties", "50-59dB"});
-        catergoryList.put(Range.create(60, 69), new String[]{"sixties", "60-69dB"});
-        catergoryList.put(Range.create(70, 79), new String[]{"seventies", "70-79dB"});
-        catergoryList.put(Range.create(80, 89), new String[]{"eighties", "80-89dB"});
-        catergoryList.put(Range.create(90, 99), new String[]{"nineties", "90-9dB"});
 
         //set up axis ans columns for barchart depending on type chosen
         int xAxisIndex = 0;
-        for (Date key : dailyValues.keySet()) {
+        for (Date date : dailyValues.keySet()) {
             values = new ArrayList<>();
             AxisValue value = new AxisValue(xAxisIndex); //= dateFormat.format(date);
-            value.setLabel(dateFormat.format(key));
+            value.setLabel(dateFormat.format(date));
             xAxisValues.add(value);
             xAxisIndex++;
             if (isAbsolute || isRelative) {
-                dayValues = dailyValues.get(key);
+                dayValues = dailyValues.get(date);
                 float dayTotal = 0.0f;
-                for (String dbKey : dayValues.keySet()) {
-                    dayTotal += dayValues.get(dbKey);
+
+                for (String dBRange : dayValues.keySet()) {
+                    if (dayValues.get(dBRange) > 0) {
+                        dayTotal += dayValues.get(dBRange);
+                    }
                 }
-                for (String dbKey : dayValues.keySet()) {
-                    if (isRelative) {
-                        values.add(new SubcolumnValue(dayValues.get(dbKey) / dayTotal, chartColours.get(dbKey)).setLabel(dbKey));
+                for (String dBRange : dayValues.keySet()) {
+                    if (isRelative && dayValues.get(dBRange) > 0) {
+                        values.add(new SubcolumnValue(dayValues.get(dBRange) / dayTotal, chartColours.get(dBRange)).setLabel(dBRange));
                     } else if (isAbsolute) {
-                        if (dayValues.get(dbKey) != 0) {
-                            values.add(new SubcolumnValue(dayValues.get(dbKey), chartColours.get(dbKey)).setLabel(dbKey));
+                        if (dayValues.get(dBRange) != 0) {
+                            values.add(new SubcolumnValue(dayValues.get(dBRange), chartColours.get(dBRange)).setLabel(dBRange));
                         }
                     }
                 }
 
             } else if (isTimeline) {
-                    for (LocalTime time : dataListByDate.get(key).keySet()) {
-                        for (Range range : catergoryList.keySet()) {
-                            range.contains((int)9.0);
-                            if (range.contains((int)Math.round(dataListByDate.get(key).get(time).dB))) {
-                                values.add(new SubcolumnValue(1,chartColours.get(catergoryList.get(range)[0])).setLabel(catergoryList.get(range)[1]));
-                            }
+                for (LocalTime time : dataListByDate.get(date).keySet()) {
+                    for (Range range : categoryList.keySet()) {
+                        range.contains((int) 9.0);
+                        if (range.contains((int) Math.round(dataListByDate.get(date).get(time).dB))) {
+                            values.add(new SubcolumnValue(1, chartColours.get(categoryList.get(range)[0])).setLabel(categoryList.get(range)[1]));
                         }
                     }
+                }
             }
             Column column = new Column(values);
             column.setHasLabels(true);
@@ -419,6 +409,7 @@ public class ChartActivity extends AppCompatActivity {
         @Override
         public boolean onLongClick(View v) {
             double highestDB = 0;
+            double lowDB = 100;
             List<Integer> dayMinutes = new ArrayList<>();
             String columnDate;
             ((ColumnChartView) v).getChartRenderer().checkTouch(longTouchx, longTouchy);
@@ -434,6 +425,9 @@ public class ChartActivity extends AppCompatActivity {
                 for (LocalTime time : dailyDatapoints.keySet()) {
                     if (dailyDatapoints.get(time).dB > highestDB) {
                         highestDB = dailyDatapoints.get(time).dB;
+                    }
+                    if (dailyDatapoints.get(time).dB < lowDB) {
+                        lowDB = dailyDatapoints.get(time).dB;
                     }
                     //get the datapoint time and turn into minutes, add to a list so we can get
                     //the first datapoint time, last datapoint time and the average
@@ -452,7 +446,7 @@ public class ChartActivity extends AppCompatActivity {
                 String firstTime, lastTime;
                 firstTime = String.valueOf(dayMinutes.get(0) / 60) + ":" + String.format("%1$" + 2 + "s", dayMinutes.get(0) % 60).replace(' ', '0');
                 lastTime = String.valueOf(dayMinutes.get(dayMinutes.size() - 1) / 60) + ":" + String.format("%1$" + 2 + "s", dayMinutes.get(dayMinutes.size() - 1) % 60).replace(' ', '0');
-
+                Toast.makeText(context, String.valueOf(lowDB), Toast.LENGTH_LONG).show();
                 //start dialog stuff
                 barInfoArray = new String[]{String.valueOf(dailyDatapoints.size()), firstTime, lastTime, String.valueOf(averageMins), String.valueOf(highestDB)};
                 FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
