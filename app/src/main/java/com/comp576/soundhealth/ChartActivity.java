@@ -9,6 +9,7 @@ import android.os.Bundle;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.util.Range;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.HorizontalScrollView;
@@ -47,21 +48,21 @@ public class ChartActivity extends AppCompatActivity {
     private List<Data> dataList = new ArrayList<>();
     //setting up a list of datapoint lists keyed by date and time,
 //    private HashMap<Date,List<Data>> dataListByDate = new HashMap<>();
-    private HashMap<Date,TreeMap<LocalTime,Data>> dataListByDate = new HashMap<>();
-    private TreeMap<LocalTime,Data> dailyDatapoints = new TreeMap<>();
+    private HashMap<Date, TreeMap<LocalTime, Data>> dataListByDate = new HashMap<>();
+    private TreeMap<LocalTime, Data> dailyDatapoints = new TreeMap<>();
     //private List<Data> dailyDatapoints;
     private DataRepository dataRepository;
     private Boolean dataQueried = false;
     private Axis xAxis;
-    private TreeMap<Date, LinkedHashMap> dailyValues;
-    private LinkedHashMap<String, Float> dayValues;
-    private float totalThirties, totalForties, totalFifties, totalSixties, totalSeventies, totalEighties, totalNintiesPlus,longTouchx,longTouchy;
+    private TreeMap<Date, HashMap> dailyValues;
+    private HashMap<String, Float> dayValues;
+    private float totalThirties, totalForties, totalFifties, totalSixties, totalSeventies, totalEighties, totalNintiesPlus, longTouchx, longTouchy;
     public static String[] barInfoArray;
-    public int lowestDB = 0, highestDB=7;
-    public boolean isRelative, isAbsolute=true, isTimeline;
+    public int lowestDB = 0, highestDB = 7;
+    public boolean isRelative, isAbsolute = true, isTimeline;
 
     public void onCreate(Bundle savedInstanceState) {
-        this.context=getApplicationContext();
+        this.context = getApplicationContext();
         super.onCreate(savedInstanceState);
 //        isRelative=true;
         dataRepository = new DataRepository(this);
@@ -110,7 +111,7 @@ public class ChartActivity extends AppCompatActivity {
 
     }
 
-    private class UserDataAsyncTask extends AsyncTask<Void,Void, Void>{
+    private class UserDataAsyncTask extends AsyncTask<Void, Void, Void> {
 
         @Override
         protected Void doInBackground(Void... voids) {
@@ -123,7 +124,7 @@ public class ChartActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            Toast.makeText(context,String.valueOf(dataList.size()),Toast.LENGTH_LONG).show();
+            Toast.makeText(context, String.valueOf(dataList.size()), Toast.LENGTH_LONG).show();
             pieChartAddData();
             barChartAddData();
         }
@@ -154,7 +155,7 @@ public class ChartActivity extends AppCompatActivity {
 
         //Generating piechart slice dataList, simple categorisation of dB levels and taking percents.
         //first reset the percent variables so they are correct when piechart updates
-        totalThirties=totalForties=totalFifties=totalSixties=totalSeventies=totalEighties=totalNintiesPlus=0.0f;
+        totalThirties = totalForties = totalFifties = totalSixties = totalSeventies = totalEighties = totalNintiesPlus = 0.0f;
         for (Data dataPoint : dataList) {
             Double dB = dataPoint.dB;
             //check if null in case I forget to enable mic.
@@ -171,22 +172,22 @@ public class ChartActivity extends AppCompatActivity {
 
         List<ArrayList> sliceParamsList = new ArrayList<>();
 
-        sliceParamsList.add(new ArrayList(Arrays.asList("thirties","30-39 dB",totalThirties)));
-        sliceParamsList.add(new ArrayList(Arrays.asList("forties","40-49 dB",totalForties)));
-        sliceParamsList.add(new ArrayList(Arrays.asList("fifties","50-59 dB",totalFifties)));
-        sliceParamsList.add(new ArrayList(Arrays.asList("sixties","60-69 dB",totalSixties)));
-        sliceParamsList.add(new ArrayList(Arrays.asList("seventies","70-79 dB",totalSeventies)));
-        sliceParamsList.add(new ArrayList(Arrays.asList("eighties","80-89 dB",totalEighties)));
-        sliceParamsList.add(new ArrayList(Arrays.asList("ninties","<90 dB",totalNintiesPlus)));
+        sliceParamsList.add(new ArrayList(Arrays.asList("thirties", "30-39 dB", totalThirties)));
+        sliceParamsList.add(new ArrayList(Arrays.asList("forties", "40-49 dB", totalForties)));
+        sliceParamsList.add(new ArrayList(Arrays.asList("fifties", "50-59 dB", totalFifties)));
+        sliceParamsList.add(new ArrayList(Arrays.asList("sixties", "60-69 dB", totalSixties)));
+        sliceParamsList.add(new ArrayList(Arrays.asList("seventies", "70-79 dB", totalSeventies)));
+        sliceParamsList.add(new ArrayList(Arrays.asList("eighties", "80-89 dB", totalEighties)));
+        sliceParamsList.add(new ArrayList(Arrays.asList("ninties", "<90 dB", totalNintiesPlus)));
 
 
         List pieData = new ArrayList<>();
         //need to work out how to exclude slices based on user db range choice.
-        for(int slice=lowestDB;slice<highestDB;slice++){
+        for (int slice = lowestDB; slice < highestDB; slice++) {
             float dB = (float) sliceParamsList.get(slice).get(2);
             int colour = chartColours.get(sliceParamsList.get(slice).get(0).toString());
             String label = sliceParamsList.get(slice).get(1).toString();
-            pieData.add(new SliceValue(dB,colour).setLabel(label));
+            pieData.add(new SliceValue(dB, colour).setLabel(label));
         }
 
         PieChartData pieChartData = new PieChartData(pieData);
@@ -212,7 +213,7 @@ public class ChartActivity extends AppCompatActivity {
         dailyValues = new TreeMap<>();
         float dailyThirties, dailyForties, dailyFifties, dailySixties, dailySeventies, dailyEighties, dailyNintiesPlus;
 
-        dayValues = new LinkedHashMap<>();
+        dayValues = new HashMap<>();
         int changeDateCount = 0;
         for (Data data : dataList) {
             Date datapointDate = null;
@@ -230,25 +231,25 @@ public class ChartActivity extends AppCompatActivity {
 
 
             //adding datapoint to date keyed hashmap of time keyed treemap
-            if(dataListByDate.containsKey(datapointDate)){
+            if (dataListByDate.containsKey(datapointDate)) {
                 //retrieve treemap
                 dailyDatapoints = dataListByDate.get(datapointDate);
                 //add datapoin with time key
-                dailyDatapoints.put(LocalTime.parse(data.time +":00"),data);
+                dailyDatapoints.put(LocalTime.parse(data.time + ":00"), data);
                 //put time keyed map back in date keyed map
-                dataListByDate.put(datapointDate,dailyDatapoints);
+                dataListByDate.put(datapointDate, dailyDatapoints);
             } else {
                 dailyDatapoints = new TreeMap<>();
-                dailyDatapoints.put(LocalTime.parse(data.time+":00"),data);
-                dataListByDate.put(datapointDate,dailyDatapoints);
+                dailyDatapoints.put(LocalTime.parse(data.time + ":00"), data);
+                dataListByDate.put(datapointDate, dailyDatapoints);
             }
 
             /* idea here is to have each day with it's own set of total dB range values.
-            */
+             */
             Double dB = data.dB;
             //check if null in case I forget to enable mic.
             if (dB != null) {
-                LinkedHashMap<String, Float> tempDayValues = new LinkedHashMap<>();
+                HashMap<String, Float> tempDayValues = new HashMap<>();
                 dailyThirties = dailyForties = dailyFifties = dailySixties = dailySeventies = dailyEighties = dailyNintiesPlus = 0.0f;
 
                 if (dB > 90) dailyNintiesPlus = 1f;
@@ -288,16 +289,23 @@ public class ChartActivity extends AppCompatActivity {
                 }
             }
         }
-        //todo set up a column that has data by time via the time keyed treemap
         //setup columns w/dataList
         List<Column> columns = new ArrayList<>();
         List<SubcolumnValue> values;
         List<AxisValue> xAxisValues = new ArrayList<>();
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MMM-yy");
 
-//        for (Date date : dailyValues.keySet()) {
-//
-//        }
+        //set up map that can get labels for db ranges
+        HashMap<Range, String[]> catergoryList = new HashMap<>();
+        catergoryList.put(Range.create(0, 39), new String[]{"thirties", "<30-39dB"});
+        catergoryList.put(Range.create(40, 49), new String[]{"forties", "40-49dB"});
+        catergoryList.put(Range.create(50, 59), new String[]{"fifties", "50-59dB"});
+        catergoryList.put(Range.create(60, 69), new String[]{"sixties", "60-69dB"});
+        catergoryList.put(Range.create(70, 79), new String[]{"seventies", "70-79dB"});
+        catergoryList.put(Range.create(80, 89), new String[]{"eighties", "80-89dB"});
+        catergoryList.put(Range.create(90, 99), new String[]{"nineties", "90-9dB"});
+
+        //set up axis ans columns for barchart depending on type chosen
         int xAxisIndex = 0;
         for (Date key : dailyValues.keySet()) {
             values = new ArrayList<>();
@@ -305,19 +313,31 @@ public class ChartActivity extends AppCompatActivity {
             value.setLabel(dateFormat.format(key));
             xAxisValues.add(value);
             xAxisIndex++;
-            dayValues = dailyValues.get(key);
-            float dayTotal = 0.0f;
-            for (String dbKey : dayValues.keySet()) {
-                dayTotal += dayValues.get(dbKey);
-            }
-            for (String dbKey : dayValues.keySet()) {
-                if(isRelative) {
-                    values.add(new SubcolumnValue(dayValues.get(dbKey) / dayTotal, chartColours.get(dbKey)).setLabel(dbKey));
-                } else if (isAbsolute){
-                    values.add(new SubcolumnValue(dayValues.get(dbKey), chartColours.get(dbKey)).setLabel(dbKey));
-                } else if (isTimeline){
-                    //todo
+            if (isAbsolute || isRelative) {
+                dayValues = dailyValues.get(key);
+                float dayTotal = 0.0f;
+                for (String dbKey : dayValues.keySet()) {
+                    dayTotal += dayValues.get(dbKey);
                 }
+                for (String dbKey : dayValues.keySet()) {
+                    if (isRelative) {
+                        values.add(new SubcolumnValue(dayValues.get(dbKey) / dayTotal, chartColours.get(dbKey)).setLabel(dbKey));
+                    } else if (isAbsolute) {
+                        if (dayValues.get(dbKey) != 0) {
+                            values.add(new SubcolumnValue(dayValues.get(dbKey), chartColours.get(dbKey)).setLabel(dbKey));
+                        }
+                    }
+                }
+
+            } else if (isTimeline) {
+                    for (LocalTime time : dataListByDate.get(key).keySet()) {
+                        for (Range range : catergoryList.keySet()) {
+                            range.contains((int)9.0);
+                            if (range.contains((int)Math.round(dataListByDate.get(key).get(time).dB))) {
+                                values.add(new SubcolumnValue(1,chartColours.get(catergoryList.get(range)[0])).setLabel(catergoryList.get(range)[1]));
+                            }
+                        }
+                    }
             }
             Column column = new Column(values);
             column.setHasLabels(true);
@@ -327,35 +347,31 @@ public class ChartActivity extends AppCompatActivity {
         //generate yaxis
         Axis yAxis = new Axis();
         List<AxisValue> yAxisValues = new ArrayList<>();
-        if(isRelative){
+        if (isRelative) {
             yAxis.setName("percent");
             int percLabel = 0;
             for (float perc = 0.0f; perc < 1.1f; perc += 0.1f) {
                 yAxisValues.add(new AxisValue(perc, ("" + percLabel).toCharArray()));
                 percLabel += 10;
             }
-        } else if (isAbsolute){
+        } else if (isAbsolute || isTimeline) {
             yAxis.setName("number of points");
-            //todo, figure out how to get the scale on this axis
-            int maxDayPoints =0;
-            for(Date date : dataListByDate.keySet()){
-                TreeMap<LocalTime,Data> timeMap = dataListByDate.get(date);
-                if(timeMap.size()>maxDayPoints){
-                    maxDayPoints=timeMap.size();
+            int maxDayPoints = 0;
+            for (Date date : dataListByDate.keySet()) {
+                TreeMap<LocalTime, Data> timeMap = dataListByDate.get(date);
+                if (timeMap.size() > maxDayPoints) {
+                    maxDayPoints = timeMap.size();
                 }
             }
             int absLabel = 0;
-            for (int abs = 0; abs < maxDayPoints+5; abs += 1) {
+            for (int abs = 0; abs < maxDayPoints + 4; abs += 1) {
                 yAxisValues.add(new AxisValue(abs, ("" + absLabel).toCharArray()));
                 absLabel += 1;
             }
-        } else if (isTimeline){
-            //todo
         }
 
         ColumnChartData barChartData = new ColumnChartData(columns);
         barChartData.setStacked(true);
-
 
 
         xAxis = new Axis();
@@ -374,7 +390,7 @@ public class ChartActivity extends AppCompatActivity {
 
         barChartView.setColumnChartData(barChartData);
         //make sure the bars are set at a decent size relative to the number of days represented
-        barChartView.setMinimumWidth(210 * (dailyValues.keySet().size()+1));
+        barChartView.setMinimumWidth(210 * (dailyValues.keySet().size() + 1));
 
         //make sure the barchart is scrolled to the latest day inside the horizontal scrollview.
         hScrollView.post(new Runnable() {
@@ -398,16 +414,16 @@ public class ChartActivity extends AppCompatActivity {
         }
     };
 
-//set up long click listener to get column touched index, filter the datalist to get the points for that column and show stats
+    //set up long click listener to get column touched index, filter the datalist to get the points for that column and show stats
     View.OnLongClickListener longClickListener = new View.OnLongClickListener() {
         @Override
         public boolean onLongClick(View v) {
-            double highestDB=0;
+            double highestDB = 0;
             List<Integer> dayMinutes = new ArrayList<>();
             String columnDate;
-            ((ColumnChartView)v).getChartRenderer().checkTouch(longTouchx,longTouchy);
-            SelectedValue val = ((ColumnChartView)v).getChartRenderer().getSelectedValue();
-            if(val.getFirstIndex() >= 0) {
+            ((ColumnChartView) v).getChartRenderer().checkTouch(longTouchx, longTouchy);
+            SelectedValue val = ((ColumnChartView) v).getChartRenderer().getSelectedValue();
+            if (val.getFirstIndex() >= 0) {
                 columnDate = String.valueOf(xAxis.getValues().get(Integer.parseInt(String.valueOf(val.getFirstIndex()))).getLabelAsChars());
                 try {
                     dailyDatapoints = dataListByDate.get(new SimpleDateFormat("dd-MMM-yy").parse(columnDate));
