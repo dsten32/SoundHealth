@@ -22,7 +22,7 @@
             android:src="@drawable/ic_settings_black_24dp"
             android:clickable="true"
             android:onClick="showDialog"
-            app:backgroundTint="#548e92"
+            app:backgroundTint="@color/colorSecondaryDark"
             android:focusable="true"
             android:layout_alignParentEnd="true"
             android:layout_marginTop="5dp"

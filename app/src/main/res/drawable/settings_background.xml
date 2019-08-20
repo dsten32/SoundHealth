@@ -8,6 +8,6 @@
         <!--android:height="250dp"-->
         <!--/>-->
     <solid
-        android:color="#649397"
+        android:color="@color/colorPrimary"
         />
 </shape>

@@ -17,7 +17,7 @@
         android:src="@drawable/ic_settings_black_24dp"
         android:clickable="true"
         android:onClick="showDialog"
-        app:backgroundTint="#548e92"
+        app:backgroundTint="@color/colorSecondaryDark"
         android:focusable="true"
         android:layout_alignParentEnd="true"
         android:layout_marginTop="5dp"
@@ -36,14 +36,14 @@
             <lecho.lib.hellocharts.view.PieChartView
                 android:id="@+id/pieChart"
                 android:layout_width="match_parent"
-                android:layout_height="550dp"
+                android:layout_height="440dp"
                 android:visibility="visible" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:text="Daily Percentages"
+                android:text="Daily"
                 android:textAlignment="center"/>
 
             <HorizontalScrollView
