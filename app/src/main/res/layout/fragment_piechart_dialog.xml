@@ -11,7 +11,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Choose dB range"
+        android:text="@string/db_range"
         android:textAlignment="center" />
 
     <!--<TextView-->
@@ -54,8 +54,13 @@
         app:mrb_tickInterval="1"
         app:mrb_tickLabelColor="@color/colorAccent"
         app:mrb_tickLabelSelectedColor="@color/colorPrimary"
-        app:mrb_tickLabelSize="4sp"
+        app:mrb_tickLabelSize="6sp"
         app:mrb_tickTopLabels="@array/ticks_labels"/>
 
+    <Switch
+        android:id="@+id/cBlind"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/colour_blind_option"/>
 
 </LinearLayout>

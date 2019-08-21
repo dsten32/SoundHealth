@@ -8,4 +8,6 @@
     <string name="pick_stop_date">Stop Date</string>
     <string name="default_notification_channel_id">default_id</string>
     <string name="fcm_message">default_message</string>
+    <string name="colour_blind_option">Colour Blind Option</string>
+    <string name="db_range">Choose dB range</string>
 </resources>

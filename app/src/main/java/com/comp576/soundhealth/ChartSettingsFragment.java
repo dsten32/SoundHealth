@@ -6,7 +6,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.RadioButton;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import com.appyvet.materialrangebar.RangeBar;
@@ -15,7 +17,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.DialogFragment;
 
-public class ChartSettingsFragment extends DialogFragment implements RangeBar.OnRangeBarChangeListener, View.OnClickListener, RadioButton.OnCheckedChangeListener {
+public class ChartSettingsFragment extends DialogFragment implements RangeBar.OnRangeBarChangeListener, View.OnClickListener, OnCheckedChangeListener {
     ChartActivity chartActivity;
     View view;
 
@@ -39,13 +41,15 @@ public class ChartSettingsFragment extends DialogFragment implements RangeBar.On
         dBRange.setRangePinsByIndices(chartActivity.lowestDB, chartActivity.highestDB - 1);
         RadioButton absButton = view.findViewById(R.id.dataAbsolute);
         absButton.setChecked(chartActivity.isAbsolute);
-        absButton.setOnCheckedChangeListener(this::onCheckedChanged);
+        absButton.setOnCheckedChangeListener(this);
         RadioButton relButton = view.findViewById(R.id.dataRelative);
-        relButton.setOnCheckedChangeListener(this::onCheckedChanged);
+        relButton.setOnCheckedChangeListener(this);
         RadioButton timeButton = view.findViewById(R.id.dataTimeline);
         timeButton.setChecked(chartActivity.isTimeline);
-        timeButton.setOnCheckedChangeListener(this::onCheckedChanged);
-
+        timeButton.setOnCheckedChangeListener(this);
+        Switch colourBlindSwitch = view.findViewById(R.id.cBlind);
+        colourBlindSwitch.setOnCheckedChangeListener(this);
+        colourBlindSwitch.setChecked(chartActivity.isColourBlind);
 //        Button submit = view.findViewById(R.id.feedback_submit);
 //        submit.setOnClickListener(this::onClick);
 
@@ -81,13 +85,27 @@ public class ChartSettingsFragment extends DialogFragment implements RangeBar.On
         switch (buttonView.getId()) {
             case R.id.dataRelative:
                 chartActivity.isRelative = ((RadioButton) view.findViewById(R.id.dataRelative)).isChecked();
+                chartActivity.barChartAddData();
                 break;
             case R.id.dataAbsolute:
                 chartActivity.isAbsolute = ((RadioButton) view.findViewById(R.id.dataAbsolute)).isChecked();
+                chartActivity.barChartAddData();
                 break;
             case R.id.dataTimeline:
                 chartActivity.isTimeline = ((RadioButton) view.findViewById(R.id.dataTimeline)).isChecked();
+                chartActivity.barChartAddData();
+                break;
+            case R.id.cBlind:
+
+                if(isChecked){
+                    ((ChartActivity) getActivity()).isColourBlind = true;
+                } else {
+                    ((ChartActivity) getActivity()).isColourBlind = false;
+                }
+                ((ChartActivity) getActivity()).setChartColours();
+                ((ChartActivity) getActivity()).pieChartAddData();
+                ((ChartActivity) getActivity()).barChartAddData();
+                break;
         }
-        chartActivity.barChartAddData();
     }
 }

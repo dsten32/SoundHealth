@@ -16,11 +16,11 @@
 
     <string-array name="ticks_labels">
         <item><![CDATA[<30]]></item>
-        <item><![CDATA[40–49]]></item>
-        <item><![CDATA[50–59]]></item>
-        <item><![CDATA[60–69]]></item>
-        <item><![CDATA[70–79]]></item>
-        <item><![CDATA[80–89]]></item>
+        <item><![CDATA[40]]></item>
+        <item><![CDATA[50]]></item>
+        <item><![CDATA[60]]></item>
+        <item><![CDATA[70]]></item>
+        <item><![CDATA[80]]></item>
         <item><![CDATA[>90]]></item>
     </string-array>
 

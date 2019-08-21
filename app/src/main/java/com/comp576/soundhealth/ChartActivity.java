@@ -9,6 +9,7 @@ import android.os.Bundle;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.util.Log;
 import android.util.Range;
 import android.view.MotionEvent;
 import android.view.View;
@@ -30,6 +31,7 @@ import java.time.LocalTime;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.work.Logger;
 import lecho.lib.hellocharts.model.*;
 import lecho.lib.hellocharts.model.SliceValue;
 import lecho.lib.hellocharts.model.ColumnChartData;
@@ -51,6 +53,7 @@ public class ChartActivity extends AppCompatActivity {
     private HashMap<Date, TreeMap<LocalTime, Data>> dataListByDate = new HashMap<>();
     private TreeMap<LocalTime, Data> dailyDatapoints = new TreeMap<>();
     //private List<Data> dailyDatapoints;
+    private HashMap<Range, String[]> categoryList;
     private DataRepository dataRepository;
     private Boolean dataQueried = false;
     private Axis xAxis;
@@ -61,7 +64,7 @@ public class ChartActivity extends AppCompatActivity {
     private float totalThirties, totalForties, totalFifties, totalSixties, totalSeventies, totalEighties, totalNintiesPlus, longTouchx, longTouchy;
     public static String[] barInfoArray;
     public int lowestDB = 0, highestDB = 7;
-    public boolean isRelative, isAbsolute = true, isTimeline;
+    public boolean isRelative, isAbsolute = true, isTimeline, isColourBlind;
 
     public void onCreate(Bundle savedInstanceState) {
         this.context = getApplicationContext();
@@ -74,6 +77,8 @@ public class ChartActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_chart);
 
+        setChartColours();
+        setChartOptions();
         pieChartView = findViewById(R.id.pieChart);
         pieChartView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -110,7 +115,40 @@ public class ChartActivity extends AppCompatActivity {
         barChartView.setOnLongClickListener(longClickListener);
 
         new UserDataAsyncTask().execute();
+    }
 
+    private void setChartOptions(){
+        //set up map that can get labels for db ranges
+        categoryList = new HashMap<>();
+        categoryList.put(Range.create(0, 39), new String[]{"thirties", "<30-39dB"});
+        categoryList.put(Range.create(40, 49), new String[]{"forties", "40-49dB"});
+        categoryList.put(Range.create(50, 59), new String[]{"fifties", "50-59dB"});
+        categoryList.put(Range.create(60, 69), new String[]{"sixties", "60-69dB"});
+        categoryList.put(Range.create(70, 79), new String[]{"seventies", "70-79dB"});
+        categoryList.put(Range.create(80, 89), new String[]{"eighties", "80-89dB"});
+        categoryList.put(Range.create(90, 99), new String[]{"nineties", "90-9dB"});
+    }
+
+    public void setChartColours(){
+        //set up chart colours
+        chartColours = new HashMap<>();
+        if(isColourBlind) {
+            chartColours.put("thirties", Color.parseColor("#DCDCDC"));
+            chartColours.put("forties", Color.parseColor("#999999"));
+            chartColours.put("fifties", Color.parseColor("#777777"));
+            chartColours.put("sixties", Color.parseColor("#555555"));
+            chartColours.put("seventies", Color.parseColor("#333333"));
+            chartColours.put("eighties", Color.parseColor("#111111"));
+            chartColours.put("ninties", Color.parseColor("#000000"));
+        } else {
+            chartColours.put("thirties", Color.GREEN);
+            chartColours.put("forties", Color.BLUE);
+            chartColours.put("fifties", Color.CYAN);
+            chartColours.put("sixties", Color.GRAY);
+            chartColours.put("seventies", Color.YELLOW);
+            chartColours.put("eighties", Color.MAGENTA);
+            chartColours.put("ninties", Color.RED);
+        }
     }
 
     private class UserDataAsyncTask extends AsyncTask<Void, Void, Void> {
@@ -132,32 +170,39 @@ public class ChartActivity extends AppCompatActivity {
         }
     }
 
-
     //method to setup the piechart and manage re-building on user changing dB range for display
     public void pieChartAddData() {
-        //set up chart colours
-        chartColours = new HashMap<>();
-        chartColours.put("thirties", Color.GREEN);
-        chartColours.put("forties", Color.BLUE);
-        chartColours.put("fifties", Color.CYAN);
-        chartColours.put("sixties", Color.GRAY);
-        chartColours.put("seventies", Color.YELLOW);
-        chartColours.put("eighties", Color.MAGENTA);
-        chartColours.put("ninties", Color.RED);
-
         //get total number of user datapoints so a percentage value
         // for each category can be displayed in the piechart
-        float dataTotal = dataList.size();
-        float addPercent;
-        if (dataTotal != 0) {
-            addPercent = 100 / dataTotal;
-        } else {
-            addPercent = 1.0f;
-        }
+        float addPercent = 100 / (( dataList.size() != 0 ) ? (float)dataList.size() : 1.0f);
 
         //Generating piechart slice dataList, simple categorisation of dB levels and taking percents.
         //first reset the percent variables so they are correct when piechart updates
         totalThirties = totalForties = totalFifties = totalSixties = totalSeventies = totalEighties = totalNintiesPlus = 0.0f;
+        List<ArrayList> sliceParamsList = new ArrayList<>();
+        //tried to condense the adding of data to the chart, to avoid the code below this,
+        //but it screwed the filtering. will try again later but may need to redesign
+        //the filtering system first
+//        for (Data dataPoint : dataList) {
+//            int dB = (int) Math.round(dataPoint.dB);
+//            if(dB != 0) {
+//                for (Range range : categoryList.keySet()) {
+//                    Log.d("range","accessed");
+//
+//                    if (range.contains(dB)) {
+//                        for(ArrayList subList : sliceParamsList ) {
+//                            if(subList.contains(categoryList.get(range)[0])){
+//                                sliceParamsList.add(new ArrayList(Arrays.asList(categoryList.get(range)[0], categoryList.get(range)[1], (float)subList.get(2) + addPercent)));
+//                            } else {
+//                                sliceParamsList.add(new ArrayList(Arrays.asList(categoryList.get(range)[0], categoryList.get(range)[1], addPercent)));
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
+
+
         for (Data dataPoint : dataList) {
             Double dB = dataPoint.dB;
             //check if null in case I forget to enable mic.
@@ -172,7 +217,6 @@ public class ChartActivity extends AppCompatActivity {
             }
         }
 
-        List<ArrayList> sliceParamsList = new ArrayList<>();
 
         sliceParamsList.add(new ArrayList(Arrays.asList("thirties", "30-39 dB", totalThirties)));
         sliceParamsList.add(new ArrayList(Arrays.asList("forties", "40-49 dB", totalForties)));
@@ -181,7 +225,6 @@ public class ChartActivity extends AppCompatActivity {
         sliceParamsList.add(new ArrayList(Arrays.asList("seventies", "70-79 dB", totalSeventies)));
         sliceParamsList.add(new ArrayList(Arrays.asList("eighties", "80-89 dB", totalEighties)));
         sliceParamsList.add(new ArrayList(Arrays.asList("ninties", "<90 dB", totalNintiesPlus)));
-
 
         List pieData = new ArrayList<>();
         //need to work out how to exclude slices based on user db range choice.
@@ -198,7 +241,6 @@ public class ChartActivity extends AppCompatActivity {
         pieChartView.setPieChartData(pieChartData);
 
         pieChartView.setOnValueTouchListener(new ValueTouchListener(pieChartData, pieChartView));
-
     }
 
     //method for setting up barchart.
@@ -211,15 +253,6 @@ public class ChartActivity extends AppCompatActivity {
         // could be instead of using data points we do similar to the piechart.
         // for each map key there are 7 string: int pairs. if dB value in category then increment the int with that key.
         HorizontalScrollView hScrollView = (HorizontalScrollView) findViewById(R.id.barChartScroll);
-        //set up map that can get labels for db ranges
-        HashMap<Range, String[]> categoryList = new HashMap<>();
-        categoryList.put(Range.create(0, 39), new String[]{"thirties", "<30-39dB"});
-        categoryList.put(Range.create(40, 49), new String[]{"forties", "40-49dB"});
-        categoryList.put(Range.create(50, 59), new String[]{"fifties", "50-59dB"});
-        categoryList.put(Range.create(60, 69), new String[]{"sixties", "60-69dB"});
-        categoryList.put(Range.create(70, 79), new String[]{"seventies", "70-79dB"});
-        categoryList.put(Range.create(80, 89), new String[]{"eighties", "80-89dB"});
-        categoryList.put(Range.create(90, 99), new String[]{"nineties", "90-9dB"});
 
         dailyValues = new TreeMap<>();
         float dailyThirties, dailyForties, dailyFifties, dailySixties, dailySeventies, dailyEighties, dailyNintiesPlus;
@@ -239,7 +272,6 @@ public class ChartActivity extends AppCompatActivity {
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-
 
             //adding datapoint to date keyed hashmap of time keyed treemap
             if (dataListByDate.containsKey(datapointDate)) {
@@ -290,7 +322,6 @@ public class ChartActivity extends AppCompatActivity {
         List<SubcolumnValue> values;
         List<AxisValue> xAxisValues = new ArrayList<>();
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MMM-yy");
-
 
         //set up axis ans columns for barchart depending on type chosen
         int xAxisIndex = 0;
@@ -363,7 +394,6 @@ public class ChartActivity extends AppCompatActivity {
         ColumnChartData barChartData = new ColumnChartData(columns);
         barChartData.setStacked(true);
 
-
         xAxis = new Axis();
         xAxis.setValues(xAxisValues);
         xAxis.setHasLines(true);
@@ -390,7 +420,6 @@ public class ChartActivity extends AppCompatActivity {
         });
         barChartView.setHorizontalScrollBarEnabled(true);
     }
-
 
     //adding custom touch listener to get bar chart
     // column selected so the long click listener can access
@@ -517,6 +546,4 @@ public class ChartActivity extends AppCompatActivity {
         DialogFragment dialogFragment = new ChartSettingsFragment();
         dialogFragment.show(fragmentTransaction, "chartDialog");
     }
-
-
 }
