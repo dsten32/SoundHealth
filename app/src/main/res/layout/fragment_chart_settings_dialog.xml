@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center"
@@ -12,40 +11,36 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Choose Barchart type"/>
+        android:text="@string/barchart_type"/>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
-
 
         <RadioGroup
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-
             <RadioButton
                 android:id="@+id/dataRelative"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checked="true"
-                android:text="Relative" />
+                android:text="@string/relative" />
 
             <RadioButton
                 android:id="@+id/dataAbsolute"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Absolute" />
+                android:text="@string/absolute" />
 
             <RadioButton
                 android:id="@+id/dataTimeline"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Timeline" />
+                android:text="@string/timeline" />
         </RadioGroup>
     </LinearLayout>
-
-
 </LinearLayout>
 

@@ -58,7 +58,7 @@
         android:shadowDx="0"
         android:shadowDy="0"
         android:shadowRadius="5"
-        android:text="Submit"
+        android:text="@string/submit"
         android:textColor="@color/colorSecondaryText"
         android:textSize="20sp" />
 

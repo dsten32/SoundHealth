@@ -21,13 +21,13 @@
         android:id="@+id/intro"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Welcome to SoundHealth, push the shiny button below to get your first datapoint"
+        android:text="@string/welcome_text"
         android:textAppearance="@style/TextAppearance.AppCompat.Headline"
         />
     <Button
         android:id="@+id/main_btn"
         android:layout_centerHorizontal="true"
-        android:text="Loading..."
+        android:text="@string/no_data"
         android:textColor="#012636"
         android:textSize="19sp"
         android:layout_marginTop="100dp"

@@ -18,8 +18,8 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingRight="3dp"
-            android:text="Number of datapoints:"
+            android:paddingEnd="3dp"
+            android:text="@string/number_of_datapoints"
             android:textColor="@android:color/white" />
 
         <TextView
@@ -38,8 +38,8 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingRight="3dp"
-            android:text="First datapoint recorded at:"
+            android:paddingEnd="3dp"
+            android:text="@string/first_datapoint"
             android:textColor="@android:color/white" />
 
         <TextView
@@ -59,8 +59,8 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingRight="3dp"
-            android:text="Last datapoint recorded at:"
+            android:paddingEnd="3dp"
+            android:text="@string/last_datapoint"
             android:textColor="@android:color/white" />
 
         <TextView
@@ -79,8 +79,8 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingRight="3dp"
-            android:text="Average minutes between recordings:"
+            android:paddingEnd="3dp"
+            android:text="@string/average_minutes"
             android:textColor="@android:color/white" />
 
         <TextView
@@ -99,8 +99,8 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingRight="3dp"
-            android:text="Highest dB reading:"
+            android:paddingEnd="3dp"
+            android:text="@string/highest_db_reading"
             android:textColor="@android:color/white" />
 
         <TextView

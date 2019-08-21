@@ -10,4 +10,23 @@
     <string name="fcm_message">default_message</string>
     <string name="colour_blind_option">Colour Blind Option</string>
     <string name="db_range">Choose dB range</string>
+    <string name="daily">Daily Chart</string>
+    <string name="barchart_type">Choose Barchart type</string>
+    <string name="relative">Relative</string>
+    <string name="absolute">Absolute</string>
+    <string name="timeline">Timeline</string>
+    <string name="no_data">Loading...</string>
+    <string name="welcome_text">Welcome to SoundHealth, push the shiny button below to get your first datapoint</string>
+    <string name="interval">Set recording interval:</string>
+    <string name="min">min</string>
+    <string name="data_collection_stop_time">Set Stop Time</string>
+    <string name="blur">Blur my location</string>
+    <string name="loading_data">Loading Data</string>
+    <string name="submit">Submit</string>
+    <string name="number_of_datapoints">Number of datapoints:</string>
+    <string name="first_datapoint">First datapoint recorded at:</string>
+    <string name="last_datapoint">Last datapoint recorded at:</string>
+    <string name="average_minutes">Average minutes between recordings:</string>
+    <string name="highest_db_reading">Highest dB reading:</string>
+    <string name="close">close</string>
 </resources>

@@ -14,14 +14,6 @@
         android:text="@string/db_range"
         android:textAlignment="center" />
 
-    <!--<TextView-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:text="Rate this app"-->
-        <!--android:textAlignment="center" />-->
-
-    <!--https://www.mkyong.com/android/android-rating-bar-example/-->
-    <!--https://www.tutorialspoint.com/how-to-use-ratingbar-in-android-->
     <com.appyvet.materialrangebar.RangeBar
         android:id="@+id/range_bar"
         android:layout_width="match_parent"
@@ -31,8 +23,8 @@
         app:mrb_barWeight="2dp"
         app:mrb_connectingLineWeight="4dp"
         app:mrb_connectingLineColors="@array/connecting_colors"
-        app:mrb_leftSelectorColor="#00FFA6"
-        app:mrb_rightSelectorColor="#00FFA6"
+        app:mrb_leftSelectorColor="@color/colorSecondary"
+        app:mrb_rightSelectorColor="@color/colorSecondary"
         app:mrb_selectorBoundaryColor="@color/colorAccent"
         app:mrb_selectorBoundarySize="2dp"
         app:mrb_selectorSize="8dp"
@@ -52,8 +44,8 @@
         app:mrb_tickEnd="6"
         app:mrb_tickHeight="4dp"
         app:mrb_tickInterval="1"
-        app:mrb_tickLabelColor="@color/colorAccent"
-        app:mrb_tickLabelSelectedColor="@color/colorPrimary"
+        app:mrb_tickLabelColor="@color/colorSecondary"
+        app:mrb_tickLabelSelectedColor="@color/colorPrimaryAccent"
         app:mrb_tickLabelSize="6sp"
         app:mrb_tickTopLabels="@array/ticks_labels"/>
 

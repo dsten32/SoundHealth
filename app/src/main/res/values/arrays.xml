@@ -1,17 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="tick_colors">
-        <!--<item>#FF5722</item>-->
-        <!--<item>#F00000</item>-->
-        <!--<item>#070772</item>-->
         <item>#16C450</item>
     </string-array>
 
     <string-array name="connecting_colors">
         <item>#000</item>
-        <!--<item>#F00000</item>-->
-        <!--<item>#0000FF</item>-->
-        <!--<item>#00F000</item>-->
     </string-array>
 
     <string-array name="ticks_labels">
@@ -23,5 +17,4 @@
         <item><![CDATA[80]]></item>
         <item><![CDATA[>90]]></item>
     </string-array>
-
 </resources>
