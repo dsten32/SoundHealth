@@ -72,5 +72,6 @@ dependencies {
     implementation 'androidx.multidex:multidex:2.0.1'
     //range bar for setting dB range on pie chart
     implementation 'com.appyvet:materialrangebar:1.4.6'
+    implementation 'com.hlab.fabrevealmenu:fab-reveal-menu:1.0.4'
 }
 apply plugin: 'com.google.gms.google-services'

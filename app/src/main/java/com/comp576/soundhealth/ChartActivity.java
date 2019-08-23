@@ -25,13 +25,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.TreeMap;
 import java.time.LocalTime;
 
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.work.Logger;
 import lecho.lib.hellocharts.model.*;
 import lecho.lib.hellocharts.model.SliceValue;
 import lecho.lib.hellocharts.model.ColumnChartData;
@@ -53,11 +53,11 @@ public class ChartActivity extends AppCompatActivity {
     private HashMap<Date, TreeMap<LocalTime, Data>> dataListByDate = new HashMap<>();
     private TreeMap<LocalTime, Data> dailyDatapoints = new TreeMap<>();
     //private List<Data> dailyDatapoints;
-    private HashMap<Range, String[]> categoryList;
+    private HashMap<Range<Integer>, String[]> categoryList;
     private DataRepository dataRepository;
     private Boolean dataQueried = false;
     private Axis xAxis;
-    private TreeMap<Date, LinkedHashMap> dailyValues;
+    private TreeMap<Date, LinkedHashMap<String, Float>> dailyValues;
     //this is a linkedhashmap rather than a plain hashmap so that columns will
     //always have the same order. probably a better way to do this
     private LinkedHashMap<String, Float> dayValues;
@@ -119,7 +119,7 @@ public class ChartActivity extends AppCompatActivity {
 
     private void setChartOptions(){
         //set up map that can get labels for db ranges
-        categoryList = new HashMap<>();
+        categoryList = new HashMap<Range<Integer>, String[]>();
         categoryList.put(Range.create(0, 39), new String[]{"thirties", "<30-39dB"});
         categoryList.put(Range.create(40, 49), new String[]{"forties", "40-49dB"});
         categoryList.put(Range.create(50, 59), new String[]{"fifties", "50-59dB"});
@@ -171,68 +171,48 @@ public class ChartActivity extends AppCompatActivity {
     }
 
     //method to setup the piechart and manage re-building on user changing dB range for display
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public void pieChartAddData() {
         //get total number of user datapoints so a percentage value
         // for each category can be displayed in the piechart
-        float addPercent = 100 / (( dataList.size() != 0 ) ? (float)dataList.size() : 1.0f);
+        float addPercent = 100 /(( dataList.size() != 0 ) ? (float)dataList.size() : 1.0f);
 
         //Generating piechart slice dataList, simple categorisation of dB levels and taking percents.
-        //first reset the percent variables so they are correct when piechart updates
-        totalThirties = totalForties = totalFifties = totalSixties = totalSeventies = totalEighties = totalNintiesPlus = 0.0f;
         List<ArrayList> sliceParamsList = new ArrayList<>();
-        //tried to condense the adding of data to the chart, to avoid the code below this,
-        //but it screwed the filtering. will try again later but may need to redesign
-        //the filtering system first
-//        for (Data dataPoint : dataList) {
-//            int dB = (int) Math.round(dataPoint.dB);
-//            if(dB != 0) {
-//                for (Range range : categoryList.keySet()) {
-//                    Log.d("range","accessed");
-//
-//                    if (range.contains(dB)) {
-//                        for(ArrayList subList : sliceParamsList ) {
-//                            if(subList.contains(categoryList.get(range)[0])){
-//                                sliceParamsList.add(new ArrayList(Arrays.asList(categoryList.get(range)[0], categoryList.get(range)[1], (float)subList.get(2) + addPercent)));
-//                            } else {
-//                                sliceParamsList.add(new ArrayList(Arrays.asList(categoryList.get(range)[0], categoryList.get(range)[1], addPercent)));
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-
-
+        //set up list with category dets arrays
+        for (Range<Integer> range : categoryList.keySet()) {
+            sliceParamsList.add(new ArrayList(Arrays.asList(categoryList.get(range)[0], categoryList.get(range)[1], 0.0f)));
+        }
         for (Data dataPoint : dataList) {
-            Double dB = dataPoint.dB;
-            //check if null in case I forget to enable mic.
-            if (dB != null) {
-                if (dB > 90) totalNintiesPlus += addPercent;
-                else if (dB > 80) totalEighties += addPercent;
-                else if (dB > 70) totalSeventies += addPercent;
-                else if (dB > 60) totalSixties += addPercent;
-                else if (dB > 50) totalFifties += addPercent;
-                else if (dB > 40) totalForties += addPercent;
-                else if (dB < 40) totalThirties += addPercent;
+            int dB = (int) Math.round(dataPoint.dB);
+            if(dB != 0) {
+                for (Range<Integer> range : categoryList.keySet()) {
+                    if (range.contains(dB)) {
+                        for (int subList = 0;subList < sliceParamsList.size(); subList++){
+                            if(sliceParamsList.get(subList).contains(categoryList.get(range)[0])){
+                                ArrayList sub = sliceParamsList.get(subList);
+                                float tempFlt = (float)sub.get(2) + addPercent;
+                                sliceParamsList.remove(sub);
+                                sliceParamsList.add(new ArrayList(Arrays.asList(categoryList.get(range)[0], categoryList.get(range)[1], tempFlt )));
+                                break;
+                            }
+                        }
+                    }
+                }
             }
         }
-
-
-        sliceParamsList.add(new ArrayList(Arrays.asList("thirties", "30-39 dB", totalThirties)));
-        sliceParamsList.add(new ArrayList(Arrays.asList("forties", "40-49 dB", totalForties)));
-        sliceParamsList.add(new ArrayList(Arrays.asList("fifties", "50-59 dB", totalFifties)));
-        sliceParamsList.add(new ArrayList(Arrays.asList("sixties", "60-69 dB", totalSixties)));
-        sliceParamsList.add(new ArrayList(Arrays.asList("seventies", "70-79 dB", totalSeventies)));
-        sliceParamsList.add(new ArrayList(Arrays.asList("eighties", "80-89 dB", totalEighties)));
-        sliceParamsList.add(new ArrayList(Arrays.asList("ninties", "<90 dB", totalNintiesPlus)));
+        //new range choice code
+        String[] defaultPieDBs = new String[]{"thirties","forties","fifties","sixties","seventies","eighties","ninties"};
+        String[] userPieDBs = Arrays.copyOfRange(defaultPieDBs,lowestDB,highestDB-1);
 
         List pieData = new ArrayList<>();
-        //need to work out how to exclude slices based on user db range choice.
-        for (int slice = lowestDB; slice < highestDB; slice++) {
-            float dB = (float) sliceParamsList.get(slice).get(2);
-            int colour = chartColours.get(sliceParamsList.get(slice).get(0).toString());
-            String label = sliceParamsList.get(slice).get(1).toString();
-            pieData.add(new SliceValue(dB, colour).setLabel(label));
+        for (ArrayList subList : sliceParamsList) {
+            if(Arrays.stream(userPieDBs).anyMatch(subList.get(0)::equals)  ){
+                float dB = (float) subList.get(2);
+                int colour = chartColours.get(subList.get(0).toString());
+                String label = subList.get(1).toString();
+                pieData.add(new SliceValue(dB, colour).setLabel(label));
+            }
         }
 
         PieChartData pieChartData = new PieChartData(pieData);
@@ -254,7 +234,7 @@ public class ChartActivity extends AppCompatActivity {
         // for each map key there are 7 string: int pairs. if dB value in category then increment the int with that key.
         HorizontalScrollView hScrollView = (HorizontalScrollView) findViewById(R.id.barChartScroll);
 
-        dailyValues = new TreeMap<>();
+        dailyValues = new TreeMap<Date, LinkedHashMap<String, Float>>();
         float dailyThirties, dailyForties, dailyFifties, dailySixties, dailySeventies, dailyEighties, dailyNintiesPlus;
 
         dayValues = new LinkedHashMap<>();
@@ -296,7 +276,7 @@ public class ChartActivity extends AppCompatActivity {
 
                 if (dailyValues.containsKey(datapointDate)) {
                     tempDayValues = dailyValues.get(datapointDate);
-                    for (Range range : categoryList.keySet()) {
+                    for (Range<Integer> range : categoryList.keySet()) {
                         if (range.contains(dB)) {
                             if (tempDayValues.containsKey(categoryList.get(range)[0])) {
                                 tempDayValues.put(categoryList.get(range)[0], tempDayValues.get(categoryList.get(range)[0]) + 1f);
@@ -308,7 +288,7 @@ public class ChartActivity extends AppCompatActivity {
                         }
                     }
                 } else {
-                    for (Range range : categoryList.keySet()) {
+                    for (Range<Integer> range : categoryList.keySet()) {
                         if (range.contains(dB)) {
                             tempDayValues.put(categoryList.get(range)[0], 1f);
                             dailyValues.put(datapointDate, tempDayValues);
@@ -352,7 +332,7 @@ public class ChartActivity extends AppCompatActivity {
 
             } else if (isTimeline) {
                 for (LocalTime time : dataListByDate.get(date).keySet()) {
-                    for (Range range : categoryList.keySet()) {
+                    for (Range<Integer> range : categoryList.keySet()) {
                         range.contains((int) 9.0);
                         if (range.contains((int) Math.round(dataListByDate.get(date).get(time).dB))) {
                             values.add(new SubcolumnValue(1, chartColours.get(categoryList.get(range)[0])).setLabel(categoryList.get(range)[1]));
