@@ -219,7 +219,6 @@ public class ChartActivity extends AppCompatActivity {
         pieChartData.setHasLabels(true).setValueLabelTextSize(14);
         pieChartData.setHasCenterCircle(true).setCenterCircleScale(0.7f).setCenterText1("Your Sound Profile").setCenterText1FontSize(20).setCenterText1Color(Color.parseColor("#0097A7"));
         pieChartView.setPieChartData(pieChartData);
-
         pieChartView.setOnValueTouchListener(new ValueTouchListener(pieChartData, pieChartView));
     }
 
@@ -227,18 +226,18 @@ public class ChartActivity extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.O)
     protected void barChartAddData() {
         //users daily chart
-        //ok, lets try creating a linkedhashmap of date:datapoint pairs. need to convert the datapoint date string back into a date
+        //creating a linkedhashmap of date:datapoint pairs. need to convert the datapoint date string back into a date
         //after that add the hashmap to a TreeMap, should sort on date. then can loop through,
-        // use the key as column label and datapoints as column values. how will that work?
+        // use the key as column label and datapoints as column values.
         // could be instead of using data points we do similar to the piechart.
         // for each map key there are 7 string: int pairs. if dB value in category then increment the int with that key.
         HorizontalScrollView hScrollView = (HorizontalScrollView) findViewById(R.id.barChartScroll);
 
-        dailyValues = new TreeMap<Date, LinkedHashMap<String, Float>>();
+        dailyValues = new TreeMap<>();
         float dailyThirties, dailyForties, dailyFifties, dailySixties, dailySeventies, dailyEighties, dailyNintiesPlus;
 
         dayValues = new LinkedHashMap<>();
-        int changeDateCount = 0;
+//        int changeDateCount = 0;
         for (Data data : dataList) {
             Date datapointDate = null;
             try {
@@ -258,12 +257,12 @@ public class ChartActivity extends AppCompatActivity {
                 //retrieve treemap
                 dailyDatapoints = dataListByDate.get(datapointDate);
                 //add datapoin with time key
-                dailyDatapoints.put(LocalTime.parse(data.time + ":00"), data);
+                dailyDatapoints.put(LocalTime.parse(data.time), data);
                 //put time keyed map back in date keyed map
                 dataListByDate.put(datapointDate, dailyDatapoints);
             } else {
                 dailyDatapoints = new TreeMap<>();
-                dailyDatapoints.put(LocalTime.parse(data.time + ":00"), data);
+                dailyDatapoints.put(LocalTime.parse(data.time), data);
                 dataListByDate.put(datapointDate, dailyDatapoints);
             }
 

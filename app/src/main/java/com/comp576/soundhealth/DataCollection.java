@@ -78,7 +78,7 @@ public class DataCollection extends Activity {
                     public void onSuccess(Location location) {
                         if (location != null) {
                             String date =new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault()).format(new Date());
-                            String time =new SimpleDateFormat("kk:mm", Locale.getDefault()).format(new Date());
+                            String time =new SimpleDateFormat("kk:mm:ss", Locale.getDefault()).format(new Date());
                             Log.d("time is", time);
                             String userId = "some text I haven't decided yet";
                             Double lat,lng;
