@@ -61,7 +61,7 @@ public class ChartActivity extends AppCompatActivity {
     //this is a linkedhashmap rather than a plain hashmap so that columns will
     //always have the same order. probably a better way to do this
     private LinkedHashMap<String, Float> dayValues;
-    private float totalThirties, totalForties, totalFifties, totalSixties, totalSeventies, totalEighties, totalNintiesPlus, longTouchx, longTouchy;
+    private float longTouchx, longTouchy;
     public static String[] barInfoArray;
     public int lowestDB = 0, highestDB = 7;
     public boolean isRelative, isAbsolute = true, isTimeline, isColourBlind;
@@ -93,8 +93,6 @@ public class ChartActivity extends AppCompatActivity {
 
                 DialogFragment dialogFragment = new PiechartFragment();
                 dialogFragment.show(fragmentTransaction, "pieDialog");
-                //end dialog stuff
-//                Toast.makeText(context, "long touch", Toast.LENGTH_LONG).show();
                 return false;
             }
         });
@@ -103,7 +101,7 @@ public class ChartActivity extends AppCompatActivity {
         barChartView.setOnValueTouchListener(new ColumnChartOnValueSelectListener() {
             @Override
             public void onValueSelected(int columnIndex, int subcolumnIndex, SubcolumnValue value) {
-                //not sure if i should do anything with this
+                //should add code that shows info about the subcolumn selected.
             }
 
             @Override
@@ -234,8 +232,6 @@ public class ChartActivity extends AppCompatActivity {
         HorizontalScrollView hScrollView = (HorizontalScrollView) findViewById(R.id.barChartScroll);
 
         dailyValues = new TreeMap<>();
-        float dailyThirties, dailyForties, dailyFifties, dailySixties, dailySeventies, dailyEighties, dailyNintiesPlus;
-
         dayValues = new LinkedHashMap<>();
 //        int changeDateCount = 0;
         for (Data data : dataList) {
@@ -313,7 +309,6 @@ public class ChartActivity extends AppCompatActivity {
             if (isAbsolute || isRelative) {
                 dayValues = dailyValues.get(date);
                 float dayTotal = 0.0f;
-
                 for (String dBRange : dayValues.keySet()) {
                     if (dayValues.get(dBRange) > 0) {
                         dayTotal += dayValues.get(dBRange);
@@ -454,7 +449,6 @@ public class ChartActivity extends AppCompatActivity {
                 String firstTime, lastTime;
                 firstTime = String.valueOf(dayMinutes.get(0) / 60) + ":" + String.format("%1$" + 2 + "s", dayMinutes.get(0) % 60).replace(' ', '0');
                 lastTime = String.valueOf(dayMinutes.get(dayMinutes.size() - 1) / 60) + ":" + String.format("%1$" + 2 + "s", dayMinutes.get(dayMinutes.size() - 1) % 60).replace(' ', '0');
-                Toast.makeText(context, String.valueOf(lowDB), Toast.LENGTH_LONG).show();
                 //start dialog stuff
                 barInfoArray = new String[]{String.valueOf(dailyDatapoints.size()), firstTime, lastTime, String.valueOf(averageMins), String.valueOf(highestDB)};
                 FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
@@ -468,8 +462,6 @@ public class ChartActivity extends AppCompatActivity {
                 dialogFragment.show(fragmentTransaction, "barDialog");
                 //end dialog stuff
                 if (((ColumnChartView) v).getChartRenderer().isTouched()) {
-//                Toast.makeText(context,String.valueOf(dayCount),Toast.LENGTH_LONG).show();
-//                Toast.makeText(context, String.valueOf(xAxis.getValues().get(Integer.parseInt(String.valueOf(val.getFirstIndex()))).getLabelAsChars()),Toast.LENGTH_LONG).show();
                 }
             }
             return false;
@@ -486,8 +478,6 @@ public class ChartActivity extends AppCompatActivity {
     public void onEnterAnimationComplete() {
         if (dataList.isEmpty()) {
             Toast.makeText(this, dataQueried.toString(), Toast.LENGTH_SHORT).show();
-        } else {
-//            Toast.makeText(this, "#datapoints collected: " + dataList.size(), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -504,7 +494,6 @@ public class ChartActivity extends AppCompatActivity {
         public void onValueSelected(int arcIndex, SliceValue value) {
             pieChartData.setHasCenterCircle(true).setCenterCircleScale(0.7f).setCenterText1("Your exposure to " + String.valueOf(value.getLabelAsChars()) + " was").setCenterText1FontSize(15).setCenterText1Color(Color.parseColor("#0097A7")).setCenterText2(String.valueOf(Math.round(value.getValue())) + "%").setCenterText2FontSize(10).setCenterText2Color(Color.parseColor("#0097A7"));
             pieChartView.setPieChartData(pieChartData);
-            Toast.makeText(context, "db Range: " + String.valueOf(value.getLabelAsChars()), Toast.LENGTH_SHORT).show();
         }
 
         @Override
