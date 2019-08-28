@@ -9,7 +9,6 @@ import android.os.Bundle;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.util.Log;
 import android.util.Range;
 import android.view.MotionEvent;
 import android.view.View;
@@ -23,9 +22,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
 import java.util.TreeMap;
 import java.time.LocalTime;
 
@@ -42,6 +39,7 @@ import lecho.lib.hellocharts.listener.PieChartOnValueSelectListener;
 import lecho.lib.hellocharts.listener.ColumnChartOnValueSelectListener;
 import lecho.lib.hellocharts.view.ColumnChartView;
 
+
 public class ChartActivity extends AppCompatActivity {
     private Context context;
     HashMap<String, Integer> chartColours;
@@ -57,11 +55,9 @@ public class ChartActivity extends AppCompatActivity {
     private DataRepository dataRepository;
     private Boolean dataQueried = false;
     private Axis xAxis;
-    private TreeMap<Date, LinkedHashMap<String, Float>> dailyValues;
-    //this is a linkedhashmap rather than a plain hashmap so that columns will
-    //always have the same order. probably a better way to do this
-    private LinkedHashMap<String, Float> dayValues;
-    private float longTouchx, longTouchy;
+    private TreeMap<Date, TreeMap<String, Float>> dailyValues;
+    private TreeMap<String, Float> dayValues;
+    private float longTouchX, longTouchY;
     public static String[] barInfoArray;
     public int lowestDB = 0, highestDB = 7;
     public boolean isRelative, isAbsolute = true, isTimeline, isColourBlind;
@@ -69,7 +65,6 @@ public class ChartActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         this.context = getApplicationContext();
         super.onCreate(savedInstanceState);
-//        isRelative=true;
         dataRepository = new DataRepository(this);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -80,42 +75,18 @@ public class ChartActivity extends AppCompatActivity {
         setChartColours();
         setChartOptions();
         pieChartView = findViewById(R.id.pieChart);
-        pieChartView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                //start dialog stuff
-                FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                Fragment prev = getSupportFragmentManager().findFragmentByTag("pieDialog");
-                if (prev != null) {
-                    fragmentTransaction.remove(prev);
-                }
-                fragmentTransaction.addToBackStack(null);
-
-                DialogFragment dialogFragment = new PiechartFragment();
-                dialogFragment.show(fragmentTransaction, "pieDialog");
-                return false;
-            }
-        });
 
         barChartView = findViewById(R.id.barChart);
-        barChartView.setOnValueTouchListener(new ColumnChartOnValueSelectListener() {
-            @Override
-            public void onValueSelected(int columnIndex, int subcolumnIndex, SubcolumnValue value) {
-                //should add code that shows info about the subcolumn selected.
-            }
-
-            @Override
-            public void onValueDeselected() {
-            }
-        });
         //attach listeners
+        pieChartView.setOnLongClickListener(pieChartOnLongClickListener);
         barChartView.setOnTouchListener(barChartTouchListener);
+        barChartView.setOnValueTouchListener(barChartValueSelectListener);
         barChartView.setOnLongClickListener(longClickListener);
 
         new UserDataAsyncTask().execute();
     }
 
-    private void setChartOptions(){
+    private void setChartOptions() {
         //set up map that can get labels for db ranges
         categoryList = new HashMap<Range<Integer>, String[]>();
         categoryList.put(Range.create(0, 39), new String[]{"thirties", "<30-39dB"});
@@ -127,10 +98,10 @@ public class ChartActivity extends AppCompatActivity {
         categoryList.put(Range.create(90, 99), new String[]{"nineties", "90-9dB"});
     }
 
-    public void setChartColours(){
+    public void setChartColours() {
         //set up chart colours
         chartColours = new HashMap<>();
-        if(isColourBlind) {
+        if (isColourBlind) {
             chartColours.put("thirties", Color.parseColor("#DCDCDC"));
             chartColours.put("forties", Color.parseColor("#999999"));
             chartColours.put("fifties", Color.parseColor("#777777"));
@@ -162,7 +133,7 @@ public class ChartActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            Toast.makeText(context, String.valueOf(dataList.size()), Toast.LENGTH_LONG).show();
+//            Toast.makeText(context, String.valueOf(dataList.size()), Toast.LENGTH_LONG).show();
             pieChartAddData();
             barChartAddData();
         }
@@ -173,7 +144,7 @@ public class ChartActivity extends AppCompatActivity {
     public void pieChartAddData() {
         //get total number of user datapoints so a percentage value
         // for each category can be displayed in the piechart
-        float addPercent = 100 /(( dataList.size() != 0 ) ? (float)dataList.size() : 1.0f);
+        float addPercent = 100 / ((dataList.size() != 0) ? (float) dataList.size() : 1.0f);
 
         //Generating piechart slice dataList, simple categorisation of dB levels and taking percents.
         List<ArrayList> sliceParamsList = new ArrayList<>();
@@ -183,15 +154,15 @@ public class ChartActivity extends AppCompatActivity {
         }
         for (Data dataPoint : dataList) {
             int dB = (int) Math.round(dataPoint.dB);
-            if(dB != 0) {
+            if (dB != 0) {
                 for (Range<Integer> range : categoryList.keySet()) {
                     if (range.contains(dB)) {
-                        for (int subList = 0;subList < sliceParamsList.size(); subList++){
-                            if(sliceParamsList.get(subList).contains(categoryList.get(range)[0])){
+                        for (int subList = 0; subList < sliceParamsList.size(); subList++) {
+                            if (sliceParamsList.get(subList).contains(categoryList.get(range)[0])) {
                                 ArrayList sub = sliceParamsList.get(subList);
-                                float tempFlt = (float)sub.get(2) + addPercent;
+                                float tempFlt = (float) sub.get(2) + addPercent;
                                 sliceParamsList.remove(sub);
-                                sliceParamsList.add(new ArrayList(Arrays.asList(categoryList.get(range)[0], categoryList.get(range)[1], tempFlt )));
+                                sliceParamsList.add(new ArrayList(Arrays.asList(categoryList.get(range)[0], categoryList.get(range)[1], tempFlt)));
                                 break;
                             }
                         }
@@ -200,12 +171,12 @@ public class ChartActivity extends AppCompatActivity {
             }
         }
         //new range choice code
-        String[] defaultPieDBs = new String[]{"thirties","forties","fifties","sixties","seventies","eighties","ninties"};
-        String[] userPieDBs = Arrays.copyOfRange(defaultPieDBs,lowestDB,highestDB-1);
+        String[] defaultPieDBs = new String[]{"thirties", "forties", "fifties", "sixties", "seventies", "eighties", "ninties"};
+        String[] userPieDBs = Arrays.copyOfRange(defaultPieDBs, lowestDB, highestDB - 1);
 
         List pieData = new ArrayList<>();
         for (ArrayList subList : sliceParamsList) {
-            if(Arrays.stream(userPieDBs).anyMatch(subList.get(0)::equals)  ){
+            if (Arrays.stream(userPieDBs).anyMatch(subList.get(0)::equals)) {
                 float dB = (float) subList.get(2);
                 int colour = chartColours.get(subList.get(0).toString());
                 String label = subList.get(1).toString();
@@ -215,7 +186,11 @@ public class ChartActivity extends AppCompatActivity {
 
         PieChartData pieChartData = new PieChartData(pieData);
         pieChartData.setHasLabels(true).setValueLabelTextSize(14);
-        pieChartData.setHasCenterCircle(true).setCenterCircleScale(0.7f).setCenterText1("Your Sound Profile").setCenterText1FontSize(20).setCenterText1Color(Color.parseColor("#0097A7"));
+        pieChartData.setHasCenterCircle(true)
+                .setCenterCircleScale(0.7f)
+                .setCenterText1("Your Sound Profile")
+                .setCenterText1FontSize(20)
+                .setCenterText1Color(Color.parseColor("#0097A7"));
         pieChartView.setPieChartData(pieChartData);
         pieChartView.setOnValueTouchListener(new ValueTouchListener(pieChartData, pieChartView));
     }
@@ -232,18 +207,11 @@ public class ChartActivity extends AppCompatActivity {
         HorizontalScrollView hScrollView = (HorizontalScrollView) findViewById(R.id.barChartScroll);
 
         dailyValues = new TreeMap<>();
-        dayValues = new LinkedHashMap<>();
-//        int changeDateCount = 0;
+        dayValues = new TreeMap<>();
         for (Data data : dataList) {
             Date datapointDate = null;
             try {
                 datapointDate = new SimpleDateFormat("dd-MMM-yyyy").parse(data.date);
-                //to ensure there is a bunch of days in the graph even if all the datapoints
-                //were collected on one day, for demo purposes.
-//                long day = (long) 1000 * 60 * 60 * 24;
-//                datapointDate.setTime(datapointDate.getTime() - (changeDateCount % 14)*day);
-//                data.date = new SimpleDateFormat("dd-MMM-yyyy").format(datapointDate);
-//                changeDateCount++;
             } catch (ParseException e) {
                 e.printStackTrace();
             }
@@ -267,7 +235,7 @@ public class ChartActivity extends AppCompatActivity {
             //check if null in case I forget to enable mic.
             if (data.dB != null) {
                 int dB = (int) Math.round(data.dB);
-                LinkedHashMap<String, Float> tempDayValues = new LinkedHashMap<>();
+                TreeMap<String, Float> tempDayValues = new TreeMap<>();
 
                 if (dailyValues.containsKey(datapointDate)) {
                     tempDayValues = dailyValues.get(datapointDate);
@@ -395,14 +363,103 @@ public class ChartActivity extends AppCompatActivity {
         barChartView.setHorizontalScrollBarEnabled(true);
     }
 
+    ColumnChartOnValueSelectListener barChartValueSelectListener = new ColumnChartOnValueSelectListener(){
+        @Override
+        public void onValueSelected(int columnIndex, int subcolumnIndex, SubcolumnValue value) {
+            //should add code that shows info about the subcolumn selected.
+            String subcolumnLabel = String.valueOf(value.getLabelAsChars());
+            String columnDate = String.valueOf(xAxis.getValues().get(columnIndex).getLabelAsChars());
+            Range subcolumnRange = new Range(0,100);
+            int valuesInRange = 0;
+
+            try {
+                dailyDatapoints = dataListByDate.get(new SimpleDateFormat("dd-MMM-yy").parse(columnDate));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            // if the barchart type is absolute just get the value of the subcolumn selected.
+            if(isAbsolute) {
+                valuesInRange = (int)value.getValue();
+                Toast.makeText(context,
+                        "Decibel range: "
+                                + subcolumnLabel.substring(0,1).toUpperCase() + subcolumnLabel.substring(1)
+                                + "\nNumber of readings: "
+                                + String.valueOf(valuesInRange),Toast.LENGTH_LONG).show();
+            } else if (isRelative){
+                for (Range range : categoryList.keySet()) {
+                    if(categoryList.get(range)[0].equals(subcolumnLabel)){
+                        subcolumnRange = range;
+                        break;
+                    }
+                }
+                for (LocalTime time : dailyDatapoints.keySet()) {
+                    if(subcolumnRange.contains((int) (Math.round(dailyDatapoints.get(time).dB)))){
+                        valuesInRange++;
+                    }
+                }
+                Toast.makeText(context,
+                        "Decibel range: "
+                                + subcolumnLabel.substring(0,1).toUpperCase()
+                                + subcolumnLabel.substring(1)
+                                + "\nNumber of readings: "
+                                + String.valueOf(valuesInRange),Toast.LENGTH_LONG).show();
+            } else if (isTimeline){
+                //loop through this list with a counter. once counter = subcolumn index
+                // that should be the datapoint we want.
+                int countPoints=0;
+                String selectedPointTime="";
+                double pointDB=0;
+                for(LocalTime time :dailyDatapoints.keySet()){
+                    if(countPoints == subcolumnIndex){
+                        selectedPointTime = dailyDatapoints.get(time).time;
+                        pointDB = dailyDatapoints.get(time).dB;
+                    }
+                    countPoints++;
+                }
+                String[] time = selectedPointTime.split(":");
+                String amPm = "am";
+                if(Integer.parseInt(time[0])>=12)
+                    amPm="pm";
+                Toast.makeText(context,
+                        "Decibel: "
+                                + String.valueOf((double)(Math.round(pointDB*100))/100)
+                                + "\n" + "Time taken: "
+                                +time[0] +":" +time[1] + " "
+                                + amPm,Toast.LENGTH_LONG).show();
+            }
+        }
+
+        @Override
+        public void onValueDeselected() {
+        }
+    };
+
     //adding custom touch listener to get bar chart
     // column selected so the long click listener can access
     View.OnTouchListener barChartTouchListener = new View.OnTouchListener() {
         @Override
         public boolean onTouch(View v, MotionEvent event) {
-            longTouchx = event.getX();
-            longTouchy = event.getY();
+            longTouchX = event.getX();
+            longTouchY = event.getY();
             v.performClick();
+            return false;
+        }
+    };
+
+    View.OnLongClickListener pieChartOnLongClickListener = new View.OnLongClickListener() {
+        @Override
+        public boolean onLongClick(View v) {
+            //start dialog stuff
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            Fragment prev = getSupportFragmentManager().findFragmentByTag("pieDialog");
+            if (prev != null) {
+                fragmentTransaction.remove(prev);
+            }
+            fragmentTransaction.addToBackStack(null);
+
+            DialogFragment dialogFragment = new PiechartFragment();
+            dialogFragment.show(fragmentTransaction, "pieDialog");
             return false;
         }
     };
@@ -415,7 +472,7 @@ public class ChartActivity extends AppCompatActivity {
             double lowDB = 100;
             List<Integer> dayMinutes = new ArrayList<>();
             String columnDate;
-            ((ColumnChartView) v).getChartRenderer().checkTouch(longTouchx, longTouchy);
+            ((ColumnChartView) v).getChartRenderer().checkTouch(longTouchX, longTouchY);
             SelectedValue val = ((ColumnChartView) v).getChartRenderer().getSelectedValue();
             if (val.getFirstIndex() >= 0) {
                 columnDate = String.valueOf(xAxis.getValues().get(Integer.parseInt(String.valueOf(val.getFirstIndex()))).getLabelAsChars());
@@ -492,13 +549,23 @@ public class ChartActivity extends AppCompatActivity {
 
         @Override
         public void onValueSelected(int arcIndex, SliceValue value) {
-            pieChartData.setHasCenterCircle(true).setCenterCircleScale(0.7f).setCenterText1("Your exposure to " + String.valueOf(value.getLabelAsChars()) + " was").setCenterText1FontSize(15).setCenterText1Color(Color.parseColor("#0097A7")).setCenterText2(String.valueOf(Math.round(value.getValue())) + "%").setCenterText2FontSize(10).setCenterText2Color(Color.parseColor("#0097A7"));
+            pieChartData.setHasCenterCircle(true)
+                    .setCenterCircleScale(0.7f)
+                    .setCenterText1("Your exposure to " + String.valueOf(value.getLabelAsChars()) + " was")
+                    .setCenterText1FontSize(15)
+                    .setCenterText1Color(Color.parseColor("#0097A7"))
+                    .setCenterText2(String.valueOf(Math.round(value.getValue())) + "%")
+                    .setCenterText2FontSize(10)
+                    .setCenterText2Color(Color.parseColor("#0097A7"));
             pieChartView.setPieChartData(pieChartData);
         }
 
         @Override
         public void onValueDeselected() {
-            pieChartData.setHasCenterCircle(true).setCenterText1("Your Sound Profile").setCenterText1FontSize(20).setCenterText1Color(Color.parseColor("#0097A7"));
+            pieChartData.setHasCenterCircle(true)
+                    .setCenterText1("Your Sound Profile")
+                    .setCenterText1FontSize(20)
+                    .setCenterText1Color(Color.parseColor("#0097A7"));
             pieChartView.setPieChartData(pieChartData);
         }
     }
