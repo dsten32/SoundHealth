@@ -1,5 +1,7 @@
 package com.comp576.soundhealth;
 
+import android.database.Cursor;
+
 import java.util.List;
 
 import androidx.lifecycle.LiveData;
@@ -23,4 +25,6 @@ public interface DataDao {
     List<Data> getDataList();
     @Query("SELECT * from Data where id=(SELECT count(id) from Data)")
     Data getLast();
+    @Query("SELECT * FROM Data")
+    Cursor getCursor();
 }

@@ -11,23 +11,10 @@ import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
-
 import android.text.Html;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Switch;
@@ -35,7 +22,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.navigation.NavigationView;
-import com.google.firebase.messaging.FirebaseMessagingService;
 
 import org.glassfish.jersey.client.ClientConfig;
 import org.json.simple.JSONArray;
@@ -50,6 +36,17 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static android.Manifest.permission.INTERNET;
@@ -80,18 +77,42 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+//        //file stuff test
+//        File exportPath = getApplicationContext().getExternalCacheDir();
+//        File file = new File(exportPath +"/"+ "ANewCSV.csv");
+////        if (!file.exists()) {
+////            Log.d("file block"," hi");
+////            file.mkdir();
+////        }
+//        CsvWriter csvWriter = new CsvWriter();
+//
+//            Log.d("collection block"," hi");
+//        List<String[]> csvData = new ArrayList<>();
+//        csvData.add(new String[]{"header1", "header2"});
+//        csvData.add(new String[]{"value1", "value2"});
+//
+//        try {
+//            Log.d("write block"," hi");
+//            csvWriter.write(file, StandardCharsets.UTF_8, csvData);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        Toast.makeText(getApplicationContext(),String.valueOf(file.exists())+" "+file.toString(),Toast.LENGTH_LONG).show();
+        //end
         repo = new DataRepository(getApplicationContext());
+//        Exporter exporter = new Exporter(repo);
+//        exporter.saveCSV();
         setContentView(R.layout.activity_main);
         introText = (TextView) findViewById(R.id.intro);
         //TODO here's (prbably) why the app crashes without an internet connection. move this datacollection out ouf the on create. duh!
         dataCollectior = new DataCollection(getApplicationContext());
         interval = 30;
         mainButton = (Button) findViewById(R.id.main_btn);
+        //get the last item in the database to populate the main button. if null then make something up.
         data = repo.lastItem();
         if (data == null){
             data = new Data("01-Jan-1900", "01:30", "astring", 53.678361, -1.688494, 31.0,false);
             new AddressAsyncTask().execute(data);
-
         } else {
             new AddressAsyncTask().execute(data);
         }
@@ -149,6 +170,9 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.feedback:
                         showFeedbackDiaolog();
                         break;
+                    case R.id.export:
+                        new Exporter(repo,getApplicationContext()).saveCSV();
+                        break;
                     default:
                         return true;
                 }
@@ -156,6 +180,8 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
+
+
 
         continuousSwitch = (Switch) navigationView.getMenu().findItem(R.id.continuousSwitch).getActionView();
         continuousSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -172,6 +198,8 @@ public class MainActivity extends AppCompatActivity {
         });
         //check that app can access location data and record audio
         checkPermissions();
+//        Cursor cursor = repo.getCursor();
+
     }
 
     //get address from google geolocation api using the datapoint latlng

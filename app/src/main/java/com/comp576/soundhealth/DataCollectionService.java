@@ -6,8 +6,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
-import android.widget.Switch;
-import android.widget.Toast;
 
 import java.util.Calendar;
 

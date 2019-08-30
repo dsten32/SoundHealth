@@ -1,16 +1,9 @@
 package com.comp576.soundhealth;
 
-import android.Manifest;
-import android.content.pm.PackageManager;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.util.Log;
-
-import androidx.core.app.ActivityCompat;
-
-import static android.Manifest.permission.RECORD_AUDIO;
-import static androidx.core.content.ContextCompat.checkSelfPermission;
 
 /*base code for this class used from:
 https://stackoverflow.com/questions/10655703/what-does-androids-getmaxamplitude-function-for-the-mediarecorder-actually-gi

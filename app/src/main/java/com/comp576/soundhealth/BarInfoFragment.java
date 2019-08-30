@@ -1,21 +1,13 @@
 package com.comp576.soundhealth;
 
 import android.os.Bundle;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.RatingBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
-
-import static android.content.Context.INPUT_METHOD_SERVICE;
 
 public class BarInfoFragment extends DialogFragment{
     //    private TextView numPoints,firstPoint,lastPoint,avgMins,highestDB;

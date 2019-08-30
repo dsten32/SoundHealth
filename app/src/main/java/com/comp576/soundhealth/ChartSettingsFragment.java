@@ -9,7 +9,6 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.RadioButton;
 import android.widget.Switch;
-import android.widget.Toast;
 
 import com.appyvet.materialrangebar.RangeBar;
 
@@ -62,6 +61,7 @@ public class ChartSettingsFragment extends DialogFragment implements RangeBar.On
         dismiss();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onRangeChangeListener(RangeBar rangeBar, int leftPinIndex, int rightPinIndex, String leftPinValue, String rightPinValue) {
         ((ChartActivity) getActivity()).lowestDB = leftPinIndex;

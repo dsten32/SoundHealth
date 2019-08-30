@@ -2,25 +2,17 @@ package com.comp576.soundhealth;
 
 import android.os.Build;
 import android.os.Bundle;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.EditText;
-import android.widget.RatingBar;
 import android.widget.Switch;
-import android.widget.Toast;
 
 import com.appyvet.materialrangebar.RangeBar;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.DialogFragment;
-
-import static android.content.Context.INPUT_METHOD_SERVICE;
 
 public class PiechartFragment extends DialogFragment implements RangeBar.OnRangeBarChangeListener, View.OnClickListener, Switch.OnCheckedChangeListener {
     @Override

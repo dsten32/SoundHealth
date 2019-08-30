@@ -1,13 +1,10 @@
 package com.comp576.soundhealth;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.os.AsyncTask;
-import android.widget.Toast;
+import android.util.Log;
 
-import com.google.android.gms.common.internal.safeparcel.SafeParcelable;
-
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -89,9 +86,6 @@ public class DataRepository {
         }
     }
 
-    public LiveData<List<Data>> getAllData() {
-        return allData;
-    }
 
     public Data lastItem() {
         ExecutorService executorService = Executors.newFixedThreadPool(10);
@@ -107,5 +101,22 @@ public class DataRepository {
             e.printStackTrace();
         }
         return data;
+    }
+
+    public Cursor getCursor(){
+        Log.d("cursor","getting..");
+        ExecutorService executorService = Executors.newFixedThreadPool(10);
+        Callable<Cursor> insertCallable = () -> dataDao.getCursor();
+        Cursor cursor = null;
+
+        Future<Cursor> future = executorService.submit(insertCallable);
+        try {
+            cursor = future.get();
+        } catch (InterruptedException e1) {
+            e1.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        return cursor;
     }
 }

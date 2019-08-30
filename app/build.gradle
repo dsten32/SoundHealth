@@ -73,5 +73,7 @@ dependencies {
     //range bar for setting dB range on pie chart
     implementation 'com.appyvet:materialrangebar:1.4.6'
     implementation 'com.hlab.fabrevealmenu:fab-reveal-menu:1.0.4'
+    //csv library
+    implementation 'de.siegmar:fastcsv:1.0.3'
 }
 apply plugin: 'com.google.gms.google-services'
