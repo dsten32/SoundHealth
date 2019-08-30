@@ -1,10 +1,13 @@
 package com.comp576.soundhealth;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.type.Date;
 
@@ -35,7 +38,7 @@ public class Exporter extends AppCompatActivity {
         super.onCreate(savedInstanceState, persistentState);
     }
 
-    public void saveCSV(){
+    public String saveCSV(){
 //        DataRepository dataRepository = new DataRepository(getApplicationContext());
         Cursor cursor = repo.getCursor();
         List<String[]> csvData = new ArrayList<>();
@@ -54,6 +57,7 @@ public class Exporter extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+        Toast.makeText(context,"File Saved to: "+file.toString(),Toast.LENGTH_LONG).show();
+        return file.toString();
     }
 }

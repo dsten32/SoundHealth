@@ -8,6 +8,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -29,8 +30,11 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -171,7 +175,21 @@ public class MainActivity extends AppCompatActivity {
                         showFeedbackDiaolog();
                         break;
                     case R.id.export:
-                        new Exporter(repo,getApplicationContext()).saveCSV();
+                        String file = new Exporter(repo,getApplicationContext()).saveCSV();
+// trying to set up sharing for email/drive
+//                        Intent intentShareFile = new Intent(Intent.ACTION_SEND);
+//                        File fileWithinMyDir = new File(file);
+//
+//                        if(fileWithinMyDir.exists()) {
+//                            intentShareFile.setType("application/text");
+//                            intentShareFile.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://"+file));
+//
+//                            intentShareFile.putExtra(Intent.EXTRA_SUBJECT,
+//                                    "Sharing File...");
+//                            intentShareFile.putExtra(Intent.EXTRA_TEXT, "Sharing File...");
+//
+//                            startActivity(Intent.createChooser(intentShareFile, "Share File"));
+//                        }
                         break;
                     default:
                         return true;
