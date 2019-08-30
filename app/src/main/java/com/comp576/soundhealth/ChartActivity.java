@@ -415,6 +415,8 @@ public class ChartActivity extends AppCompatActivity {
                     if(countPoints == subcolumnIndex){
                         selectedPointTime = dailyDatapoints.get(time).time;
                         pointDB = dailyDatapoints.get(time).dB;
+                        MainActivity mainActivity = (MainActivity) getParent();
+
                     }
                     countPoints++;
                 }

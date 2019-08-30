@@ -122,7 +122,7 @@ public class DataCollection extends Activity {
     public class AddressAsyncTask extends AsyncTask<Data, Void, String> {
 
         @Override
-        protected String doInBackground(Data... data) {
+        public String doInBackground(Data... data) {
             double lat = data[0].lat;
             double lng = data[0].lng;
             String address = null;

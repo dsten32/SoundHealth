@@ -51,20 +51,20 @@
             android:label="@string/title_activity_chart">
         </activity>
 
-        <activity
-            android:name=".TakeDataPointActivity"
-            android:label="voiceActivity" >
-            <intent-filter>
-                <action android:name="android.media.action.IMAGE_CAPTURE" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.VOICE" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.media.action.STILL_IMAGE_CAMERA" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.VOICE" />
-            </intent-filter>
-        </activity>
+        <!--<activity-->
+            <!--android:name=".TakeDataPointActivity"-->
+            <!--android:label="voiceActivity" >-->
+            <!--<intent-filter>-->
+                <!--<action android:name="android.media.action.IMAGE_CAPTURE" />-->
+                <!--<category android:name="android.intent.category.DEFAULT" />-->
+                <!--<category android:name="android.intent.category.VOICE" />-->
+            <!--</intent-filter>-->
+            <!--<intent-filter>-->
+                <!--<action android:name="android.media.action.STILL_IMAGE_CAMERA" />-->
+                <!--<category android:name="android.intent.category.DEFAULT" />-->
+                <!--<category android:name="android.intent.category.VOICE" />-->
+            <!--</intent-filter>-->
+        <!--</activity>-->
 
         <receiver
             android:name=".AlarmReceiver"
@@ -75,13 +75,6 @@
             android:name=".DataCollectionService"
             android:exported="false" />
 
-        <service
-            android:name=".MyFirebaseMessagingService"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT" />
-            </intent-filter>
-        </service>
     </application>
 
 
