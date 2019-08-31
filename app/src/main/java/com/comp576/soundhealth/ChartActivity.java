@@ -1,5 +1,6 @@
 package com.comp576.soundhealth;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.AsyncTask;
@@ -62,6 +63,7 @@ public class ChartActivity extends AppCompatActivity {
     public static String[] barInfoArray;
     public int lowestDB = 0, highestDB = 7;
     public boolean isRelative, isAbsolute = true, isTimeline, isColourBlind;
+    public Activity thisActivity = this;
 
     public void onCreate(Bundle savedInstanceState) {
         this.context = getApplicationContext();
@@ -411,25 +413,28 @@ public class ChartActivity extends AppCompatActivity {
                 int countPoints=0;
                 String selectedPointTime="";
                 double pointDB=0;
+                Data timeDatapoint=null;
                 for(LocalTime time :dailyDatapoints.keySet()){
                     if(countPoints == subcolumnIndex){
+                        timeDatapoint = dailyDatapoints.get(time);
                         selectedPointTime = dailyDatapoints.get(time).time;
                         pointDB = dailyDatapoints.get(time).dB;
-                        MainActivity mainActivity = (MainActivity) getParent();
-
+                        break;
                     }
                     countPoints++;
                 }
-                String[] time = selectedPointTime.split(":");
-                String amPm = "am";
-                if(Integer.parseInt(time[0])>=12)
-                    amPm="pm";
-                Toast.makeText(context,
-                        "Decibel: "
-                                + String.valueOf((double)(Math.round(pointDB*100))/100)
-                                + "\n" + "Time taken: "
-                                +time[0] +":" +time[1] + " "
-                                + amPm,Toast.LENGTH_LONG).show();
+                new AddressAsyncTask(thisActivity,timeDatapoint).execute(timeDatapoint);
+//                String[] time = selectedPointTime.split(":");
+//                String amPm = "am";
+//                if(Integer.parseInt(time[0])>=12)
+//                    amPm="pm";
+//                Toast.makeText(context,
+//                        "Decibel: "
+//                                + String.valueOf((double)(Math.round(pointDB*100))/100)
+//                                + "\n" + "Time taken: "
+//                                +time[0] +":" +time[1] + " "
+//                                + amPm
+//                                ,Toast.LENGTH_LONG).show();
             }
         }
 
