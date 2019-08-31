@@ -75,5 +75,8 @@ dependencies {
     implementation 'com.hlab.fabrevealmenu:fab-reveal-menu:1.0.4'
     //csv library
     implementation 'de.siegmar:fastcsv:1.0.3'
+
+    implementation 'com.android.support:support-compat:28.0.0-alpha1'
+    implementation 'com.android.support:support-v4:28.0.0'
 }
 apply plugin: 'com.google.gms.google-services'

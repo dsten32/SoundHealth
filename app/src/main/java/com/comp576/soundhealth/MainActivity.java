@@ -47,6 +47,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.FileProvider;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
@@ -81,28 +82,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        //file stuff test
-//        File exportPath = getApplicationContext().getExternalCacheDir();
-//        File file = new File(exportPath +"/"+ "ANewCSV.csv");
-////        if (!file.exists()) {
-////            Log.d("file block"," hi");
-////            file.mkdir();
-////        }
-//        CsvWriter csvWriter = new CsvWriter();
-//
-//            Log.d("collection block"," hi");
-//        List<String[]> csvData = new ArrayList<>();
-//        csvData.add(new String[]{"header1", "header2"});
-//        csvData.add(new String[]{"value1", "value2"});
-//
-//        try {
-//            Log.d("write block"," hi");
-//            csvWriter.write(file, StandardCharsets.UTF_8, csvData);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        Toast.makeText(getApplicationContext(),String.valueOf(file.exists())+" "+file.toString(),Toast.LENGTH_LONG).show();
-        //end
         repo = new DataRepository(getApplicationContext());
 //        Exporter exporter = new Exporter(repo);
 //        exporter.saveCSV();
@@ -176,20 +155,19 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case R.id.export:
                         String file = new Exporter(repo,getApplicationContext()).saveCSV();
-// trying to set up sharing for email/drive
-//                        Intent intentShareFile = new Intent(Intent.ACTION_SEND);
-//                        File fileWithinMyDir = new File(file);
-//
-//                        if(fileWithinMyDir.exists()) {
-//                            intentShareFile.setType("application/text");
-//                            intentShareFile.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://"+file));
-//
-//                            intentShareFile.putExtra(Intent.EXTRA_SUBJECT,
-//                                    "Sharing File...");
-//                            intentShareFile.putExtra(Intent.EXTRA_TEXT, "Sharing File...");
-//
-//                            startActivity(Intent.createChooser(intentShareFile, "Share File"));
-//                        }
+                        Intent sendIntent = new Intent();
+
+                        Uri apkURI = FileProvider.getUriForFile(
+                                getApplicationContext(),
+                                getApplicationContext()
+                                        .getPackageName() + ".provider", new File(file));
+                        sendIntent.setDataAndType(apkURI, "text/plain");
+                        sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+                        sendIntent.setAction(Intent.ACTION_SEND);
+                        sendIntent.putExtra(Intent.EXTRA_EMAIL, "a thing string");
+                        sendIntent.putExtra(Intent.EXTRA_STREAM, apkURI);
+                        startActivity(sendIntent);
                         break;
                     default:
                         return true;
@@ -273,11 +251,6 @@ public class MainActivity extends AppCompatActivity {
     private void checkPermissions() {
         if (checkSelfPermission(RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED || checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED  || checkSelfPermission(Manifest.permission.INTERNET)!= PackageManager.PERMISSION_GRANTED ) {
             ActivityCompat.requestPermissions(this, new String[]{RECORD_AUDIO, ACCESS_FINE_LOCATION,INTERNET}, 0);
-            //    Activity#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for Activity#requestPermissions for more details.
             return;
         }
     }
