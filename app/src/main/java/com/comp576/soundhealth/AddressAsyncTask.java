@@ -2,6 +2,8 @@ package com.comp576.soundhealth;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.text.Html;
 import android.widget.Toast;
@@ -24,24 +26,35 @@ import javax.ws.rs.core.MediaType;
 
 //get address from google geolocation api using the datapoint latlng
 public class AddressAsyncTask extends AsyncTask<Data, Void, String> {
-    Data data;
-    Activity activity;
+    private Data data;
+    private Activity activity;
+    private boolean updateButtonText;
+    private boolean isInternet;
 
-    public AddressAsyncTask(Activity activity,Data data) {
+    public AddressAsyncTask(Activity activity, Data data) {
         this.data = data;
         this.activity = activity;
     }
 
     @Override
     public String doInBackground(Data... data) {
+        NetworkInfo activeNetwork = ((ConnectivityManager) activity.getApplication().getApplicationContext()
+                .getSystemService(Context.CONNECTIVITY_SERVICE))
+                .getActiveNetworkInfo();
+        isInternet = activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
+
+        if (!isInternet) {
+            return "No internet connection found";
+        }
         double lat = data[0].lat;
         double lng = data[0].lng;
         String address = null;
         try {
             //one connection method
-            ClientConfig config=new ClientConfig();
+            ClientConfig config = new ClientConfig();
             Client client = ClientBuilder.newClient(config);
-            URI apiURI = new URI("https://maps.googleapis.com/maps/api/geocode/json?latlng="+lat+","+lng+"&key=AIzaSyC8avA0VDGZmk6m1sAI7feb1HCEBDK41BY");
+            URI apiURI = new URI("https://maps.googleapis.com/maps/api/geocode/json?latlng=" + lat + "," + lng + "&key=AIzaSyC8avA0VDGZmk6m1sAI7feb1HCEBDK41BY");
             WebTarget target = client.target(apiURI);
             String jsonResponse = target.request().accept(MediaType.APPLICATION_JSON).get(String.class);
             JSONParser parser = new JSONParser();
@@ -59,27 +72,36 @@ public class AddressAsyncTask extends AsyncTask<Data, Void, String> {
     @SuppressLint("SetTextI18n")
     @Override
     protected void onPostExecute(String address) {
-
         String addressString = address;
-//        String htmlButtonText = "<br><h5>Most recent noise data</h5>"
-//                + "<b>Date: </b><em>" + data.date + "</em>"
-//                + "<br><b>Time: </b><em>" + data.time + "</em>"
-//                + "<br><b>location Blurred: </b><em>" + String.valueOf(data.isBlurred) + "</em>"
-//                + "<br><b>Location: </b><em>" + addressString.replace(",","<br>") + "</em>"
-//                + "<br><b>dB: </b><em>" + String.valueOf((Math.round(data.dB))) + "</em>";
-//        MainActivity.mainButton.setText(Html.fromHtml(htmlButtonText));
+        if (isInternet) {
+            if (updateButtonText) {
+                String htmlButtonText = "<br><h5>Most recent noise data</h5>"
+                        + "<b>Date: </b><em>" + data.date + "</em>"
+                        + "<br><b>Time: </b><em>" + data.time + "</em>"
+                        + "<br><b>location Blurred: </b><em>" + String.valueOf(data.isBlurred) + "</em>"
+                        + "<br><b>Location: </b><em>" + addressString.replace(",", "<br>") + "</em>"
+                        + "<br><b>dB: </b><em>" + String.valueOf((Math.round(data.dB))) + "</em>";
+                MainActivity.mainButton.setText(Html.fromHtml(htmlButtonText));
+            } else {
+                String[] time = data.time.split(":");
+                String amPm = "am";
+                if (Integer.parseInt(time[0]) >= 12)
+                    amPm = "pm";
+                Toast.makeText(activity.getApplicationContext(),
+                        "Decibel: "
+                                + String.valueOf((double) (Math.round(data.dB * 100)) / 100)
+                                + "\n" + "Time taken: "
+                                + time[0] + ":" + time[1] + " "
+                                + amPm
+                                + "\n" + addressString.replace(", ", "\n")
+                        , Toast.LENGTH_LONG).show();
+            }
+        } else {
+            MainActivity.mainButton.setText(address);
+        }
+    }
 
-        String[] time = data.time.split(":");
-        String amPm = "am";
-        if(Integer.parseInt(time[0])>=12)
-            amPm="pm";
-        Toast.makeText(activity.getApplicationContext(),
-                "Decibel: "
-                        + String.valueOf((double)(Math.round(data.dB*100))/100)
-                        + "\n" + "Time taken: "
-                        +time[0] +":" +time[1] + " "
-                        + amPm
-                        + "\n" + addressString.replace(",","\n")
-                ,Toast.LENGTH_LONG).show();
+    public void setUpdateButtonText(boolean updateButtonText) {
+        this.updateButtonText = updateButtonText;
     }
 }

@@ -4,6 +4,8 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.location.Location;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.text.Html;
@@ -65,12 +67,9 @@ public class DataCollection extends Activity {
         data=null;
     }
 
-    //data collection method move to own class?
-    @SuppressLint("MissingPermission") //add an exception try/catch to the getLastLocation?
+    @SuppressLint("MissingPermission")
     public void getDataPoint(){
-        //see if we can generate some data shall we?
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context);
-
         fusedLocationProviderClient.getLastLocation()
                 .addOnSuccessListener(this, new OnSuccessListener<Location>() {
                     @SuppressLint("SetTextI18n")
@@ -106,12 +105,9 @@ public class DataCollection extends Activity {
                                 sendData(data);
                                 new AddressAsyncTask().execute(data);
                                 Toast.makeText(context, "Datapoint saved: "+(double)Math.round(data.dB*100)/100, Toast.LENGTH_SHORT).show();
-//                            Toast.makeText(context,lastData.toString(),Toast.LENGTH_LONG).show();
                             } else {
                                 Toast.makeText(context, "Datapoint not collected, turn the mic on!", Toast.LENGTH_LONG).show();
                             }
-
-
                         }
                     }
                 });
@@ -120,14 +116,23 @@ public class DataCollection extends Activity {
 
     //get address from google geolocation api using the datapoint latlng
     public class AddressAsyncTask extends AsyncTask<Data, Void, String> {
+        boolean isInternet=false;
 
         @Override
         public String doInBackground(Data... data) {
+            NetworkInfo activeNetwork =((ConnectivityManager)context
+                    .getSystemService(Context.CONNECTIVITY_SERVICE))
+                    .getActiveNetworkInfo();
+            isInternet = activeNetwork != null &&
+                    activeNetwork.isConnectedOrConnecting();
+
+            if (!isInternet) {
+                return "No internet connection found";
+            }
             double lat = data[0].lat;
             double lng = data[0].lng;
             String address = null;
             try {
-                //one connection method
                 ClientConfig config=new ClientConfig();
                 Client client = ClientBuilder.newClient(config);
                 URI apiURI = new URI("https://maps.googleapis.com/maps/api/geocode/json?latlng="+lat+","+lng+"&key=AIzaSyC8avA0VDGZmk6m1sAI7feb1HCEBDK41BY");
@@ -148,14 +153,18 @@ public class DataCollection extends Activity {
         @SuppressLint("SetTextI18n")
         @Override
         protected void onPostExecute(String address) {
+            if(isInternet) {
             addressString = address;
             String htmlButtonText = "<br><h5>Most recent noise data</h5>"
                     + "<b>Date: </b><em>" + data.date + "</em>"
                     + "<br><b>Time: </b><em>" + data.time + "</em>"
                     + "<br><b>location Blurred: </b><em>" + String.valueOf(data.isBlurred) + "</em>"
-                    + "<br><b>Location: </b><em>" + addressString.replace(",","<br>") + "</em>"
+                    + "<br><b>Location: </b><em>" + addressString.replace(",", "<br>") + "</em>"
                     + "<br><b>dB: </b><em>" + String.valueOf((Math.round(data.dB))) + "</em>";
             MainActivity.mainButton.setText(Html.fromHtml(htmlButtonText));
+        } else {
+                MainActivity.mainButton.setText(address);
+            }
         }
     }
 

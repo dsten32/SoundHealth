@@ -34,8 +34,8 @@ public class PiechartFragment extends DialogFragment implements RangeBar.OnRange
         Switch colourBlindSwitch = view.findViewById(R.id.cBlind);
         colourBlindSwitch.setOnCheckedChangeListener(this);
         colourBlindSwitch.setChecked(chartActivity.isColourBlind);
-        //feedbackText = view.findViewById(R.id.feedback_text);
-        //feedbackText.setOnKeyListener(this::onKey);
+        //shareMessage = view.findViewById(R.id.feedback_text);
+        //shareMessage.setOnKeyListener(this::onKey);
 
 //        Button submit = view.findViewById(R.id.feedback_submit);
 //        submit.setOnClickListener(this::onClick);

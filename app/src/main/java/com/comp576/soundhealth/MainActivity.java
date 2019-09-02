@@ -8,6 +8,8 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -31,10 +33,12 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -61,7 +65,6 @@ public class MainActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
     private NavigationView navigationView;
-    private TextView introText;
     private static int MINUTE = 60;
     private int interval;
     private DialogFragment dialogFragment;
@@ -69,41 +72,56 @@ public class MainActivity extends AppCompatActivity {
     private DialogFragment timePicker = new DataCollectionSettingsFragment.TimePickerFragment();
     private DataRepository repo;
     private Data data;
-    private DataCollection dataCollectior;
+    private Context context;
+    private DataCollection dataCollector;
     public static Switch continuousSwitch;
     public static boolean isBlurred, isStopTime, isCollecting;
     public static float blurValue,feedbackRating;
-    public static String feedbackText;
     public static int stopHour = 24, stopMin=60;
     public static Button mainButton;
+    //export and share variables
+    public static String shareMessage="";
+    private Exporter exporter;
+    public File file;
 
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        repo = new DataRepository(getApplicationContext());
+        context = getApplicationContext();
+        repo = new DataRepository(context);
+
 //        Exporter exporter = new Exporter(repo);
 //        exporter.saveCSV();
         setContentView(R.layout.activity_main);
-        introText = (TextView) findViewById(R.id.intro);
-        //TODO here's (prbably) why the app crashes without an internet connection. move this datacollection out ouf the on create. duh!
-        dataCollectior = new DataCollection(getApplicationContext());
+        //TODO here's (prbably) why the app crashes without an internet connection. move this
+        // datacollection out ouf the on create. duh!
+
         interval = 30;
         mainButton = (Button) findViewById(R.id.main_btn);
         //get the last item in the database to populate the main button. if null then make something up.
         data = repo.lastItem();
         if (data == null){
             data = new Data("01-Jan-1900", "01:30", "astring", 53.678361, -1.688494, 31.0,false);
+        }
+
+        //attempting to error handle no internet connection
+        NetworkInfo activeNetwork =((ConnectivityManager)context
+                .getSystemService(Context.CONNECTIVITY_SERVICE))
+                .getActiveNetworkInfo();
+        if(activeNetwork != null &&
+                    activeNetwork.isConnectedOrConnecting()) {
             new AddressAsyncTask().execute(data);
         } else {
-            new AddressAsyncTask().execute(data);
+            mainButton.setText("No internet connection found");
         }
 
         mainButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Toast.makeText(getApplicationContext(), "Collecting", Toast.LENGTH_SHORT).show();
-                dataCollectior.getDataPoint();
+                Toast.makeText(context, "Collecting", Toast.LENGTH_SHORT).show();
+                dataCollector = new DataCollection(context);
+                dataCollector.getDataPoint();
             }
         });
 
@@ -115,25 +133,22 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         navigationView = (NavigationView) findViewById(R.id.nav);
-
-
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @TargetApi(Build.VERSION_CODES.O)
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 int id = menuItem.getItemId();
-
                 switch (id) {
                     case R.id.chart:
-                        Intent goToChart = new Intent(getApplicationContext(), ChartActivity.class);
+                        Intent goToChart = new Intent(context, ChartActivity.class);
                         startActivity(goToChart);
                         break;
                     case R.id.settings:
                         showSettingsDialog();
                         break;
                     case R.id.mapview:
-                        Intent goToMap = new Intent(getApplicationContext(), MapsActivity.class);
+                        Intent goToMap = new Intent(context, MapsActivity.class);
                         startActivity(goToMap);
                         break;
                     case R.id.continuousSwitch:
@@ -148,26 +163,10 @@ public class MainActivity extends AppCompatActivity {
                             return true;
                         }
                     case R.id.fakedata:
-                        DataCollection dataCollection = new DataCollection(getApplicationContext());
+                        DataCollection dataCollection = new DataCollection(context);
                         dataCollection.sendDataCollection();
-                    case R.id.feedback:
-                        showFeedbackDiaolog();
-                        break;
                     case R.id.export:
-                        String file = new Exporter(repo,getApplicationContext()).saveCSV();
-                        Intent sendIntent = new Intent();
-
-                        Uri apkURI = FileProvider.getUriForFile(
-                                getApplicationContext(),
-                                getApplicationContext()
-                                        .getPackageName() + ".provider", new File(file));
-                        sendIntent.setDataAndType(apkURI, "text/plain");
-                        sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-                        sendIntent.setAction(Intent.ACTION_SEND);
-                        sendIntent.putExtra(Intent.EXTRA_EMAIL, "a thing string");
-                        sendIntent.putExtra(Intent.EXTRA_STREAM, apkURI);
-                        startActivity(sendIntent);
+                        exportCSV();
                         break;
                     default:
                         return true;
@@ -200,9 +199,19 @@ public class MainActivity extends AppCompatActivity {
 
     //get address from google geolocation api using the datapoint latlng
     public class AddressAsyncTask extends AsyncTask<Data, Void, String> {
+        boolean isInternet=false;
 
         @Override
         public String doInBackground(Data... data) {
+            NetworkInfo activeNetwork =((ConnectivityManager)context
+                    .getSystemService(Context.CONNECTIVITY_SERVICE))
+                    .getActiveNetworkInfo();
+            isInternet = activeNetwork != null &&
+                    activeNetwork.isConnectedOrConnecting();
+
+            if (!isInternet) {
+                return "No internet connection found";
+            }
             double lat = data[0].lat;
             double lng = data[0].lng;
             String address = null;
@@ -210,7 +219,9 @@ public class MainActivity extends AppCompatActivity {
                 //one connection method
                 ClientConfig config=new ClientConfig();
                 Client client = ClientBuilder.newClient(config);
-                URI apiURI = new URI("https://maps.googleapis.com/maps/api/geocode/json?latlng="+lat+","+lng+"&key=AIzaSyC8avA0VDGZmk6m1sAI7feb1HCEBDK41BY");
+                URI apiURI = new URI("https://maps.googleapis.com/maps/api/geocode/json?latlng="
+                        +lat+","+lng
+                        +"&key=AIzaSyC8avA0VDGZmk6m1sAI7feb1HCEBDK41BY"); //should really have this secured
                 WebTarget target = client.target(apiURI);
                 String jsonResponse = target.request().accept(MediaType.APPLICATION_JSON).get(String.class);
                 JSONParser parser = new JSONParser();
@@ -228,15 +239,18 @@ public class MainActivity extends AppCompatActivity {
         @SuppressLint("SetTextI18n")
         @Override
         protected void onPostExecute(String address) {
-            addressString = address;
-            String htmlButtonText = "<br><h5>Most recent noise data</h5>"
-                    + "<b>Date: </b><em>" + data.date + "</em>"
-                    + "<br><b>Time: </b><em>" + data.time + "</em>"
-                    + "<br><b>location Blurred: </b><<em>" + String.valueOf(data.isBlurred) + "</em>"
-                    + "<br><b>Location: </b><em>" + addressString.replace(",","<br>") + "</em>"
-                    + "<br><b>dB: </b><em>" + String.valueOf((Math.round(data.dB))) + "</em>"
-                    ;
-            mainButton.setText(Html.fromHtml(htmlButtonText));
+            if(isInternet) {
+                addressString = address;
+                String htmlButtonText = "<br><h5>Most recent noise data</h5>"
+                        + "<b>Date: </b><em>" + data.date + "</em>"
+                        + "<br><b>Time: </b><em>" + data.time + "</em>"
+                        + "<br><b>location Blurred: </b><<em>" + String.valueOf(data.isBlurred) + "</em>"
+                        + "<br><b>Location: </b><em>" + addressString.replace(",", "<br>") + "</em>"
+                        + "<br><b>dB: </b><em>" + String.valueOf((Math.round(data.dB))) + "</em>";
+                mainButton.setText(Html.fromHtml(htmlButtonText));
+            }else {
+                mainButton.setText(address);
+            }
         }
     }
 
@@ -255,13 +269,38 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void exportCSV(){
+        exporter = new Exporter(repo,context);
+        file = exporter.saveCSV();
+        List<String[]> csvData = exporter.getCSV();
+
+        for(int row=0;row<7;row++){
+            shareMessage += Arrays.toString(csvData.get(row)) +"\n";
+        }
+        showShareDialog();
+    }
+
+    public void shareCSV(){
+        Intent sendIntent = new Intent();
+        Uri apkURI = FileProvider.getUriForFile(
+                context,
+                context
+                        .getPackageName() + ".provider", file);
+        sendIntent.setType("text/plain");
+        sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_STREAM, apkURI);
+        sendIntent.putExtra(Intent.EXTRA_SUBJECT,"SoundHealth Data");
+        startActivity(sendIntent);
+    }
+
     // Setup a recurring alarm for user settable (eventually) number of minutes
     //from https://github.com/codepath/android_guides/wiki/Starting-Background-Services#using-with-alarmmanager-for-periodic-tasks
     public void scheduleDataCollection() {
         isCollecting = true;
         Toast.makeText(this, "data collection started", Toast.LENGTH_SHORT).show();
         // Construct an intent that will execute the AlarmReceiver
-        Intent intent = new Intent(getApplicationContext(), AlarmReceiver.class);
+        Intent intent = new Intent(context, AlarmReceiver.class);
         // Create a PendingIntent to be triggered when the alarm goes off
         final PendingIntent pIntent = PendingIntent.getBroadcast(this, AlarmReceiver.REQUEST_CODE,
                 intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -278,15 +317,14 @@ public class MainActivity extends AppCompatActivity {
     public void cancelDataCollection() {
         isCollecting = false;
         Toast.makeText(this, "data collection stopped", Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(getApplicationContext(), AlarmReceiver.class);
+        Intent intent = new Intent(context, AlarmReceiver.class);
         final PendingIntent pIntent = PendingIntent.getBroadcast(this, AlarmReceiver.REQUEST_CODE,
                 intent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
         alarm.cancel(pIntent);
-
     }
 
-    //show the data collection settings dialog fragment
+    //show dialogs
     public void showSettingsDialog() {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         Fragment prev = getSupportFragmentManager().findFragmentByTag("dataDialog");
@@ -299,29 +337,27 @@ public class MainActivity extends AppCompatActivity {
         dialogFragment.show(fragmentTransaction, "dataDialog");
     }
 
-    public void showFeedbackDiaolog() {
+    public void showShareDialog() {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        Fragment prev = getSupportFragmentManager().findFragmentByTag("feedbackDialog");
+        Fragment prev = getSupportFragmentManager().findFragmentByTag("shareDialog");
         if (prev != null) {
             fragmentTransaction.remove(prev);
         }
         fragmentTransaction.addToBackStack(null);
 
         dialogFragment = new FeedbackFragment();
-        dialogFragment.show(fragmentTransaction, "feedbackDialog");
-//        FeedbackFragment.newInstance().show(getSupportFragmentManager(), "feedbackDialog");;
+        dialogFragment.show(fragmentTransaction, "shareDialog");
+//        FeedbackFragment.newInstance().show(getSupportFragmentManager(), "shareDialog");;
     }
-
-    public void showPickerDialog(View view) {
-        timePicker.show(getSupportFragmentManager(), "dataStopTimePicker");
-    }
-
     //dismiss the settings dialog fragment
     public void dismissSettings(View view) {
         dialogFragment.dismiss();
     }
 
-    //setters
+    //pickers & setters
+    public void showPickerDialog(View view) {
+        timePicker.show(getSupportFragmentManager(), "dataStopTimePicker");
+    }
 
     public void setStopHour(int stopHour) {
         this.stopHour = stopHour;

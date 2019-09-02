@@ -22,7 +22,7 @@
     <string name="data_collection_stop_time">Set Stop Time</string>
     <string name="blur">Blur my location</string>
     <string name="loading_data">Loading Data</string>
-    <string name="submit">Submit</string>
+    <string name="submit">Share</string>
     <string name="number_of_datapoints">Number of datapoints:</string>
     <string name="first_datapoint">First datapoint recorded at:</string>
     <string name="last_datapoint">Last datapoint recorded at:</string>
