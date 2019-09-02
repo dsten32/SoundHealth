@@ -21,7 +21,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Switch;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.navigation.NavigationView;
@@ -33,8 +32,6 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
@@ -92,11 +89,7 @@ public class MainActivity extends AppCompatActivity {
         context = getApplicationContext();
         repo = new DataRepository(context);
 
-//        Exporter exporter = new Exporter(repo);
-//        exporter.saveCSV();
         setContentView(R.layout.activity_main);
-        //TODO here's (prbably) why the app crashes without an internet connection. move this
-        // datacollection out ouf the on create. duh!
 
         interval = 30;
         mainButton = (Button) findViewById(R.id.main_btn);
