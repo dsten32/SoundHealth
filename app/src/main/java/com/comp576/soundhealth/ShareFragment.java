@@ -20,7 +20,7 @@ import androidx.fragment.app.DialogFragment;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
 
-public class FeedbackFragment extends DialogFragment implements View.OnKeyListener, View.OnClickListener {
+public class ShareFragment extends DialogFragment implements View.OnKeyListener, View.OnClickListener {
     private MainActivity mainActivity;
     private EditText messageText;
     private TextView path;

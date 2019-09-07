@@ -338,9 +338,9 @@ public class MainActivity extends AppCompatActivity {
         }
         fragmentTransaction.addToBackStack(null);
 
-        dialogFragment = new FeedbackFragment();
+        dialogFragment = new ShareFragment();
         dialogFragment.show(fragmentTransaction, "shareDialog");
-//        FeedbackFragment.newInstance().show(getSupportFragmentManager(), "shareDialog");;
+//        ShareFragment.newInstance().show(getSupportFragmentManager(), "shareDialog");;
     }
     //dismiss the settings dialog fragment
     public void dismissSettings(View view) {
