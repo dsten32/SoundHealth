@@ -41,7 +41,10 @@ import lecho.lib.hellocharts.model.SubcolumnValue;
 import lecho.lib.hellocharts.view.ColumnChartView;
 import lecho.lib.hellocharts.view.PieChartView;
 
-
+/**
+Charting screen activity takes the user's data and visualises it in different ways.
+Generates user interactive pie and bar charts.
+ */
 public class ChartActivity extends AppCompatActivity {
     private Context context;
     HashMap<String, Integer> chartColours;
@@ -65,6 +68,9 @@ public class ChartActivity extends AppCompatActivity {
     public boolean isRelative, isAbsolute = true, isTimeline, isColourBlind;
     public Activity thisActivity = this;
 
+    /**
+    set up actionbar and views, attach listeners and fetch user data
+     */
     public void onCreate(Bundle savedInstanceState) {
         this.context = getApplicationContext();
         super.onCreate(savedInstanceState);
@@ -88,7 +94,10 @@ public class ChartActivity extends AppCompatActivity {
 
         new UserDataAsyncTask().execute();
     }
-
+/**
+Generates a hashmap for categorising data. Data falling in the range key of the hashmap with have
+the labels in the string array applied
+ */
     private void setChartOptions() {
         //set up map that can get labels for db ranges
         categoryList = new HashMap<Range<Integer>, String[]>();
@@ -100,7 +109,9 @@ public class ChartActivity extends AppCompatActivity {
         categoryList.put(Range.create(80, 89), new String[]{"eighties", "80-89dB"});
         categoryList.put(Range.create(90, 99), new String[]{"nineties", "90-9dB"});
     }
-
+/**
+Generates the colour palette for normal and grayscale views.
+ */
     public void setChartColours() {
         //set up chart colours
         chartColours = new HashMap<>();
@@ -122,7 +133,9 @@ public class ChartActivity extends AppCompatActivity {
             chartColours.put("ninties", Color.RED);
         }
     }
-
+/**
+Fetches user data from the local Room library
+ */
     private class UserDataAsyncTask extends AsyncTask<Void, Void, Void> {
 
         @Override
@@ -142,7 +155,11 @@ public class ChartActivity extends AppCompatActivity {
         }
     }
 
-    //method to setup the piechart and manage re-building on user changing dB range for display
+    /**
+     * method to setup the piechart and manage re-building on user changing dB range for display.
+    counts number of user datapoint falling into each category and turns the results into
+    percentages for the pie chart. filters the data based on user chosen db range via settings.
+     */
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void pieChartAddData() {
         //get total number of user datapoints so a percentage value
@@ -173,7 +190,7 @@ public class ChartActivity extends AppCompatActivity {
                 }
             }
         }
-        //new range choice code
+        //range choice code
         String[] defaultPieDBs = new String[]{"thirties", "forties", "fifties", "sixties", "seventies", "eighties", "ninties"};
         String[] userPieDBs = Arrays.copyOfRange(defaultPieDBs, lowestDB, highestDB - 1);
 
@@ -198,15 +215,15 @@ public class ChartActivity extends AppCompatActivity {
         pieChartView.setOnValueTouchListener(new ValueTouchListener(pieChartData, pieChartView));
     }
 
-    //method for setting up barchart.
+    /**
+     * method for setting up barchart.
+     */
     @RequiresApi(api = Build.VERSION_CODES.O)
     protected void barChartAddData() {
-        //users daily chart
-        //creating a linkedhashmap of date:datapoint pairs. need to convert the datapoint date string back into a date
-        //after that add the hashmap to a TreeMap, should sort on date. then can loop through,
-        // use the key as column label and datapoints as column values.
-        // could be instead of using data points we do similar to the piechart.
-        // for each map key there are 7 string: int pairs. if dB value in category then increment the int with that key.
+        /*
+        /users daily chart. for each map key there are 7 string: int pairs.
+        if dB value in category then increment the int with that key.
+         */
         HorizontalScrollView hScrollView = (HorizontalScrollView) findViewById(R.id.barChartScroll);
 
         dailyValues = new TreeMap<>();
@@ -269,7 +286,8 @@ public class ChartActivity extends AppCompatActivity {
         List<AxisValue> xAxisValues = new ArrayList<>();
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MMM-yy");
 
-        //set up axis ans columns for barchart depending on type chosen
+        //set up axis ans
+        // dcolumns for barchart depending on type chosen
         int xAxisIndex = 0;
         for (Date date : dailyValues.keySet()) {
             values = new ArrayList<>();
@@ -411,30 +429,15 @@ public class ChartActivity extends AppCompatActivity {
                 //loop through this list with a counter. once counter = subcolumn index
                 // that should be the datapoint we want.
                 int countPoints=0;
-                String selectedPointTime="";
-                double pointDB=0;
                 Data timeDatapoint=null;
                 for(LocalTime time :dailyDatapoints.keySet()){
                     if(countPoints == subcolumnIndex){
                         timeDatapoint = dailyDatapoints.get(time);
-                        selectedPointTime = dailyDatapoints.get(time).time;
-                        pointDB = dailyDatapoints.get(time).dB;
                         break;
                     }
                     countPoints++;
                 }
                 new AddressAsyncTask(thisActivity,timeDatapoint).execute(timeDatapoint);
-//                String[] time = selectedPointTime.split(":");
-//                String amPm = "am";
-//                if(Integer.parseInt(time[0])>=12)
-//                    amPm="pm";
-//                Toast.makeText(context,
-//                        "Decibel: "
-//                                + String.valueOf((double)(Math.round(pointDB*100))/100)
-//                                + "\n" + "Time taken: "
-//                                +time[0] +":" +time[1] + " "
-//                                + amPm
-//                                ,Toast.LENGTH_LONG).show();
             }
         }
 
@@ -443,8 +446,10 @@ public class ChartActivity extends AppCompatActivity {
         }
     };
 
-    //adding custom touch listener to get bar chart
-    // column selected so the long click listener can access
+    /**
+     * adding custom touch listener to get bar chart column selected so the
+     * long click listener can access
+     */
     View.OnTouchListener barChartTouchListener = new View.OnTouchListener() {
         @Override
         public boolean onTouch(View v, MotionEvent event) {
@@ -472,7 +477,9 @@ public class ChartActivity extends AppCompatActivity {
         }
     };
 
-    //set up long click listener to get column touched index, filter the datalist to get the points for that column and show stats
+    /**
+     * set up long click listener to get column touched index, filter the datalist to get the points for that column and show stats
+     */
     View.OnLongClickListener longClickListener = new View.OnLongClickListener() {
         @Override
         public boolean onLongClick(View v) {
@@ -539,13 +546,18 @@ public class ChartActivity extends AppCompatActivity {
         finish();
         return true;
     }
-
+/**
+Shows toast if user data list is empty, confirms if database has been queried
+ */
     public void onEnterAnimationComplete() {
         if (dataList.isEmpty()) {
             Toast.makeText(this, dataQueried.toString(), Toast.LENGTH_SHORT).show();
         }
     }
 
+    /**
+    Class to handle user touching pie chart segments
+     */
     private class ValueTouchListener implements PieChartOnValueSelectListener {
         private PieChartView pieChartView;
         private PieChartData pieChartData;
@@ -578,6 +590,9 @@ public class ChartActivity extends AppCompatActivity {
         }
     }
 
+    /**
+    Displays chart settings dialog
+     */
     public void showDialog(View view) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         Fragment prev = getSupportFragmentManager().findFragmentByTag("chartDialog");

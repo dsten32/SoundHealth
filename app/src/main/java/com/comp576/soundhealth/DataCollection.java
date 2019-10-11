@@ -49,7 +49,12 @@ import androidx.annotation.RequiresApi;
 
 import static androidx.constraintlayout.widget.Constraints.TAG;
 
-
+/**
+ * Class to handle collecting and storing a datapoint
+ * interaction with the google firestore database. Also handles fetching
+ * and sending a batch of fake data for testing/demo purposes.
+ * Should probably split the data collecting and data stoarge functions into different classes.
+ */
 public class DataCollection extends Activity {
     private FusedLocationProviderClient fusedLocationProviderClient;
     private DataRepository dataRepository;
@@ -193,9 +198,11 @@ public class DataCollection extends Activity {
 
     }
 
+    /**
+     * create a batch of fake data and send to the firestore. uses GenerateData class
+     */
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void sendDataCollection(){
-        //create a batch of fake data and send to the firestore.
         ArrayList<Data> dataList = (ArrayList<Data>) new GenerateData().getFakeData();
         WriteBatch batch = db.batch();
         int dbID=0; //want to add id to the data as it's being sent. didn't work but not sure if it was 'cos of other problems

@@ -10,7 +10,9 @@ import java.util.Locale;
 
 import androidx.annotation.RequiresApi;
 
-//for generating lots of fake data in and around hamilton if I need it.
+/**
+ * for generating lots of fake data in and around hamilton if I need it.
+ */
 public class GenerateData {
     String date, time, userId;
     boolean isBlurred;

@@ -14,10 +14,11 @@ import java.util.concurrent.Future;
 
 import androidx.lifecycle.LiveData;
 
+/**
+ * Interacts with dao
+ */
 public class DataRepository {
     private DataDao dataDao;
-    private ExecutorService executorService;
-    private List<Data> dataList;
     private LiveData<List<Data>> allData;
     DataRepository(Context context) {
         DataRoomDatabase db = DataRoomDatabase.getDatabase(context);
@@ -25,9 +26,6 @@ public class DataRepository {
         allData = dataDao.getAllData();
     }
     public long insert(final Data data) {
-//        InsertAsyncTask insert = new InsertAsyncTask();
-//        insert.execute(data);
-//        return insert.id;
         ExecutorService executorService = Executors.newFixedThreadPool(10);
         Callable<Long> insertCallable = () -> dataDao.insert(data);
         long rowId = 0;
@@ -43,39 +41,8 @@ public class DataRepository {
         return rowId;
     }
 
-    public void update(Data data) {
-        new UpdateAsyncTask().execute(data);
-    }
-    private class UpdateAsyncTask extends AsyncTask<Data, Void, Void> {
-        @Override
-        protected Void doInBackground(final Data... params) {
-            for (Data data : params) {
-                dataDao.update(data);
-            }
-            return null;
-        }
-
-
-    }
-    public void delete(Data data) {
-        new DeleteAsyncTask().execute(data);
-    }
-    private class DeleteAsyncTask extends AsyncTask<Data, Void, Void> {
-        @Override
-        protected Void doInBackground(final Data... params) {
-            for (Data data : params) {
-                dataDao.delete(data);
-            }
-            return null;
-        }
-    }
 
     public List<Data> getDataList(){
-//        List<Data> testList = new ArrayList<>();
-//        testList.add(new Data("d","t","u",1.0,2.0,3.0));
-//
-//        return testList;
-//        return dataDao.getDataList();
         return new DataListAsyncTask().doInBackground();
     }
     private class DataListAsyncTask extends AsyncTask<Void,Void,List<Data>>{

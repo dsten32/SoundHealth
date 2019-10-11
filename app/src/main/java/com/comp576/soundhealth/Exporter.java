@@ -24,7 +24,11 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 import de.siegmar.fastcsv.writer.CsvWriter;
-
+/**
+ * Class to handle generating a csv file from the room database.
+ * Saves csv to external storage and passes list of data rows to main activity to
+ * display in the share dialog
+ */
 public class Exporter extends AppCompatActivity {
     DataRepository repo;
     Context context;
@@ -40,9 +44,10 @@ public class Exporter extends AppCompatActivity {
     public void onCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
         super.onCreate(savedInstanceState, persistentState);
     }
-
+/**
+ * generate csv and write to external storage
+ */
     public File saveCSV(){
-//        DataRepository dataRepository = new DataRepository(getApplicationContext());
         Cursor cursor = repo.getCursor();
         csvData = new ArrayList<>();
         csvData.add(Arrays.copyOfRange(cursor.getColumnNames(),0,7));
@@ -59,8 +64,6 @@ public class Exporter extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-//        Toast.makeText(context,"File Saved to: "+file.toString(),Toast.LENGTH_LONG).show();
-//        Toast.makeText(context,Arrays.toString(csvData.get(0)),Toast.LENGTH_LONG).show();
         return file;
     }
 

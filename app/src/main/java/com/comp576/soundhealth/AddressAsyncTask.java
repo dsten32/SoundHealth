@@ -24,7 +24,10 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 
-//get address from google geolocation api using the datapoint latlng
+/**
+Class to retrieve the address of data points via google api.
+Retrieval performed on a background thread and returned to the calling method
+ */
 public class AddressAsyncTask extends AsyncTask<Data, Void, String> {
     private Data data;
     private Activity activity;
@@ -35,7 +38,10 @@ public class AddressAsyncTask extends AsyncTask<Data, Void, String> {
         this.data = data;
         this.activity = activity;
     }
-
+/**
+Get network connection and send the latitude and longitude values to the api.
+Parse the resulting json to pull out the useful address to pass to the postexecute method
+ */
     @Override
     public String doInBackground(Data... data) {
         NetworkInfo activeNetwork = ((ConnectivityManager) activity.getApplication().getApplicationContext()
@@ -69,6 +75,12 @@ public class AddressAsyncTask extends AsyncTask<Data, Void, String> {
         return address;
     }
 
+    /**
+    Take the address obtained and generate a string using the datapoint date, time,
+    decibel and blur status.
+    If called by the post data collection method format string as html for display.
+    else it was called by the bar chart and should show as a Toast
+     */
     @SuppressLint("SetTextI18n")
     @Override
     protected void onPostExecute(String address) {

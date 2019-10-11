@@ -44,9 +44,9 @@ import androidx.fragment.app.FragmentTransaction;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
-//import com.google.maps.android.heatmaps.HeatmapTileProvider;
-//import com.google.maps.android.heatmaps.WeightedLatLng;
-
+/**
+ * Map screen activty. sets up google map view and filters and applies data to heatmap for display.
+ */
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
     private FusedLocationProviderClient fusedLocationProviderClient;
     private GoogleMap mMap;
@@ -65,7 +65,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private DialogFragment datePicker = new HeatmapSettingDialogFragment.DatePickerFragment();
     private DialogFragment timePicker = new HeatmapSettingDialogFragment.TimePickerFragment();
     private HeatmapSettingDialogFragment heatmapDialog;
-
+/**
+ * sets up map view, actionbar and objects to fetch user data and full dataset from the Firestore
+ */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,7 +93,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         return true;
     }
 
-    //get user userDataList from repository and add heatmap to map on complete
+    /**
+     *     get user userDataList from repository and add heatmap to map on complete
+     */
     private class UserAsyncTask extends AsyncTask<Void, Void, List<Data>> {
 
         @Override
@@ -112,7 +116,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    //get all userDataList from Firestore and enable allDataList Heatmap button on complete
+    /**
+     *     get all userDataList from Firestore and enable allDataList Heatmap button on complete
+     */
     private class FirebaseAsyncTask extends AsyncTask<Void, Void, List<Data>> {
 
         @Override
@@ -152,7 +158,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             ActivityCompat.requestPermissions(this, new String[]{ACCESS_FINE_LOCATION}, 0);
             return;
         }
-
+//todo move Onsuccesslistener to own class.
         fusedLocationProviderClient.getLastLocation()
                 .addOnSuccessListener(this, new OnSuccessListener<Location>() {
                     @SuppressLint("MissingPermission")
@@ -194,7 +200,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
 
-    //generate heatmap layer based on filter settings set by user. to replace the other two methods, probably.
+    /**generate heatmap layer based on filter settings set by user. to replace the other two methods, probably.
+     *
+     * @throws ParseException
+     */
     private void addFilteredHeatMap() throws ParseException {
         mMap.clear();
         List<Data> heatMapData = new ArrayList<>();
@@ -280,7 +289,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    //show the heatmap settings dialog fragment
+    /**
+     * show the heatmap settings dialog fragment
+     */
     public void showDialog(View view) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         Fragment prev = getSupportFragmentManager().findFragmentByTag("dialog");

@@ -14,10 +14,16 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.DialogFragment;
 
+/**
+ * Smaller settings dialog shown on piechart long touch.
+ * just has pie chart decibel range and colour option.
+ */
 public class PiechartFragment extends DialogFragment implements RangeBar.OnRangeBarChangeListener, View.OnClickListener, Switch.OnCheckedChangeListener {
+    private ChartActivity chartActivity;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        chartActivity = (ChartActivity) getActivity();
     }
     @Override
     public void onStart() {
@@ -34,11 +40,6 @@ public class PiechartFragment extends DialogFragment implements RangeBar.OnRange
         Switch colourBlindSwitch = view.findViewById(R.id.cBlind);
         colourBlindSwitch.setOnCheckedChangeListener(this);
         colourBlindSwitch.setChecked(chartActivity.isColourBlind);
-        //shareMessage = view.findViewById(R.id.feedback_text);
-        //shareMessage.setOnKeyListener(this::onKey);
-
-//        Button submit = view.findViewById(R.id.feedback_submit);
-//        submit.setOnClickListener(this::onClick);
 
         return view;
     }
@@ -50,11 +51,12 @@ public class PiechartFragment extends DialogFragment implements RangeBar.OnRange
             dismiss();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onRangeChangeListener(RangeBar rangeBar, int leftPinIndex, int rightPinIndex, String leftPinValue, String rightPinValue) {
-        ((ChartActivity) getActivity()).lowestDB = leftPinIndex;
-        ((ChartActivity) getActivity()).highestDB = rightPinIndex+1;
-        ((ChartActivity) getActivity()).pieChartAddData();
+        chartActivity.lowestDB = leftPinIndex;
+        chartActivity.highestDB = rightPinIndex+1;
+        chartActivity.pieChartAddData();
     }
 
     @Override
@@ -72,12 +74,12 @@ public class PiechartFragment extends DialogFragment implements RangeBar.OnRange
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
         if(isChecked){
-            ((ChartActivity) getActivity()).isColourBlind = true;
+            chartActivity.isColourBlind = true;
         } else {
-            ((ChartActivity) getActivity()).isColourBlind = false;
+            chartActivity.isColourBlind = false;
         }
-        ((ChartActivity) getActivity()).setChartColours();
-        ((ChartActivity) getActivity()).pieChartAddData();
-        ((ChartActivity) getActivity()).barChartAddData();
+        chartActivity.setChartColours();
+        chartActivity.pieChartAddData();
+        chartActivity.barChartAddData();
     }
 }

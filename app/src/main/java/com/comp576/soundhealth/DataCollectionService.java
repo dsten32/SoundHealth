@@ -9,14 +9,22 @@ import android.util.Log;
 
 import java.util.Calendar;
 
-//from https://github.com/codepath/android_guides/wiki/Starting-Background-Services#using-with-alarmmanager-for-periodic-tasks
+/**
+from https://github.com/codepath/android_guides/wiki/Starting-Background-Services#using-with-alarmmanager-for-periodic-tasks
+Class to handle the scheduled data collection as set up by the user.
+If the user set stop time has been reached then the alarm is cancelled and the UI reset.
+Else a DataCollection instance is created and a datapoint logged.
+ */
 public class DataCollectionService extends IntentService {
 
 
     public DataCollectionService() {
         super("DataCollectionService");
     }
-
+/**
+On service start, get the current time and compare to the scheduled data collection stop time.
+Determine whether to collect data or cancel timer and update UI.
+ */
     @Override
     protected void onHandleIntent(Intent intent) {
         final Calendar c = Calendar.getInstance();

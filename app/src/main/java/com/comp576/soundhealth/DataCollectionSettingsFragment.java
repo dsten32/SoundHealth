@@ -28,6 +28,11 @@ import androidx.fragment.app.DialogFragment;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
 
+/**
+ * Sets up the continuous colletion settings and blur setting. Handle passing these user settings
+ * back to the main activity. Does this by accessing the activity directly. This could be replaced
+ * with sharedpreferences?
+ */
 public class DataCollectionSettingsFragment extends DialogFragment implements CompoundButton.OnCheckedChangeListener, SeekBar.OnSeekBarChangeListener, View.OnClickListener, DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener, View.OnKeyListener {
     private View view;
     private MainActivity mainActivity;

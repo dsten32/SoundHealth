@@ -23,6 +23,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
+/**
+ * Sets up the settings dialog. allows user to choose how the heatmap data is filtered.
+ * can select days, time, date range, user or full dataset. passes user choices back to map activity
+ */
 public class HeatmapSettingDialogFragment extends DialogFragment implements View.OnClickListener, DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
     public static final int START_FLAG =1;
     public static final int END_FLAG = 0;

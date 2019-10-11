@@ -58,6 +58,9 @@ import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static android.Manifest.permission.INTERNET;
 import static android.Manifest.permission.RECORD_AUDIO;
 
+/**
+ *
+ */
 public class MainActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
@@ -71,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
     private Data data;
     private Context context;
     private DataCollection dataCollector;
+    private NetworkInfo activeNetwork;
     public static Switch continuousSwitch;
     public static boolean isBlurred, isStopTime, isCollecting;
     public static float blurValue,feedbackRating;
@@ -93,22 +97,7 @@ public class MainActivity extends AppCompatActivity {
 
         interval = 30;
         mainButton = (Button) findViewById(R.id.main_btn);
-        //get the last item in the database to populate the main button. if null then make something up.
-        data = repo.lastItem();
-        if (data == null){
-            data = new Data("01-Jan-1900", "01:30", "astring", 53.678361, -1.688494, 31.0,false);
-        }
-
-        //attempting to error handle no internet connection
-        NetworkInfo activeNetwork =((ConnectivityManager)context
-                .getSystemService(Context.CONNECTIVITY_SERVICE))
-                .getActiveNetworkInfo();
-        if(activeNetwork != null &&
-                    activeNetwork.isConnectedOrConnecting()) {
-            new AddressAsyncTask().execute(data);
-        } else {
-            mainButton.setText("No internet connection found");
-        }
+        setButtonText();
 
         mainButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -126,71 +115,94 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         navigationView = (NavigationView) findViewById(R.id.nav);
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @TargetApi(Build.VERSION_CODES.O)
-            @RequiresApi(api = Build.VERSION_CODES.O)
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                int id = menuItem.getItemId();
-                switch (id) {
-                    case R.id.chart:
-                        Intent goToChart = new Intent(context, ChartActivity.class);
-                        startActivity(goToChart);
-                        break;
-                    case R.id.settings:
-                        showSettingsDialog();
-                        break;
-                    case R.id.mapview:
-                        Intent goToMap = new Intent(context, MapsActivity.class);
-                        startActivity(goToMap);
-                        break;
-                    case R.id.continuousSwitch:
-                        if (!((Switch) menuItem.getActionView()).isChecked()) {
-                            ((Switch) menuItem.getActionView()).setChecked(true);
-                            drawerLayout.closeDrawer(Gravity.LEFT);
-                            return true;
-                        } else {
-                            ((Switch) menuItem.getActionView()).setChecked(false);
-                            cancelDataCollection();
-                            drawerLayout.closeDrawer(Gravity.LEFT);
-                            return true;
-                        }
-                    case R.id.fakedata:
-                        DataCollection dataCollection = new DataCollection(context);
-                        dataCollection.sendDataCollection();
-                    case R.id.export:
-                        exportCSV();
-                        break;
-                    default:
-                        return true;
-                }
-                drawerLayout.closeDrawer(Gravity.LEFT);
-                return true;
-            }
-        });
-
-
+        navigationView.setNavigationItemSelectedListener(navListener);
 
         continuousSwitch = (Switch) navigationView.getMenu().findItem(R.id.continuousSwitch).getActionView();
-        continuousSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    showSettingsDialog();
-                    drawerLayout.closeDrawer(Gravity.LEFT);
-                } else {
-                    cancelDataCollection();
-//                    ((Switch)navigationView.getMenu().findItem(R.id.continuousSwitch).getActionView()).setChecked(false);
-                }
-            }
-        });
+        continuousSwitch.setOnCheckedChangeListener(checkedChangeListener);
         //check that app can access location data and record audio
         checkPermissions();
-//        Cursor cursor = repo.getCursor();
+    }
 
+    NavigationView.OnNavigationItemSelectedListener navListener = new NavigationView.OnNavigationItemSelectedListener() {
+        @TargetApi(Build.VERSION_CODES.O)
+        @RequiresApi(api = Build.VERSION_CODES.O)
+        @Override
+        public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+            int id = menuItem.getItemId();
+            switch (id) {
+                case R.id.chart:
+                    Intent goToChart = new Intent(context, ChartActivity.class);
+                    startActivity(goToChart);
+                    break;
+                case R.id.settings:
+                    showSettingsDialog();
+                    break;
+                case R.id.mapview:
+                    Intent goToMap = new Intent(context, MapsActivity.class);
+                    startActivity(goToMap);
+                    break;
+                case R.id.continuousSwitch:
+                    if (!((Switch) menuItem.getActionView()).isChecked()) {
+                        ((Switch) menuItem.getActionView()).setChecked(true);
+                        drawerLayout.closeDrawer(Gravity.LEFT);
+                        return true;
+                    } else {
+                        ((Switch) menuItem.getActionView()).setChecked(false);
+                        cancelDataCollection();
+                        drawerLayout.closeDrawer(Gravity.LEFT);
+                        return true;
+                    }
+                case R.id.fakedata:
+                    DataCollection dataCollection = new DataCollection(context);
+                    dataCollection.sendDataCollection();
+                case R.id.export:
+                    exportCSV();
+                    break;
+                default:
+                    return true;
+            }
+            drawerLayout.closeDrawer(Gravity.LEFT);
+            return true;
+        }
+    };
+
+    CompoundButton.OnCheckedChangeListener checkedChangeListener = new CompoundButton.OnCheckedChangeListener() {
+        @Override
+        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            if (isChecked) {
+                showSettingsDialog();
+                drawerLayout.closeDrawer(Gravity.LEFT);
+            } else {
+                cancelDataCollection();
+//                    ((Switch)navigationView.getMenu().findItem(R.id.continuousSwitch).getActionView()).setChecked(false);
+            }
+        }
+    };
+
+    private void setButtonText(){
+        //get the last item in the database to populate the main button. if null then make something up.
+        data = repo.lastItem();
+        if (data == null){
+            data = new Data("01-Jan-1900", "01:30", "astring", 53.678361, -1.688494, 31.0,false);
+        }
+        if(getIsNetwork() &&
+                activeNetwork.isConnectedOrConnecting()) {
+            new AddressAsyncTask().execute(data);
+        } else {
+            mainButton.setText("No internet connection found");
+        }
+    }
+
+    private boolean getIsNetwork(){
+        //attempting to error handle no internet connection
+        activeNetwork =((ConnectivityManager)context
+                .getSystemService(Context.CONNECTIVITY_SERVICE))
+                .getActiveNetworkInfo();
+        return activeNetwork != null;
     }
 
     //get address from google geolocation api using the datapoint latlng
+    // todo swap to using the external class and remove this
     public class AddressAsyncTask extends AsyncTask<Data, Void, String> {
         boolean isInternet=false;
 
@@ -287,8 +299,9 @@ public class MainActivity extends AppCompatActivity {
         startActivity(sendIntent);
     }
 
-    // Setup a recurring alarm for user settable (eventually) number of minutes
-    //from https://github.com/codepath/android_guides/wiki/Starting-Background-Services#using-with-alarmmanager-for-periodic-tasks
+    /**Setup a recurring alarm for user settable (eventually) number of minutes
+     * from https://github.com/codepath/android_guides/wiki/Starting-Background-Services#using-with-alarmmanager-for-periodic-tasks
+     */
     public void scheduleDataCollection() {
         isCollecting = true;
         Toast.makeText(this, "data collection started", Toast.LENGTH_SHORT).show();
@@ -340,7 +353,6 @@ public class MainActivity extends AppCompatActivity {
 
         dialogFragment = new ShareFragment();
         dialogFragment.show(fragmentTransaction, "shareDialog");
-//        ShareFragment.newInstance().show(getSupportFragmentManager(), "shareDialog");;
     }
     //dismiss the settings dialog fragment
     public void dismissSettings(View view) {

@@ -9,6 +9,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
+/**
+ * loading spinner animation shown while data is being fetched from firestore in the map activity
+ */
 public class SpinnerFragment extends DialogFragment {
 
     @Override

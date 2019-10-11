@@ -6,6 +6,9 @@ import android.os.Parcelable;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+/**
+ * Data object for storing in Room library and holding data related variables when used in app
+ */
 @Entity
 public class Data implements Parcelable {
     @PrimaryKey(autoGenerate = true)

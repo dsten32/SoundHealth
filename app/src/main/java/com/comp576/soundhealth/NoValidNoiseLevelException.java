@@ -1,5 +1,8 @@
 package com.comp576.soundhealth;
 
+/**
+ * exception class for the noise recorder
+ */
 class NoValidNoiseLevelException extends Exception {
     public NoValidNoiseLevelException() {
         super();

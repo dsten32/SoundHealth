@@ -8,9 +8,11 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
-
+/*
+Class to generate the bar chart day column information dialog.
+Triggered on barchart column long touch.
+ */
 public class BarInfoFragment extends DialogFragment{
-    //    private TextView numPoints,firstPoint,lastPoint,avgMins,highestDB;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -20,6 +22,10 @@ public class BarInfoFragment extends DialogFragment{
         super.onStart();
         getDialog().getWindow().setBackgroundDrawableResource(android.R.color.transparent);
     }
+    /*
+    Inflate the dialog layout and populate with the cahrt information.
+    Retrieve the info from the chart activity via a string array.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_show_bar_data, container, false);

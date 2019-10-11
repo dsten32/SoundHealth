@@ -6,6 +6,9 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
+/**
+ * set up database
+ */
 @Database(entities = {Data.class}, version = 1,exportSchema = false)
 public abstract class DataRoomDatabase extends RoomDatabase {
     public abstract DataDao dataDao();

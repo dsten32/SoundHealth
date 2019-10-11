@@ -16,6 +16,9 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.DialogFragment;
 
+/**
+ *set up chart settings dialog and update chart class with user chosen variables
+ */
 public class ChartSettingsFragment extends DialogFragment implements RangeBar.OnRangeBarChangeListener, View.OnClickListener, OnCheckedChangeListener {
     ChartActivity chartActivity;
     View view;
@@ -49,8 +52,6 @@ public class ChartSettingsFragment extends DialogFragment implements RangeBar.On
         Switch colourBlindSwitch = view.findViewById(R.id.cBlind);
         colourBlindSwitch.setOnCheckedChangeListener(this);
         colourBlindSwitch.setChecked(chartActivity.isColourBlind);
-//        Button submit = view.findViewById(R.id.feedback_submit);
-//        submit.setOnClickListener(this::onClick);
 
         return view;
     }
@@ -70,14 +71,10 @@ public class ChartSettingsFragment extends DialogFragment implements RangeBar.On
     }
 
     @Override
-    public void onTouchStarted(RangeBar rangeBar) {
-
-    }
+    public void onTouchStarted(RangeBar rangeBar) {}
 
     @Override
-    public void onTouchEnded(RangeBar rangeBar) {
-
-    }
+    public void onTouchEnded(RangeBar rangeBar) {}
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override

@@ -5,17 +5,21 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-//from https://github.com/codepath/android_guides/wiki/Starting-Background-Services#using-with-alarmmanager-for-periodic-tasks
+/**
+from https://github.com/codepath/android_guides/wiki/Starting-Background-Services#using-with-alarmmanager-for-periodic-tasks
+Triggered by the Alarm based on user chosen data collection interval. Starts the DataCollectionService.
+ */
 public class AlarmReceiver extends BroadcastReceiver {
     public static final int REQUEST_CODE = 1;
     public static final String ACTION = "com.codepath.example.servicesdemo.alarm";
 
-    // Triggered by the Alarm periodically (starts the service to run task)
+    /**
+     Creates new intent and passes to DataCollectionService when started.
+     */
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.d("AlarmReceiver","accessed");
         Intent i = new Intent(context, DataCollectionService.class);
-//        i.putExtra("foo", "bar");
             context.startService(i);
     }
 }
