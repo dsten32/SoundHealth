@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
     private NetworkInfo activeNetwork;
     public static Switch continuousSwitch;
     public static boolean isBlurred, isStopTime, isCollecting;
-    public static float blurValue,feedbackRating;
+    public static float blurValue;
     public static int stopHour = 24, stopMin=60;
     public static Button mainButton;
     //export and share variables
@@ -174,7 +174,6 @@ public class MainActivity extends AppCompatActivity {
                 drawerLayout.closeDrawer(Gravity.LEFT);
             } else {
                 cancelDataCollection();
-//                    ((Switch)navigationView.getMenu().findItem(R.id.continuousSwitch).getActionView()).setChecked(false);
             }
         }
     };

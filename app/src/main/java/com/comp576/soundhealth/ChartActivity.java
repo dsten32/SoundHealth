@@ -52,7 +52,6 @@ public class ChartActivity extends AppCompatActivity {
     private ColumnChartView barChartView;
     private List<Data> dataList = new ArrayList<>();
     //setting up a list of datapoint lists keyed by date and time,
-//    private HashMap<Date,List<Data>> dataListByDate = new HashMap<>();
     private HashMap<Date, TreeMap<LocalTime, Data>> dataListByDate = new HashMap<>();
     private TreeMap<LocalTime, Data> dailyDatapoints = new TreeMap<>();
     //private List<Data> dailyDatapoints;
@@ -149,7 +148,6 @@ Fetches user data from the local Room library
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-//            Toast.makeText(context, String.valueOf(dataList.size()), Toast.LENGTH_LONG).show();
             pieChartAddData();
             barChartAddData();
         }
