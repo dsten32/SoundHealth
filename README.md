@@ -1,5 +1,5 @@
 # SoundHealth
-PfR2 Project.
+Programing for Research 2 [COMPX576-19B](https://papers.waikato.ac.nz/papers/2019/COMPX576) self-guided Project.
 
 Masters paper project app
 
